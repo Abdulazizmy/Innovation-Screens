@@ -9,19 +9,15 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
+*{box-sizing:border-box}
 
-*{
-  box-sizing:border-box;
-}
-
-html,
-body{
+html,body{
   margin:0;
   padding:0;
   min-height:100%;
   font-family:Arial,Tahoma,sans-serif;
   background:#f5f5f7;
-  color:#202024;
+  color:#202024
 }
 
 :root{
@@ -34,12 +30,12 @@ body{
   --border:#e5e5ea;
   --ok:#18864b;
   --danger:#c83232;
-  --side:235px;
+  --side:235px
 }
 
 .app{
   min-height:100vh;
-  display:flex;
+  display:flex
 }
 
 .sidebar{
@@ -52,7 +48,7 @@ body{
   border-left:1px solid var(--border);
   z-index:10;
   display:flex;
-  flex-direction:column;
+  flex-direction:column
 }
 
 .logo{
@@ -60,7 +56,7 @@ body{
   display:flex;
   align-items:center;
   padding:0 22px;
-  border-bottom:1px solid var(--border);
+  border-bottom:1px solid var(--border)
 }
 
 .logo-mark{
@@ -73,23 +69,23 @@ body{
   align-items:center;
   justify-content:center;
   font-weight:800;
-  margin-left:10px;
+  margin-left:10px
 }
 
 .logo-text{
   font-size:16px;
-  font-weight:800;
+  font-weight:800
 }
 
 .logo-sub{
   font-size:10px;
   color:var(--muted);
-  margin-top:3px;
+  margin-top:3px
 }
 
 .nav{
   padding:15px 10px;
-  flex:1;
+  flex:1
 }
 
 .nav-button{
@@ -105,61 +101,56 @@ body{
   font-size:13px;
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:10px
 }
 
 .nav-button:hover,
 .nav-button.active{
   background:var(--pl);
-  color:var(--p);
+  color:var(--p)
 }
 
 .nav-button.active{
-  font-weight:700;
+  font-weight:700
 }
 
 .nav-icon{
   width:24px;
-  text-align:center;
+  text-align:center
 }
 
 .sidebar-bottom{
   padding:12px;
-  border-top:1px solid var(--border);
+  border-top:1px solid var(--border)
 }
 
 .connection{
   padding:10px;
   background:#f7f7f9;
   border-radius:9px;
-  font-size:11px;
+  font-size:11px
 }
 
 .connection-row{
   display:flex;
   align-items:center;
-  gap:7px;
+  gap:7px
 }
 
 .dot{
   width:8px;
   height:8px;
   border-radius:50%;
-  background:#999;
+  background:#999
 }
 
-.dot.online{
-  background:#20a15a;
-}
-
-.dot.offline{
-  background:#c83232;
-}
+.dot.online{background:#20a15a}
+.dot.offline{background:#c83232}
 
 .main{
   width:100%;
   margin-right:var(--side);
-  min-height:100vh;
+  min-height:100vh
 }
 
 .topbar{
@@ -169,24 +160,24 @@ body{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:0 25px;
+  padding:0 25px
 }
 
 .page-title{
   font-size:19px;
-  font-weight:800;
+  font-weight:800
 }
 
 .page-subtitle{
   font-size:11px;
   color:var(--muted);
-  margin-top:4px;
+  margin-top:4px
 }
 
 .top-actions{
   display:flex;
   align-items:center;
-  gap:8px;
+  gap:8px
 }
 
 .lang-button,
@@ -196,7 +187,7 @@ body{
   padding:8px 11px;
   border-radius:7px;
   cursor:pointer;
-  font-size:11px;
+  font-size:11px
 }
 
 .refresh-button,
@@ -207,34 +198,25 @@ body{
   padding:8px 13px;
   border-radius:7px;
   cursor:pointer;
-  font-size:11px;
+  font-size:11px
 }
 
 .refresh-button:hover,
 .btn-primary:hover{
-  background:var(--pd);
+  background:var(--pd)
 }
 
-.btn-danger{
-  color:var(--danger);
-}
+.btn-danger{color:var(--danger)}
 
 .btn-small{
   padding:6px 8px;
-  font-size:10px;
+  font-size:10px
 }
 
-.content{
-  padding:22px;
-}
+.content{padding:22px}
 
-.page{
-  display:none;
-}
-
-.page.active{
-  display:block;
-}
+.page{display:none}
+.page.active{display:block}
 
 .card,
 .stat{
@@ -242,54 +224,52 @@ body{
   border:1px solid var(--border);
   border-radius:12px;
   padding:16px;
-  margin-bottom:15px;
+  margin-bottom:15px
 }
 
 .card-header{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  margin-bottom:14px;
+  margin-bottom:14px
 }
 
 .card-title{
   font-size:14px;
-  font-weight:800;
+  font-weight:800
 }
 
 .card-subtitle{
   color:var(--muted);
   font-size:10px;
-  margin-top:3px;
+  margin-top:3px
 }
 
 .stats{
   display:grid;
   grid-template-columns:repeat(4,1fr);
   gap:12px;
-  margin-bottom:15px;
+  margin-bottom:15px
 }
 
-.stat{
-  margin:0;
-}
+.stat{margin:0}
 
 .stat-label{
   color:var(--muted);
-  font-size:10px;
+  font-size:10px
 }
 
 .stat-value{
   font-size:25px;
   font-weight:800;
   color:var(--p);
-  margin-top:6px;
+  margin-top:6px
 }
 
 .screen-grid{
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:12px;
+  gap:12px
 }
 
 .screen-card{
@@ -297,50 +277,48 @@ body{
   border-radius:11px;
   padding:13px;
   background:#fff;
-  cursor:pointer;
+  cursor:pointer
 }
 
-.screen-card:hover{
-  border-color:#bbb4d8;
-}
+.screen-card:hover{border-color:#bbb4d8}
 
 .screen-head{
   display:flex;
   justify-content:space-between;
-  align-items:flex-start;
+  align-items:flex-start
 }
 
 .screen-number{
   font-size:10px;
-  color:var(--muted);
+  color:var(--muted)
 }
 
 .screen-name{
   font-size:13px;
   font-weight:800;
-  margin-top:5px;
+  margin-top:5px
 }
 
 .screen-location{
   font-size:10px;
   color:var(--muted);
-  margin-top:3px;
+  margin-top:3px
 }
 
 .status{
   font-size:9px;
   padding:4px 7px;
-  border-radius:20px;
+  border-radius:20px
 }
 
 .status.on{
   color:var(--ok);
-  background:#eaf8f0;
+  background:#eaf8f0
 }
 
 .status.off{
   color:var(--danger);
-  background:#fdeeee;
+  background:#fdeeee
 }
 
 .screen-size{
@@ -348,53 +326,48 @@ body{
   background:#f7f7f9;
   padding:8px;
   border-radius:7px;
-  font-size:10px;
+  font-size:10px
 }
 
 .screen-actions{
   display:flex;
   gap:5px;
-  margin-top:9px;
+  margin-top:9px
 }
 
-.screen-actions button{
-  flex:1;
-}
+.screen-actions button{flex:1}
 
-.table-wrap{
-  overflow:auto;
-}
+.table-wrap{overflow:auto}
 
 table{
   width:100%;
   border-collapse:collapse;
-  font-size:11px;
+  font-size:11px
 }
 
 th{
   background:#f7f7f9;
   color:#666;
-  font-weight:700;
+  font-weight:700
 }
 
-th,
-td{
+th,td{
   padding:10px;
   border-bottom:1px solid var(--border);
-  text-align:right;
+  text-align:right
 }
 
 .empty{
   text-align:center;
   padding:35px 15px;
   color:var(--muted);
-  font-size:11px;
+  font-size:11px
 }
 
 .editor-layout{
   display:grid;
   grid-template-columns:1fr 320px;
-  gap:15px;
+  gap:15px
 }
 
 .content-item{
@@ -405,12 +378,12 @@ td{
   background:#fff;
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:10px
 }
 
 .drag{
   color:#aaa;
-  cursor:grab;
+  cursor:grab
 }
 
 .media-thumb{
@@ -422,19 +395,19 @@ td{
   flex-shrink:0;
   display:flex;
   align-items:center;
-  justify-content:center;
+  justify-content:center
 }
 
 .media-thumb img,
 .media-thumb video{
   width:100%;
   height:100%;
-  object-fit:cover;
+  object-fit:cover
 }
 
 .item-info{
   flex:1;
-  min-width:0;
+  min-width:0
 }
 
 .item-name{
@@ -442,56 +415,55 @@ td{
   font-weight:700;
   overflow:hidden;
   text-overflow:ellipsis;
-  white-space:nowrap;
+  white-space:nowrap
 }
 
 .item-type{
   color:var(--muted);
   font-size:9px;
-  margin-top:3px;
+  margin-top:3px
 }
 
 .item-controls{
   display:flex;
   align-items:center;
-  gap:5px;
+  gap:5px
 }
 
 .form-grid{
   display:grid;
   grid-template-columns:repeat(2,1fr);
-  gap:10px;
+  gap:10px
 }
 
-.form-group{
-  margin-bottom:9px;
-}
-
-.form-group.full{
-  grid-column:1/-1;
-}
+.form-group{margin-bottom:9px}
+.form-group.full{grid-column:1/-1}
 
 label{
   display:block;
   font-size:10px;
   font-weight:700;
-  margin-bottom:5px;
+  margin-bottom:5px
 }
 
-input,
-select{
+input,select{
   width:100%;
   border:1px solid var(--border);
   background:#fff;
   border-radius:7px;
   padding:8px 9px;
   font-size:11px;
-  outline:none;
+  outline:none
 }
 
-input:focus,
-select:focus{
-  border-color:var(--p);
+input:focus,select:focus{
+  border-color:var(--p)
+}
+
+input[type="file"]{
+  padding:9px;
+  cursor:pointer;
+  background:#fafafa
 }
 
 .toggle-row{
@@ -499,25 +471,23 @@ select:focus{
   align-items:center;
   justify-content:space-between;
   padding:9px 0;
-  border-bottom:1px solid #f0f0f2;
+  border-bottom:1px solid #f0f0f2
 }
 
 .toggle{
   position:relative;
   width:38px;
-  height:20px;
+  height:20px
 }
 
-.toggle input{
-  display:none;
-}
+.toggle input{display:none}
 
 .toggle-slider{
   position:absolute;
   inset:0;
   background:#ccc;
   border-radius:20px;
-  cursor:pointer;
+  cursor:pointer
 }
 
 .toggle-slider:before{
@@ -529,15 +499,15 @@ select:focus{
   right:2px;
   border-radius:50%;
   background:#fff;
-  transition:.2s;
+  transition:.2s
 }
 
 .toggle input:checked+.toggle-slider{
-  background:var(--p);
+  background:var(--p)
 }
 
 .toggle input:checked+.toggle-slider:before{
-  transform:translateX(-18px);
+  transform:translateX(-18px)
 }
 
 .modal-backdrop{
@@ -548,12 +518,10 @@ select:focus{
   display:none;
   align-items:center;
   justify-content:center;
-  padding:20px;
+  padding:20px
 }
 
-.modal-backdrop.show{
-  display:flex;
-}
+.modal-backdrop.show{display:flex}
 
 .modal{
   width:100%;
@@ -562,19 +530,19 @@ select:focus{
   overflow:auto;
   background:#fff;
   border-radius:13px;
-  padding:18px;
+  padding:18px
 }
 
 .modal-title{
   font-size:15px;
-  font-weight:800;
+  font-weight:800
 }
 
 .modal-actions{
   display:flex;
   justify-content:flex-start;
   gap:7px;
-  margin-top:15px;
+  margin-top:15px
 }
 
 .toast{
@@ -590,88 +558,49 @@ select:focus{
   opacity:0;
   transform:translateY(10px);
   pointer-events:none;
-  transition:.2s;
+  transition:.2s
 }
 
 .toast.show{
   opacity:1;
-  transform:translateY(0);
+  transform:translateY(0)
 }
 
 html[dir=ltr] .sidebar{
   right:auto;
   left:0;
   border-left:0;
-  border-right:1px solid var(--border);
+  border-right:1px solid var(--border)
 }
 
 html[dir=ltr] .main{
   margin-right:0;
-  margin-left:var(--side);
+  margin-left:var(--side)
 }
 
-html[dir=ltr] .nav-button{
-  text-align:left;
-}
+html[dir=ltr] .nav-button{text-align:left}
 
 html[dir=ltr] th,
-html[dir=ltr] td{
-  text-align:left;
-}
+html[dir=ltr] td{text-align:left}
 
 @media(max-width:1100px){
-
-  .screen-grid{
-    grid-template-columns:repeat(3,1fr);
-  }
-
-  .stats{
-    grid-template-columns:repeat(2,1fr);
-  }
-
+  .screen-grid{grid-template-columns:repeat(3,1fr)}
+  .stats{grid-template-columns:repeat(2,1fr)}
 }
 
 @media(max-width:800px){
-
-  :root{
-    --side:0px;
-  }
-
-  .sidebar{
-    display:none;
-  }
-
-  .main{
-    margin:0!important;
-  }
-
-  .screen-grid{
-    grid-template-columns:repeat(2,1fr);
-  }
-
-  .editor-layout{
-    grid-template-columns:1fr;
-  }
-
+  :root{--side:0px}
+  .sidebar{display:none}
+  .main{margin:0!important}
+  .screen-grid{grid-template-columns:repeat(2,1fr)}
+  .editor-layout{grid-template-columns:1fr}
 }
 
 @media(max-width:520px){
-
-  .content{
-    padding:12px;
-  }
-
-  .screen-grid,
-  .stats{
-    grid-template-columns:1fr;
-  }
-
-  .topbar{
-    padding:0 12px;
-  }
-
+  .content{padding:12px}
+  .screen-grid,.stats{grid-template-columns:1fr}
+  .topbar{padding:0 12px}
 }
-
 </style>
 </head>
 
@@ -682,209 +611,130 @@ html[dir=ltr] td{
 <aside class="sidebar">
 
 <div class="logo">
+  <div class="logo-mark">IS</div>
 
-<div class="logo-mark">
-IS
-</div>
-
-<div>
-
-<div class="logo-text">
-Innovation Screens
-</div>
-
-<div class="logo-sub">
-Digital Signage
-</div>
-
-</div>
-
+  <div>
+    <div class="logo-text">Innovation Screens</div>
+    <div class="logo-sub">Digital Signage</div>
+  </div>
 </div>
 
 <nav class="nav">
 
 <button class="nav-button active" data-page="dashboard">
-<span class="nav-icon">⌂</span>
-<span>لوحة التحكم</span>
+  <span class="nav-icon">⌂</span>
+  <span>لوحة التحكم</span>
 </button>
 
 <button class="nav-button" data-page="screens">
-<span class="nav-icon">▣</span>
-<span>الشاشات</span>
+  <span class="nav-icon">▣</span>
+  <span>الشاشات</span>
 </button>
 
 <button class="nav-button" data-page="media">
-<span class="nav-icon">▧</span>
-<span>مكتبة الوسائط</span>
+  <span class="nav-icon">▧</span>
+  <span>مكتبة الوسائط</span>
 </button>
 
 <button class="nav-button" data-page="content">
-<span class="nav-icon">☷</span>
-<span>المحتوى</span>
+  <span class="nav-icon">☷</span>
+  <span>المحتوى</span>
 </button>
 
 <button class="nav-button" data-page="scheduling">
-<span class="nav-icon">◷</span>
-<span>الجدولة</span>
+  <span class="nav-icon">◷</span>
+  <span>الجدولة</span>
 </button>
 
 <button class="nav-button" data-page="settings">
-<span class="nav-icon">⚙</span>
-<span>الإعدادات</span>
+  <span class="nav-icon">⚙</span>
+  <span>الإعدادات</span>
 </button>
 
 </nav>
 
 <div class="sidebar-bottom">
-
-<div class="connection">
-
-<div class="connection-row">
-
-<span id="connectionDot" class="dot online"></span>
-
-<span id="connectionText">
-متصل بالسحابة
-</span>
-
-</div>
-
-</div>
-
+  <div class="connection">
+    <div class="connection-row">
+      <span id="connectionDot" class="dot online"></span>
+      <span id="connectionText">متصل بالسحابة</span>
+    </div>
+  </div>
 </div>
 
 </aside>
-
 
 <main class="main">
 
 <header class="topbar">
 
 <div>
-
-<div id="pageTitle" class="page-title">
-لوحة التحكم
-</div>
-
-<div class="page-subtitle">
-إدارة الشاشات والمحتوى
-</div>
-
+  <div id="pageTitle" class="page-title">لوحة التحكم</div>
+  <div class="page-subtitle">إدارة الشاشات والمحتوى</div>
 </div>
 
 <div class="top-actions">
 
-<button
-id="languageButton"
-class="lang-button">
-English
+<button id="languageButton" class="lang-button">
+  English
 </button>
 
-<button
-class="refresh-button"
-onclick="loadAll()">
-↻ تحديث
+<button class="refresh-button" onclick="loadAll()">
+  ↻ تحديث
 </button>
 
 </div>
 
 </header>
 
-
 <div class="content">
-
 
 <section id="page-dashboard" class="page active">
 
 <div class="stats">
 
 <div class="stat">
-
-<div class="stat-label">
-إجمالي الشاشات
+  <div class="stat-label">إجمالي الشاشات</div>
+  <div id="statScreens" class="stat-value">0</div>
 </div>
-
-<div id="statScreens" class="stat-value">
-0
-</div>
-
-</div>
-
 
 <div class="stat">
-
-<div class="stat-label">
-الشاشات المفعلة
+  <div class="stat-label">الشاشات المفعلة</div>
+  <div id="statEnabled" class="stat-value">0</div>
 </div>
-
-<div id="statEnabled" class="stat-value">
-0
-</div>
-
-</div>
-
 
 <div class="stat">
-
-<div class="stat-label">
-الوسائط
+  <div class="stat-label">الوسائط</div>
+  <div id="statMedia" class="stat-value">0</div>
 </div>
-
-<div id="statMedia" class="stat-value">
-0
-</div>
-
-</div>
-
 
 <div class="stat">
-
-<div class="stat-label">
-قوائم المحتوى
-</div>
-
-<div id="statPlaylists" class="stat-value">
-0
+  <div class="stat-label">قوائم المحتوى</div>
+  <div id="statPlaylists" class="stat-value">0</div>
 </div>
 
 </div>
-
-</div>
-
 
 <div class="card">
 
 <div class="card-header">
 
 <div>
-
-<div class="card-title">
-الشاشات
+  <div class="card-title">الشاشات</div>
+  <div class="card-subtitle">نظرة سريعة على الشاشات الثماني</div>
 </div>
 
-<div class="card-subtitle">
-نظرة سريعة على الشاشات الثماني
-</div>
-
-</div>
-
-<button
-class="btn btn-primary"
-onclick="openPage('screens')">
-إدارة الشاشات
+<button class="btn btn-primary" onclick="openPage('screens')">
+  إدارة الشاشات
 </button>
 
 </div>
 
-<div
-id="dashboardScreens"
-class="screen-grid">
-</div>
+<div id="dashboardScreens" class="screen-grid"></div>
 
 </div>
 
 </section>
-
 
 <section id="page-screens" class="page">
 
@@ -893,28 +743,17 @@ class="screen-grid">
 <div class="card-header">
 
 <div>
-
-<div class="card-title">
-إدارة الشاشات
-</div>
-
-<div class="card-subtitle">
-إعدادات كل شاشة ورابطها المستقل
+  <div class="card-title">إدارة الشاشات</div>
+  <div class="card-subtitle">إعدادات كل شاشة ورابطها المستقل</div>
 </div>
 
 </div>
 
-</div>
-
-<div
-id="screensGrid"
-class="screen-grid">
-</div>
+<div id="screensGrid" class="screen-grid"></div>
 
 </div>
 
 </section>
-
 
 <section id="page-media" class="page">
 
@@ -923,67 +762,35 @@ class="screen-grid">
 <div class="card-header">
 
 <div>
-
-<div class="card-title">
-مكتبة الوسائط
+  <div class="card-title">مكتبة الوسائط</div>
+  <div class="card-subtitle">
+    الصور والفيديوهات المستخدمة في الشاشات
+  </div>
 </div>
 
-<div class="card-subtitle">
-الصور والفيديوهات المستخدمة في الشاشات
-</div>
-
-</div>
-
-<button
-class="btn btn-primary"
-onclick="openMediaModal()">
-+ إضافة وسائط
+<button class="btn btn-primary" onclick="openMediaModal()">
+  + إضافة وسائط
 </button>
 
 </div>
-
 
 <div class="table-wrap">
 
 <table>
 
 <thead>
-
 <tr>
-
-<th>
-المعاينة
-</th>
-
-<th>
-الاسم
-</th>
-
-<th>
-النوع
-</th>
-
-<th>
-المقاس
-</th>
-
-<th>
-المدة
-</th>
-
-<th>
-الحالة
-</th>
-
-<th>
-</th>
-
+  <th>المعاينة</th>
+  <th>الاسم</th>
+  <th>النوع</th>
+  <th>المقاس</th>
+  <th>المدة</th>
+  <th>الحالة</th>
+  <th></th>
 </tr>
-
 </thead>
 
-<tbody id="mediaTable">
-</tbody>
+<tbody id="mediaTable"></tbody>
 
 </table>
 
@@ -992,7 +799,6 @@ onclick="openMediaModal()">
 </div>
 
 </section>
-
 
 <section id="page-content" class="page">
 
@@ -1001,200 +807,119 @@ onclick="openMediaModal()">
 <div class="card-header">
 
 <div>
-
-<div class="card-title">
-المحتوى
-</div>
-
-<div class="card-subtitle">
-اختر شاشة لإدارة المحتوى الخاص بها
+  <div class="card-title">المحتوى</div>
+  <div class="card-subtitle">
+    اختر شاشة لإدارة المحتوى الخاص بها
+  </div>
 </div>
 
 </div>
-
-</div>
-
 
 <div class="form-group">
 
-<label>
-الشاشة
-</label>
+<label>الشاشة</label>
 
-<select
-id="contentScreenSelect"
-onchange="loadContentEditor()">
-</select>
+<select id="contentScreenSelect" onchange="loadContentEditor()"></select>
 
 </div>
 
 </div>
 
-
-<div
-id="contentEditor"
-style="display:none">
+<div id="contentEditor" style="display:none">
 
 <div class="editor-layout">
-
 
 <div class="card">
 
 <div class="card-header">
 
 <div>
-
-<div
-id="contentScreenTitle"
-class="card-title">
-المحتوى
+  <div id="contentScreenTitle" class="card-title">المحتوى</div>
+  <div class="card-subtitle">ترتيب الصور والفيديوهات</div>
 </div>
 
-<div class="card-subtitle">
-ترتيب الصور والفيديوهات
-</div>
-
-</div>
-
-<button
-class="btn btn-primary"
-onclick="openMediaModal(true)">
-+ إضافة صورة أو فيديو
+<button class="btn btn-primary" onclick="openMediaModal(true)">
+  + إضافة صورة أو فيديو
 </button>
 
 </div>
 
-
-<div id="contentItems">
-</div>
-
+<div id="contentItems"></div>
 
 <button
-class="btn"
-style="width:100%"
-onclick="openMediaModal(true)">
-+ إضافة صورة أو فيديو
+  class="btn"
+  style="width:100%"
+  onclick="openMediaModal(true)">
+  + إضافة صورة أو فيديو
 </button>
 
 </div>
-
 
 <div class="card">
 
 <div class="card-header">
-
-<div class="card-title">
-إعدادات المحتوى
+  <div class="card-title">إعدادات المحتوى</div>
 </div>
-
-</div>
-
 
 <div class="toggle-row">
 
-<span>
-تكرار المحتوى بالكامل
-</span>
+<span>تكرار المحتوى بالكامل</span>
 
 <label class="toggle">
-
-<input
-id="repeatAll"
-type="checkbox"
-onchange="savePlaylistSettings()"
-checked>
-
-<span class="toggle-slider">
-</span>
-
+  <input id="repeatAll" type="checkbox"
+    onchange="savePlaylistSettings()" checked>
+  <span class="toggle-slider"></span>
 </label>
 
 </div>
 
+<div class="form-group" style="margin-top:12px">
 
-<div
-class="form-group"
-style="margin-top:12px">
-
-<label>
-المدة الافتراضية للصورة — بالثواني
-</label>
+<label>المدة الافتراضية للصورة — بالثواني</label>
 
 <input
-id="defaultDuration"
-type="number"
-min="1"
-value="10"
-onchange="savePlaylistSettings()">
+  id="defaultDuration"
+  type="number"
+  min="1"
+  value="10"
+  onchange="savePlaylistSettings()">
 
 </div>
-
 
 <div class="form-group">
 
-<label>
-الانتقال الافتراضي
-</label>
+<label>الانتقال الافتراضي</label>
 
-<select
-id="defaultTransition"
-onchange="savePlaylistSettings()">
+<select id="defaultTransition" onchange="savePlaylistSettings()">
 
-<option value="fade">
-Fade
-</option>
-
-<option value="slide">
-Slide
-</option>
-
-<option value="zoom">
-Zoom
-</option>
-
-<option value="none">
-بدون انتقال
-</option>
+<option value="fade">Fade</option>
+<option value="slide">Slide</option>
+<option value="zoom">Zoom</option>
+<option value="none">بدون انتقال</option>
 
 </select>
 
 </div>
 
-
 <div class="form-group">
 
-<label>
-طريقة عرض المحتوى
-</label>
+<label>طريقة عرض المحتوى</label>
 
-<select
-id="fitMode"
-onchange="savePlaylistSettings()">
+<select id="fitMode" onchange="savePlaylistSettings()">
 
-<option value="contain">
-احتواء
-</option>
-
-<option value="cover">
-ملء الشاشة
-</option>
-
-<option value="background">
-خلفية
-</option>
+<option value="contain">احتواء</option>
+<option value="cover">ملء الشاشة</option>
+<option value="background">خلفية</option>
 
 </select>
 
 </div>
-
 
 <button
-class="btn btn-primary"
-style="width:100%;margin-top:5px"
-onclick="publishCurrentScreen()">
-
-🚀 نشر على الشاشة
-
+  class="btn btn-primary"
+  style="width:100%;margin-top:5px"
+  onclick="publishCurrentScreen()">
+  🚀 نشر على الشاشة
 </button>
 
 </div>
@@ -1205,7 +930,6 @@ onclick="publishCurrentScreen()">
 
 </section>
 
-
 <section id="page-scheduling" class="page">
 
 <div class="card">
@@ -1213,69 +937,35 @@ onclick="publishCurrentScreen()">
 <div class="card-header">
 
 <div>
-
-<div class="card-title">
-الجدولة
+  <div class="card-title">الجدولة</div>
+  <div class="card-subtitle">
+    إدارة المحتوى حسب التاريخ والوقت
+  </div>
 </div>
 
-<div class="card-subtitle">
-إدارة المحتوى حسب التاريخ والوقت
-</div>
-
-</div>
-
-<button
-class="btn btn-primary"
-onclick="openScheduleModal()">
-
-+ إضافة جدولة
-
+<button class="btn btn-primary" onclick="openScheduleModal()">
+  + إضافة جدولة
 </button>
 
 </div>
-
 
 <div class="table-wrap">
 
 <table>
 
 <thead>
-
 <tr>
-
-<th>
-الشاشة
-</th>
-
-<th>
-المحتوى
-</th>
-
-<th>
-البداية
-</th>
-
-<th>
-النهاية
-</th>
-
-<th>
-الأولوية
-</th>
-
-<th>
-الحالة
-</th>
-
-<th>
-</th>
-
+  <th>الشاشة</th>
+  <th>المحتوى</th>
+  <th>البداية</th>
+  <th>النهاية</th>
+  <th>الأولوية</th>
+  <th>الحالة</th>
+  <th></th>
 </tr>
-
 </thead>
 
-<tbody id="scheduleTable">
-</tbody>
+<tbody id="scheduleTable"></tbody>
 
 </table>
 
@@ -1285,7 +975,6 @@ onclick="openScheduleModal()">
 
 </section>
 
-
 <section id="page-settings" class="page">
 
 <div class="card">
@@ -1293,61 +982,32 @@ onclick="openScheduleModal()">
 <div class="card-header">
 
 <div>
-
-<div class="card-title">
-الإعدادات
-</div>
-
-<div class="card-subtitle">
-إعدادات النظام العامة
+  <div class="card-title">الإعدادات</div>
+  <div class="card-subtitle">إعدادات النظام العامة</div>
 </div>
 
 </div>
-
-</div>
-
 
 <div class="form-grid">
 
 <div class="form-group">
 
-<label>
-اللغة
-</label>
+<label>اللغة</label>
 
-<select
-id="settingsLanguage"
-onchange="changeLanguage(this.value)">
-
-<option value="ar">
-العربية
-</option>
-
-<option value="en">
-English
-</option>
-
+<select id="settingsLanguage" onchange="changeLanguage(this.value)">
+<option value="ar">العربية</option>
+<option value="en">English</option>
 </select>
 
 </div>
-
 
 <div class="form-group">
 
-<label>
-التحديث التلقائي
-</label>
+<label>التحديث التلقائي</label>
 
 <select>
-
-<option>
-Realtime
-</option>
-
-<option>
-يدوي
-</option>
-
+<option>Realtime</option>
+<option>يدوي</option>
 </select>
 
 </div>
@@ -1355,39 +1015,27 @@ Realtime
 </div>
 
 </div>
-
 
 <div class="card">
 
 <div class="card-header">
-
-<div class="card-title">
-معلومات الاتصال
+  <div class="card-title">معلومات الاتصال</div>
 </div>
 
-</div>
-
-<div
-style="font-size:11px;color:#666;line-height:1.8">
+<div style="font-size:11px;color:#666;line-height:1.8">
 
 قاعدة البيانات:
-<strong>
-Supabase
-</strong>
+<strong>Supabase</strong>
 
 <br>
 
 المزامنة:
-<strong>
-Realtime
-</strong>
+<strong>Realtime</strong>
 
 <br>
 
 عدد الشاشات:
-<strong id="settingsScreenCount">
-8
-</strong>
+<strong id="settingsScreenCount">8</strong>
 
 </div>
 
@@ -1395,190 +1043,89 @@ Realtime
 
 </section>
 
-
 </div>
 
 </main>
 
 </div>
 
-
 <!-- SCREEN MODAL -->
 
-<div
-id="screenModal"
-class="modal-backdrop">
+<div id="screenModal" class="modal-backdrop">
 
 <div class="modal">
 
-<div class="modal-title">
-إعدادات الشاشة
-</div>
+<div class="modal-title">إعدادات الشاشة</div>
 
-
-<div
-class="form-grid"
-style="margin-top:15px">
-
+<div class="form-grid" style="margin-top:15px">
 
 <div class="form-group">
-
-<label>
-اسم الشاشة
-</label>
-
+<label>اسم الشاشة</label>
 <input id="screenName">
-
 </div>
 
-
 <div class="form-group">
-
-<label>
-الموقع
-</label>
-
+<label>الموقع</label>
 <input id="screenLocation">
-
 </div>
-
 
 <div class="form-group">
-
-<label>
-العرض
-</label>
-
-<input
-id="screenWidth"
-type="number">
-
+<label>العرض</label>
+<input id="screenWidth" type="number">
 </div>
-
 
 <div class="form-group">
-
-<label>
-الارتفاع
-</label>
-
-<input
-id="screenHeight"
-type="number">
-
+<label>الارتفاع</label>
+<input id="screenHeight" type="number">
 </div>
-
 
 <div class="form-group full">
 
-<label>
-المقاس الجاهز
-</label>
+<label>المقاس الجاهز</label>
 
-<select
-id="screenPreset"
-onchange="applyScreenPreset(this.value)">
+<select id="screenPreset" onchange="applyScreenPreset(this.value)">
 
-<option value="">
-اختر المقاس
-</option>
-
-<option value="358x1600">
-358×1600 — عمودي
-</option>
-
-<option value="1080x1920">
-1080×1920 — عمودي
-</option>
-
-<option value="1200x1920">
-1200×1920 — عمودي
-</option>
-
-<option value="2160x3840">
-2160×3840 — عمودي 4K
-</option>
-
-<option value="1080x1080">
-1080×1080 — مربع
-</option>
-
-<option value="3840x3840">
-3840×3840 — مربع 4K
-</option>
-
-<option value="1280x720">
-1280×720 — أفقي
-</option>
-
-<option value="1920x1080">
-1920×1080 — أفقي
-</option>
-
-<option value="2560x1440">
-2560×1440 — أفقي
-</option>
-
-<option value="3840x2160">
-3840×2160 — أفقي 4K
-</option>
-
-<option value="4096x2160">
-4096×2160 — 4K Cinema
-</option>
+<option value="">اختر المقاس</option>
+<option value="358x1600">358×1600 — عمودي</option>
+<option value="1080x1920">1080×1920 — عمودي</option>
+<option value="1200x1920">1200×1920 — عمودي</option>
+<option value="2160x3840">2160×3840 — عمودي 4K</option>
+<option value="1080x1080">1080×1080 — مربع</option>
+<option value="3840x3840">3840×3840 — مربع 4K</option>
+<option value="1280x720">1280×720 — أفقي</option>
+<option value="1920x1080">1920×1080 — أفقي</option>
+<option value="2560x1440">2560×1440 — أفقي</option>
+<option value="3840x2160">3840×2160 — أفقي 4K</option>
+<option value="4096x2160">4096×2160 — 4K Cinema</option>
 
 </select>
 
 </div>
 
-
 <div class="form-group">
 
-<label>
-الاتجاه
-</label>
+<label>الاتجاه</label>
 
 <select id="screenOrientation">
-
-<option value="portrait">
-عمودي
-</option>
-
-<option value="landscape">
-أفقي
-</option>
-
-<option value="square">
-مربع
-</option>
-
+<option value="portrait">عمودي</option>
+<option value="landscape">أفقي</option>
+<option value="square">مربع</option>
 </select>
 
 </div>
-
 
 <div class="form-group">
 
-<label>
-الحالة
-</label>
+<label>الحالة</label>
 
 <select id="screenEnabled">
-
-<option value="true">
-مفعلة
-</option>
-
-<option value="false">
-غير مفعلة
-</option>
-
+<option value="true">مفعلة</option>
+<option value="false">غير مفعلة</option>
 </select>
 
 </div>
 
 </div>
-
 
 <div
 id="screenLinkBox"
@@ -1591,24 +1138,17 @@ font-size:10px;
 word-break:break-all">
 </div>
 
-
 <div class="modal-actions">
 
-<button
-class="btn btn-primary"
-onclick="saveScreen()">
+<button class="btn btn-primary" onclick="saveScreen()">
 حفظ
 </button>
 
-<button
-class="btn"
-onclick="closeModal('screenModal')">
+<button class="btn" onclick="closeModal('screenModal')">
 إلغاء
 </button>
 
-<button
-class="btn"
-onclick="openSelectedScreen()">
+<button class="btn" onclick="openSelectedScreen()">
 فتح الشاشة
 </button>
 
@@ -1618,102 +1158,73 @@ onclick="openSelectedScreen()">
 
 </div>
 
-
 <!-- MEDIA MODAL -->
 
-<div
-id="mediaModal"
-class="modal-backdrop">
+<div id="mediaModal" class="modal-backdrop">
 
 <div class="modal">
 
-<div class="modal-title">
-إضافة وسائط
-</div>
+<div class="modal-title">إضافة وسائط</div>
 
-
-<div
-class="form-grid"
-style="margin-top:15px">
-
+<div class="form-grid" style="margin-top:15px">
 
 <div class="form-group">
 
-<label>
-اسم الملف
-</label>
+<label>اسم الملف</label>
 
 <input
-id="mediaName"
-placeholder="مثال: شعار المركز">
+  id="mediaName"
+  placeholder="مثال: شعار المركز">
 
 </div>
 
-
 <div class="form-group">
 
-<label>
-نوع الملف
-</label>
+<label>نوع الملف</label>
 
 <select id="mediaType">
 
-<option value="image">
-صورة
-</option>
-
-<option value="video">
-فيديو
-</option>
+<option value="image">صورة</option>
+<option value="video">فيديو</option>
 
 </select>
 
 </div>
 
-
 <div class="form-group full">
 
-<label>
-اختيار الملف
-</label>
+<label>اختيار الملف من الجهاز</label>
 
 <input
-id="mediaFile"
-type="file"
-accept="image/*,video/*">
+  id="mediaFile"
+  type="file"
+  accept="image/*,video/*">
 
 </div>
-
 
 <div class="form-group">
 
-<label>
-مدة الصورة — ثانية
-</label>
+<label>مدة الصورة — ثانية</label>
 
 <input
-id="mediaDuration"
-type="number"
-min="1"
-value="10">
+  id="mediaDuration"
+  type="number"
+  min="1"
+  value="10">
 
 </div>
-
 
 <div class="form-group">
 
-<label>
-الوسوم
-</label>
+<label>الوسوم</label>
 
 <input
-id="mediaTags"
-placeholder="فعالية, مركز, إعلان">
+  id="mediaTags"
+  placeholder="فعالية, مركز, إعلان">
 
 </div>
 
 </div>
-
 
 <div
 style="
@@ -1723,29 +1234,20 @@ background:#f0eefb;
 border-radius:7px;
 color:#2A206A;
 font-size:10px;
-line-height:1.6;">
+line-height:1.6">
 
-اختر صورة أو فيديو من جهازك وسيتم رفعه تلقائيًا إلى مكتبة الوسائط.
+اختر صورة أو فيديو من جهازك، وسيتم رفع الملف تلقائيًا إلى مكتبة الوسائط.
 
 </div>
-
 
 <div class="modal-actions">
 
-<button
-class="btn btn-primary"
-onclick="saveMedia()">
-
+<button class="btn btn-primary" onclick="saveMedia()">
 رفع وإضافة
-
 </button>
 
-<button
-class="btn"
-onclick="closeModal('mediaModal')">
-
+<button class="btn" onclick="closeModal('mediaModal')">
 إلغاء
-
 </button>
 
 </div>
@@ -1753,140 +1255,80 @@ onclick="closeModal('mediaModal')">
 </div>
 
 </div>
-
 
 <!-- SCHEDULE MODAL -->
 
-<div
-id="scheduleModal"
-class="modal-backdrop">
+<div id="scheduleModal" class="modal-backdrop">
 
 <div class="modal">
 
-<div class="modal-title">
-إضافة جدولة
-</div>
+<div class="modal-title">إضافة جدولة</div>
 
-
-<div
-class="form-grid"
-style="margin-top:15px">
-
+<div class="form-grid" style="margin-top:15px">
 
 <div class="form-group">
 
-<label>
-الشاشة
-</label>
-
-<select id="scheduleScreen">
-</select>
+<label>الشاشة</label>
+<select id="scheduleScreen"></select>
 
 </div>
 
-
 <div class="form-group">
 
-<label>
-المحتوى
-</label>
-
-<select id="schedulePlaylist">
-</select>
+<label>المحتوى</label>
+<select id="schedulePlaylist"></select>
 
 </div>
 
-
 <div class="form-group">
 
-<label>
-تاريخ البداية
-</label>
-
-<input
-id="scheduleStartDate"
-type="date">
+<label>تاريخ البداية</label>
+<input id="scheduleStartDate" type="date">
 
 </div>
 
-
 <div class="form-group">
 
-<label>
-تاريخ النهاية
-</label>
-
-<input
-id="scheduleEndDate"
-type="date">
+<label>تاريخ النهاية</label>
+<input id="scheduleEndDate" type="date">
 
 </div>
 
-
 <div class="form-group">
 
-<label>
-وقت البداية
-</label>
-
-<input
-id="scheduleStartTime"
-type="time">
+<label>وقت البداية</label>
+<input id="scheduleStartTime" type="time">
 
 </div>
 
-
 <div class="form-group">
 
-<label>
-وقت النهاية
-</label>
-
-<input
-id="scheduleEndTime"
-type="time">
+<label>وقت النهاية</label>
+<input id="scheduleEndTime" type="time">
 
 </div>
 
-
 <div class="form-group">
 
-<label>
-الأولوية
-</label>
+<label>الأولوية</label>
 
 <select id="schedulePriority">
-
-<option value="1">
-عادية
-</option>
-
-<option value="2">
-عالية
-</option>
-
-<option value="3">
-عاجلة
-</option>
-
+<option value="1">عادية</option>
+<option value="2">عالية</option>
+<option value="3">عاجلة</option>
 </select>
 
 </div>
 
 </div>
-
 
 <div class="modal-actions">
 
-<button
-class="btn btn-primary"
-onclick="saveSchedule()">
+<button class="btn btn-primary" onclick="saveSchedule()">
 حفظ
 </button>
 
-<button
-class="btn"
-onclick="closeModal('scheduleModal')">
+<button class="btn" onclick="closeModal('scheduleModal')">
 إلغاء
 </button>
 
@@ -1896,12 +1338,7 @@ onclick="closeModal('scheduleModal')">
 
 </div>
 
-
-<div
-id="toast"
-class="toast">
-</div>
-
+<div id="toast" class="toast"></div>
 
 <script>
 
@@ -1914,270 +1351,141 @@ const SUPABASE_KEY =
 const STORAGE_BUCKET =
 "signage-media";
 
-
 const supabaseClient =
 window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_KEY
 );
 
+let screens=[];
+let media=[];
+let playlists=[];
+let playlistItems=[];
+let schedules=[];
 
-let screens = [];
-let media = [];
-let playlists = [];
-let playlistItems = [];
-let schedules = [];
+let selectedScreenId=null;
+let selectedPlaylistId=null;
+let addingToContent=false;
+let draggedItemId=null;
 
-let selectedScreenId = null;
-let selectedPlaylistId = null;
-
-let addingToContent = false;
-let draggedItemId = null;
-
-let currentLanguage =
-localStorage.getItem(
-  "innovationScreensLanguage"
-) || "ar";
-
+let currentLanguage=
+localStorage.getItem("innovationScreensLanguage")||"ar";
 
 function escapeHtml(value){
-
-  return String(value ?? "")
+  return String(value??"")
     .replaceAll("&","&amp;")
     .replaceAll("<","&lt;")
     .replaceAll(">","&gt;")
     .replaceAll('"',"&quot;")
     .replaceAll("'","&#039;");
-
 }
-
 
 function showToast(message){
 
-  const toast =
-    document.getElementById("toast");
+  const toast=document.getElementById("toast");
 
-  toast.textContent = message;
-
+  toast.textContent=message;
   toast.classList.add("show");
 
-  clearTimeout(
-    window.toastTimer
+  clearTimeout(window.toastTimer);
+
+  window.toastTimer=setTimeout(
+    ()=>toast.classList.remove("show"),
+    2800
   );
-
-  window.toastTimer =
-    setTimeout(
-      () => toast.classList.remove("show"),
-      2800
-    );
-
 }
 
+function setConnection(online,text){
 
-function setConnection(
-  online,
-  text
-){
+  document.getElementById("connectionDot").className=
+    "dot "+(online?"online":"offline");
 
-  document.getElementById(
-    "connectionDot"
-  ).className =
-    "dot " +
-    (online ? "online" : "offline");
-
-
-  document.getElementById(
-    "connectionText"
-  ).textContent = text;
-
+  document.getElementById("connectionText").textContent=text;
 }
-
 
 function getScreenUrl(id){
 
-  return (
-    location.origin +
+  return location.origin+
     location.pathname
-      .replace("index.html","screen.html") +
-    "?id=" +
-    id
-  );
-
+      .replace("index.html","screen.html")+
+    "?id="+id;
 }
 
-
-const pageNames = {
-
-  dashboard:[
-    "لوحة التحكم",
-    "Dashboard"
-  ],
-
-  screens:[
-    "الشاشات",
-    "Screens"
-  ],
-
-  media:[
-    "مكتبة الوسائط",
-    "Media Library"
-  ],
-
-  content:[
-    "المحتوى",
-    "Content"
-  ],
-
-  scheduling:[
-    "الجدولة",
-    "Scheduling"
-  ],
-
-  settings:[
-    "الإعدادات",
-    "Settings"
-  ]
-
+const pageNames={
+  dashboard:["لوحة التحكم","Dashboard"],
+  screens:["الشاشات","Screens"],
+  media:["مكتبة الوسائط","Media Library"],
+  content:["المحتوى","Content"],
+  scheduling:["الجدولة","Scheduling"],
+  settings:["الإعدادات","Settings"]
 };
 
-
-document
-.querySelectorAll(".nav-button")
-.forEach(
-  button => {
-
-    button.onclick = () =>
-      openPage(
-        button.dataset.page
-      );
-
-  }
-);
-
+document.querySelectorAll(".nav-button").forEach(button=>{
+  button.onclick=()=>openPage(button.dataset.page);
+});
 
 function openPage(page){
 
-  document
-    .querySelectorAll(".nav-button")
-    .forEach(
-      button =>
-        button.classList.toggle(
-          "active",
-          button.dataset.page === page
-        )
+  document.querySelectorAll(".nav-button").forEach(button=>{
+    button.classList.toggle(
+      "active",
+      button.dataset.page===page
     );
+  });
 
+  document.querySelectorAll(".page").forEach(section=>{
+    section.classList.remove("active");
+  });
 
-  document
-    .querySelectorAll(".page")
-    .forEach(
-      section =>
-        section.classList.remove(
-          "active"
-        )
-    );
-
-
-  document
-    .getElementById(
-      "page-" + page
-    )
+  document.getElementById("page-"+page)
     .classList.add("active");
-
 
   updatePageTitle();
 
-
-  if(page === "media"){
-    renderMedia();
-  }
-
-
-  if(page === "scheduling"){
-    renderSchedules();
-  }
-
-
-  if(page === "content"){
-    prepareContentSelector();
-  }
-
+  if(page==="media") renderMedia();
+  if(page==="scheduling") renderSchedules();
+  if(page==="content") prepareContentSelector();
 }
-
 
 function updatePageTitle(){
 
-  const button =
-    document.querySelector(
-      ".nav-button.active"
-    );
+  const button=document.querySelector(".nav-button.active");
 
   if(!button)return;
 
+  const data=pageNames[button.dataset.page];
 
-  const data =
-    pageNames[
-      button.dataset.page
-    ];
-
-
-  document.getElementById(
-    "pageTitle"
-  ).textContent =
-    currentLanguage === "ar"
-      ? data[0]
-      : data[1];
-
+  document.getElementById("pageTitle").textContent=
+    currentLanguage==="ar"?data[0]:data[1];
 }
-
 
 function changeLanguage(value){
 
-  currentLanguage = value;
+  currentLanguage=value;
 
   localStorage.setItem(
     "innovationScreensLanguage",
     value
   );
 
+  document.documentElement.dir=
+    value==="ar"?"rtl":"ltr";
 
-  document.documentElement.dir =
-    value === "ar"
-      ? "rtl"
-      : "ltr";
+  document.documentElement.lang=value;
 
+  document.getElementById("languageButton").textContent=
+    value==="ar"?"English":"العربية";
 
-  document.documentElement.lang =
-    value;
-
-
-  document.getElementById(
-    "languageButton"
-  ).textContent =
-    value === "ar"
-      ? "English"
-      : "العربية";
-
-
-  document.getElementById(
-    "settingsLanguage"
-  ).value = value;
-
+  document.getElementById("settingsLanguage").value=value;
 
   updatePageTitle();
-
 }
 
-
-document.getElementById(
-  "languageButton"
-).onclick = () =>
+document.getElementById("languageButton").onclick=()=>{
   changeLanguage(
-    currentLanguage === "ar"
-      ? "en"
-      : "ar"
+    currentLanguage==="ar"?"en":"ar"
   );
-
+};
 
 /* =========================
    LOAD DATA
@@ -2185,11 +1493,7 @@ document.getElementById(
 
 async function loadAll(){
 
-  setConnection(
-    true,
-    "جاري الاتصال..."
-  );
-
+  setConnection(true,"جاري الاتصال...");
 
   try{
 
@@ -2199,8 +1503,7 @@ async function loadAll(){
       playlistsResult,
       itemsResult,
       schedulesResult
-    ] =
-    await Promise.all([
+    ]=await Promise.all([
 
       supabaseClient
         .from("screens")
@@ -2210,12 +1513,7 @@ async function loadAll(){
       supabaseClient
         .from("media")
         .select("*")
-        .order(
-          "created_at",
-          {
-            ascending:false
-          }
-        ),
+        .order("created_at",{ascending:false}),
 
       supabaseClient
         .from("playlists")
@@ -2234,38 +1532,17 @@ async function loadAll(){
 
     ]);
 
+    if(screensResult.error)throw screensResult.error;
+    if(mediaResult.error)throw mediaResult.error;
+    if(playlistsResult.error)throw playlistsResult.error;
+    if(itemsResult.error)throw itemsResult.error;
+    if(schedulesResult.error)throw schedulesResult.error;
 
-    if(screensResult.error)
-      throw screensResult.error;
-
-    if(mediaResult.error)
-      throw mediaResult.error;
-
-    if(playlistsResult.error)
-      throw playlistsResult.error;
-
-    if(itemsResult.error)
-      throw itemsResult.error;
-
-    if(schedulesResult.error)
-      throw schedulesResult.error;
-
-
-    screens =
-      screensResult.data || [];
-
-    media =
-      mediaResult.data || [];
-
-    playlists =
-      playlistsResult.data || [];
-
-    playlistItems =
-      itemsResult.data || [];
-
-    schedules =
-      schedulesResult.data || [];
-
+    screens=screensResult.data||[];
+    media=mediaResult.data||[];
+    playlists=playlistsResult.data||[];
+    playlistItems=itemsResult.data||[];
+    schedules=schedulesResult.data||[];
 
     renderDashboard();
     renderScreens();
@@ -2274,32 +1551,20 @@ async function loadAll(){
     prepareContentSelector();
     updateStats();
 
-
-    setConnection(
-      true,
-      "متصل بالسحابة"
-    );
-
+    setConnection(true,"متصل بالسحابة");
 
   }catch(error){
 
     console.error(error);
 
-    setConnection(
-      false,
-      "تعذر الاتصال بالسحابة"
-    );
-
+    setConnection(false,"تعذر الاتصال بالسحابة");
 
     showToast(
-      "تعذر تحميل البيانات: " +
-      (error.message || "خطأ")
+      "تعذر تحميل البيانات: "+
+      (error.message||"خطأ")
     );
-
   }
-
 }
-
 
 /* =========================
    STATS
@@ -2307,71 +1572,42 @@ async function loadAll(){
 
 function updateStats(){
 
-  document.getElementById(
-    "statScreens"
-  ).textContent =
+  document.getElementById("statScreens").textContent=
     screens.length;
 
-
-  document.getElementById(
-    "statEnabled"
-  ).textContent =
+  document.getElementById("statEnabled").textContent=
     screens.filter(
-      screen =>
-        screen.enabled !== false
+      screen=>screen.enabled!==false
     ).length;
 
-
-  document.getElementById(
-    "statMedia"
-  ).textContent =
+  document.getElementById("statMedia").textContent=
     media.length;
 
-
-  document.getElementById(
-    "statPlaylists"
-  ).textContent =
+  document.getElementById("statPlaylists").textContent=
     playlists.length;
 
-
-  document.getElementById(
-    "settingsScreenCount"
-  ).textContent =
+  document.getElementById("settingsScreenCount").textContent=
     screens.length;
-
 }
-
 
 /* =========================
    SCREENS
 ========================= */
 
-function orientationText(
-  orientation
-){
+function orientationText(orientation){
 
-  if(orientation === "portrait")
-    return "عمودي";
-
-  if(orientation === "square")
-    return "مربع";
-
+  if(orientation==="portrait")return "عمودي";
+  if(orientation==="square")return "مربع";
   return "أفقي";
-
 }
-
 
 function screenCardHtml(screen){
 
-  const enabled =
-    screen.enabled !== false;
-
+  const enabled=screen.enabled!==false;
 
   return `
-
-  <div
-    class="screen-card"
-    onclick="openScreenSettings(${screen.id})">
+  <div class="screen-card"
+       onclick="openScreenSettings(${screen.id})">
 
     <div class="screen-head">
 
@@ -2391,328 +1627,151 @@ function screenCardHtml(screen){
 
       </div>
 
-      <span
-        class="status ${enabled ? "on" : "off"}">
-
-        ${enabled ? "مفعلة" : "غير مفعلة"}
-
+      <span class="status ${enabled?"on":"off"}">
+        ${enabled?"مفعلة":"غير مفعلة"}
       </span>
 
     </div>
 
-
     <div class="screen-size">
-
       ${screen.width} × ${screen.height}
-
       ·
-
       ${orientationText(screen.orientation)}
-
     </div>
 
+    <div class="screen-actions"
+         onclick="event.stopPropagation()">
 
-    <div
-      class="screen-actions"
-      onclick="event.stopPropagation()">
-
-      <button
-        class="btn btn-small"
-        onclick="openScreenSettings(${screen.id})">
-
+      <button class="btn btn-small"
+              onclick="openScreenSettings(${screen.id})">
         إعدادات
-
       </button>
 
-
-      <button
-        class="btn btn-small btn-primary"
-        onclick="openScreenUrl(${screen.id})">
-
+      <button class="btn btn-small btn-primary"
+              onclick="openScreenUrl(${screen.id})">
         فتح الشاشة
-
       </button>
 
     </div>
 
-  </div>
-
-  `;
-
+  </div>`;
 }
-
 
 function renderDashboard(){
 
-  const container =
-    document.getElementById(
-      "dashboardScreens"
-    );
+  const container=document.getElementById("dashboardScreens");
 
-
-  container.innerHTML =
+  container.innerHTML=
     screens.length
-      ? screens.map(
-          screenCardHtml
-        ).join("")
-      : `
-        <div class="empty">
-          لا توجد شاشات
-        </div>
-      `;
-
+      ?screens.map(screenCardHtml).join("")
+      :`<div class="empty">لا توجد شاشات</div>`;
 }
-
 
 function renderScreens(){
 
-  const container =
-    document.getElementById(
-      "screensGrid"
-    );
+  const container=document.getElementById("screensGrid");
 
-
-  container.innerHTML =
+  container.innerHTML=
     screens.length
-      ? screens.map(
-          screenCardHtml
-        ).join("")
-      : `
-        <div class="empty">
-          لا توجد شاشات
-        </div>
-      `;
-
+      ?screens.map(screenCardHtml).join("")
+      :`<div class="empty">لا توجد شاشات</div>`;
 }
-
 
 function openScreenSettings(id){
 
-  const screen =
-    screens.find(
-      item =>
-        Number(item.id) === Number(id)
-    );
-
+  const screen=screens.find(
+    item=>Number(item.id)===Number(id)
+  );
 
   if(!screen)return;
 
+  selectedScreenId=Number(id);
 
-  selectedScreenId =
-    Number(id);
+  document.getElementById("screenName").value=
+    screen.name||"";
 
+  document.getElementById("screenLocation").value=
+    screen.location||"";
 
-  document.getElementById(
-    "screenName"
-  ).value =
-    screen.name || "";
+  document.getElementById("screenWidth").value=
+    screen.width||1920;
 
+  document.getElementById("screenHeight").value=
+    screen.height||1080;
 
-  document.getElementById(
-    "screenLocation"
-  ).value =
-    screen.location || "";
+  document.getElementById("screenOrientation").value=
+    screen.orientation||"landscape";
 
+  document.getElementById("screenEnabled").value=
+    screen.enabled===false?"false":"true";
 
-  document.getElementById(
-    "screenWidth"
-  ).value =
-    screen.width || 1920;
+  document.getElementById("screenPreset").value="";
 
+  document.getElementById("screenLinkBox").innerHTML=
+    "<strong>رابط الشاشة:</strong><br>"+
+    escapeHtml(getScreenUrl(id));
 
-  document.getElementById(
-    "screenHeight"
-  ).value =
-    screen.height || 1080;
-
-
-  document.getElementById(
-    "screenOrientation"
-  ).value =
-    screen.orientation || "landscape";
-
-
-  document.getElementById(
-    "screenEnabled"
-  ).value =
-    screen.enabled === false
-      ? "false"
-      : "true";
-
-
-  document.getElementById(
-    "screenPreset"
-  ).value = "";
-
-
-  document.getElementById(
-    "screenLinkBox"
-  ).innerHTML =
-
-    "<strong>رابط الشاشة:</strong><br>" +
-
-    escapeHtml(
-      getScreenUrl(id)
-    );
-
-
-  document
-    .getElementById("screenModal")
+  document.getElementById("screenModal")
     .classList.add("show");
-
 }
-
 
 async function saveScreen(){
 
-  if(selectedScreenId === null)
-    return;
+  if(selectedScreenId===null)return;
 
-
-  const data = {
-
-    name:
-      document
-        .getElementById("screenName")
-        .value
-        .trim(),
-
-    location:
-      document
-        .getElementById("screenLocation")
-        .value
-        .trim(),
-
-    width:
-      Number(
-        document
-          .getElementById("screenWidth")
-          .value
-      ),
-
-    height:
-      Number(
-        document
-          .getElementById("screenHeight")
-          .value
-      ),
-
-    orientation:
-      document
-        .getElementById("screenOrientation")
-        .value,
-
-    enabled:
-      document
-        .getElementById("screenEnabled")
-        .value === "true",
-
-    updated_at:
-      new Date().toISOString()
-
+  const data={
+    name:document.getElementById("screenName").value.trim(),
+    location:document.getElementById("screenLocation").value.trim(),
+    width:Number(document.getElementById("screenWidth").value),
+    height:Number(document.getElementById("screenHeight").value),
+    orientation:document.getElementById("screenOrientation").value,
+    enabled:document.getElementById("screenEnabled").value==="true",
+    updated_at:new Date().toISOString()
   };
 
-
-  const {
-    error
-  } =
-    await supabaseClient
-      .from("screens")
-      .update(data)
-      .eq(
-        "id",
-        selectedScreenId
-      );
-
+  const {error}=await supabaseClient
+    .from("screens")
+    .update(data)
+    .eq("id",selectedScreenId);
 
   if(error){
-
     console.error(error);
-
-    showToast(
-      "فشل حفظ إعدادات الشاشة"
-    );
-
+    showToast("فشل حفظ إعدادات الشاشة");
     return;
-
   }
 
-
   closeModal("screenModal");
-
-  showToast(
-    "تم حفظ إعدادات الشاشة"
-  );
-
-
+  showToast("تم حفظ إعدادات الشاشة");
   loadAll();
-
 }
-
 
 function applyScreenPreset(value){
 
   if(!value)return;
 
+  const [width,height]=value.split("x").map(Number);
 
-  const [
-    width,
-    height
-  ] =
-    value
-      .split("x")
-      .map(Number);
+  document.getElementById("screenWidth").value=width;
+  document.getElementById("screenHeight").value=height;
 
-
-  document.getElementById(
-    "screenWidth"
-  ).value =
-    width;
-
-
-  document.getElementById(
-    "screenHeight"
-  ).value =
-    height;
-
-
-  document.getElementById(
-    "screenOrientation"
-  ).value =
-
-    width === height
-      ? "square"
-      : width < height
-        ? "portrait"
-        : "landscape";
-
+  document.getElementById("screenOrientation").value=
+    width===height
+      ?"square"
+      :width<height
+        ?"portrait"
+        :"landscape";
 }
-
 
 function openScreenUrl(id){
-
-  window.open(
-    getScreenUrl(id),
-    "_blank"
-  );
-
+  window.open(getScreenUrl(id),"_blank");
 }
-
 
 function openSelectedScreen(){
 
-  if(
-    selectedScreenId !== null
-  ){
-
-    openScreenUrl(
-      selectedScreenId
-    );
-
+  if(selectedScreenId!==null){
+    openScreenUrl(selectedScreenId);
   }
-
 }
-
 
 /* =========================
    MEDIA
@@ -2720,305 +1779,190 @@ function openSelectedScreen(){
 
 function renderMedia(){
 
-  const table =
-    document.getElementById(
-      "mediaTable"
-    );
-
+  const table=document.getElementById("mediaTable");
 
   if(!media.length){
 
-    table.innerHTML = `
-
+    table.innerHTML=`
       <tr>
-
-        <td
-          colspan="7"
-          class="empty">
-
+        <td colspan="7" class="empty">
           لا توجد وسائط حتى الآن
-
         </td>
-
-      </tr>
-
-    `;
+      </tr>`;
 
     return;
-
   }
 
+  table.innerHTML=media.map(item=>`
 
-  table.innerHTML =
+    <tr>
 
-    media.map(
-      item => `
+      <td>
 
-      <tr>
+        <div class="media-thumb">
 
-        <td>
+          ${
+            item.type==="image"
 
-          <div class="media-thumb">
+            ?`
 
-            ${
-              item.type === "image"
-
-              ?
-
-              `
               <img
                 src="${escapeHtml(item.file_url)}"
                 alt="">
-              `
 
-              :
+            `
 
-              `
+            :`
+
               <video
                 src="${escapeHtml(item.file_url)}"
                 muted>
               </video>
-              `
 
-            }
-
-          </div>
-
-        </td>
-
-
-        <td>
-          ${escapeHtml(item.name)}
-        </td>
-
-
-        <td>
-
-          ${
-            item.type === "image"
-              ? "صورة"
-              : "فيديو"
+            `
           }
 
-        </td>
+        </div>
 
+      </td>
 
-        <td>
+      <td>${escapeHtml(item.name)}</td>
 
-          ${
-            item.width &&
-            item.height
+      <td>
+        ${item.type==="image"?"صورة":"فيديو"}
+      </td>
 
-              ?
+      <td>
+        ${
+          item.width&&item.height
+            ?item.width+" × "+item.height
+            :"-"
+        }
+      </td>
 
-              item.width +
-              " × " +
-              item.height
+      <td>
+        ${
+          item.type==="image"
+            ?(item.duration||10)+" ث"
+            :"-"
+        }
+      </td>
 
-              :
+      <td>
 
-              "-"
+        <span class="status ${item.enabled?"on":"off"}">
+          ${item.enabled?"مفعلة":"غير مفعلة"}
+        </span>
 
-          }
+      </td>
 
-        </td>
+      <td>
 
+        <button
+          class="btn btn-small btn-danger"
+          onclick="deleteMedia('${item.id}')">
+          حذف
+        </button>
 
-        <td>
+      </td>
 
-          ${
-            item.type === "image"
+    </tr>
 
-              ?
-
-              (item.duration || 10) +
-              " ث"
-
-              :
-
-              "-"
-
-          }
-
-        </td>
-
-
-        <td>
-
-          <span
-            class="status ${
-              item.enabled
-                ? "on"
-                : "off"
-            }">
-
-            ${
-              item.enabled
-                ? "مفعلة"
-                : "غير مفعلة"
-            }
-
-          </span>
-
-        </td>
-
-
-        <td>
-
-          <button
-            class="btn btn-small btn-danger"
-            onclick="deleteMedia('${item.id}')">
-
-            حذف
-
-          </button>
-
-        </td>
-
-      </tr>
-
-      `
-    ).join("");
-
+  `).join("");
 }
 
+function openMediaModal(addToContent=false){
 
-function openMediaModal(
-  addToContent = false
-){
+  addingToContent=addToContent;
 
-  addingToContent =
-    addToContent;
+  document.getElementById("mediaName").value="";
+  document.getElementById("mediaFile").value="";
+  document.getElementById("mediaDuration").value="10";
+  document.getElementById("mediaTags").value="";
+  document.getElementById("mediaType").value="image";
 
-
-  document.getElementById(
-    "mediaName"
-  ).value = "";
-
-
-  document.getElementById(
-    "mediaFile"
-  ).value = "";
-
-
-  document.getElementById(
-    "mediaDuration"
-  ).value = "10";
-
-
-  document.getElementById(
-    "mediaTags"
-  ).value = "";
-
-
-  document
-    .getElementById("mediaModal")
+  document.getElementById("mediaModal")
     .classList.add("show");
-
 }
 
+/* =========================
+   AUTO DETECT FILE TYPE
+========================= */
+
+document.getElementById("mediaFile")
+  .addEventListener("change",function(){
+
+    const file=this.files[0];
+
+    if(!file)return;
+
+    const typeSelect=document.getElementById("mediaType");
+
+    if(file.type.startsWith("image/")){
+      typeSelect.value="image";
+    }else if(file.type.startsWith("video/")){
+      typeSelect.value="video";
+    }
+
+  });
 
 /* =========================
    READ FILE DIMENSIONS
 ========================= */
 
-async function readDimensions(
-  file,
-  type
-){
+async function readDimensions(file,type){
 
-  const objectUrl =
-    URL.createObjectURL(file);
-
+  const objectUrl=URL.createObjectURL(file);
 
   try{
 
-    if(type === "image"){
+    if(type==="image"){
 
-      const image =
-        new Image();
+      const image=new Image();
 
+      return await new Promise((resolve,reject)=>{
 
-      return await new Promise(
-        (resolve,reject)=>{
+        image.onload=()=>{
 
-          image.onload = () => {
+          resolve({
+            width:image.naturalWidth,
+            height:image.naturalHeight
+          });
 
-            resolve({
+        };
 
-              width:
-                image.naturalWidth,
+        image.onerror=reject;
+        image.src=objectUrl;
 
-              height:
-                image.naturalHeight
-
-            });
-
-          };
-
-
-          image.onerror =
-            reject;
-
-
-          image.src =
-            objectUrl;
-
-        }
-      );
+      });
 
     }
 
+    const video=document.createElement("video");
 
-    const video =
-      document.createElement(
-        "video"
-      );
+    return await new Promise((resolve,reject)=>{
 
+      video.onloadedmetadata=()=>{
 
-    return await new Promise(
-      (resolve,reject)=>{
+        resolve({
+          width:video.videoWidth,
+          height:video.videoHeight,
+          duration:video.duration
+        });
 
-        video.onloadedmetadata =
-          () => {
+      };
 
-            resolve({
+      video.onerror=reject;
+      video.src=objectUrl;
 
-              width:
-                video.videoWidth,
-
-              height:
-                video.videoHeight,
-
-              duration:
-                video.duration
-
-            });
-
-          };
-
-
-        video.onerror =
-          reject;
-
-
-        video.src =
-          objectUrl;
-
-      }
-    );
-
+    });
 
   }finally{
 
-    URL.revokeObjectURL(
-      objectUrl
-    );
+    URL.revokeObjectURL(objectUrl);
 
   }
-
 }
-
 
 /* =========================
    UPLOAD MEDIA
@@ -3026,170 +1970,93 @@ async function readDimensions(
 
 async function saveMedia(){
 
-  const fileInput =
-    document.getElementById(
-      "mediaFile"
-    );
+  const fileInput=document.getElementById("mediaFile");
+  const file=fileInput.files[0];
 
+  const enteredName=
+    document.getElementById("mediaName")
+      .value.trim();
 
-  const file =
-    fileInput.files[0];
+  const duration=Math.max(
+    1,
+    Number(
+      document.getElementById("mediaDuration").value
+    )||10
+  );
 
+  const tagsText=
+    document.getElementById("mediaTags")
+      .value.trim();
 
-  const enteredName =
-    document.getElementById(
-      "mediaName"
-    ).value.trim();
-
-
-  const duration =
-    Math.max(
-      1,
-      Number(
-        document.getElementById(
-          "mediaDuration"
-        ).value
-      ) || 10
-    );
-
-
-  const tagsText =
-    document.getElementById(
-      "mediaTags"
-    ).value.trim();
-
+  /*
+   * لا يوجد هنا أي إدخال رابط.
+   * المصدر الوحيد للوسائط هو الملف المختار
+   * من جهاز المستخدم.
+   */
 
   if(!file){
 
-    showToast(
-      "اختر صورة أو فيديو أولًا"
-    );
-
+    showToast("اختر صورة أو فيديو من جهازك أولًا");
     return;
-
   }
 
+  const isImage=file.type.startsWith("image/");
+  const isVideo=file.type.startsWith("video/");
 
-  const isImage =
-    file.type.startsWith(
-      "image/"
-    );
+  if(!isImage&&!isVideo){
 
-
-  const isVideo =
-    file.type.startsWith(
-      "video/"
-    );
-
-
-  if(!isImage && !isVideo){
-
-    showToast(
-      "نوع الملف غير مدعوم"
-    );
-
+    showToast("نوع الملف غير مدعوم");
     return;
-
   }
 
+  const type=isImage?"image":"video";
 
-  const type =
-    isImage
-      ? "image"
-      : "video";
+  const finalName=
+    enteredName||
+    file.name.replace(/\.[^/.]+$/,"");
 
+  const tags=tagsText
+    ?tagsText
+      .split(",")
+      .map(tag=>tag.trim())
+      .filter(Boolean)
+    :[];
 
-  const finalName =
-    enteredName ||
-    file.name.replace(
-      /\.[^/.]+$/,
-      ""
-    );
+  showToast("جاري رفع الملف...");
 
-
-  const tags =
-    tagsText
-
-      ?
-
-        tagsText
-          .split(",")
-          .map(
-            tag =>
-              tag.trim()
-          )
-          .filter(Boolean)
-
-      :
-
-        [];
-
-
-  showToast(
-    "جاري رفع الملف..."
-  );
-
-
-  let filePath = null;
-
+  let filePath=null;
 
   try{
 
-    const extension =
+    const extension=
       file.name.includes(".")
-        ?
+        ?file.name.split(".").pop().toLowerCase()
+        :"";
 
-          file.name
-            .split(".")
-            .pop()
-            .toLowerCase()
-
-        :
-
-          "";
-
-
-    const safeName =
+    const safeName=
       finalName
-
         .replace(
           /[^a-zA-Z0-9\u0600-\u06FF_-]/g,
           "-"
         )
+        .replace(/-+/g,"-")
+        .replace(/^-|-$/g,"");
 
-        .replace(
-          /-+/g,
-          "-"
-        )
-
-        .replace(
-          /^-|-$/g,
-          ""
-        );
-
-
-    filePath =
-
-      Date.now() +
-      "-" +
+    filePath=
+      Date.now()+
+      "-"+
       Math.random()
         .toString(36)
-        .substring(2,8) +
-      "-" +
-      (
-        safeName ||
-        "media"
-      ) +
-      (
-        extension
-          ? "." + extension
-          : ""
-      );
+        .substring(2,8)+
+      "-"+
+      (safeName||"media")+
+      (extension?"."+extension:"");
 
+    /*
+     * رفع الملف الحقيقي إلى Supabase Storage
+     */
 
-    /* UPLOAD TO STORAGE */
-
-    const uploadResult =
+    const uploadResult=
       await supabaseClient
         .storage
         .from(STORAGE_BUCKET)
@@ -3197,205 +2064,124 @@ async function saveMedia(){
           filePath,
           file,
           {
-
-            cacheControl:
-              "3600",
-
-            upsert:
-              false,
-
-            contentType:
-              file.type
-
+            cacheControl:"3600",
+            upsert:false,
+            contentType:file.type
           }
         );
 
-
     if(uploadResult.error){
-
       throw uploadResult.error;
-
     }
 
+    /*
+     * إنشاء الرابط تلقائيًا.
+     * المستخدم لا يكتبه ولا يحتاج إلى إدخاله.
+     */
 
-    /* PUBLIC URL */
-
-    const publicResult =
+    const publicResult=
       supabaseClient
         .storage
         .from(STORAGE_BUCKET)
-        .getPublicUrl(
-          filePath
-        );
+        .getPublicUrl(filePath);
 
+    const publicUrl=
+      publicResult.data.publicUrl;
 
-    const publicUrl =
-      publicResult
-        .data
-        .publicUrl;
+    const dimensions=
+      await readDimensions(file,type);
 
+    let finalDuration=null;
 
-    /* DIMENSIONS */
-
-    const dimensions =
-      await readDimensions(
-        file,
-        type
-      );
-
-
-    let finalDuration =
-      null;
-
-
-    if(type === "image"){
-
-      finalDuration =
-        duration;
-
+    if(type==="image"){
+      finalDuration=duration;
     }
-
-
-    /* SAVE DATABASE RECORD */
 
     const {
       data,
       error
-    } =
+    }=
       await supabaseClient
         .from("media")
         .insert({
 
-          name:
-            finalName,
+          name:finalName,
 
-          type:
-            type,
+          type:type,
 
-          file_path:
-            filePath,
+          file_path:filePath,
 
-          file_url:
-            publicUrl,
+          file_url:publicUrl,
 
-          file_size:
-            file.size,
+          file_size:file.size,
 
-          width:
-            dimensions.width,
+          width:dimensions.width,
 
-          height:
-            dimensions.height,
+          height:dimensions.height,
 
-          duration:
-            finalDuration,
+          duration:finalDuration,
 
-          tags:
-            tags,
+          tags:tags,
 
-          enabled:
-            true
+          enabled:true
 
         })
         .select()
         .single();
-
-
-    /* IF DATABASE FAILED,
-       DELETE FILE FROM STORAGE */
 
     if(error){
 
       await supabaseClient
         .storage
         .from(STORAGE_BUCKET)
-        .remove([
-          filePath
-        ]);
-
+        .remove([filePath]);
 
       throw error;
-
     }
 
+    media.unshift(data);
 
-    media.unshift(
-      data
-    );
-
-
-    closeModal(
-      "mediaModal"
-    );
-
+    closeModal("mediaModal");
 
     renderMedia();
-
     updateStats();
 
-
-    showToast(
-      "تم رفع الملف بنجاح"
-    );
-
-
-    /* ADD DIRECTLY TO PLAYLIST */
+    showToast("تم رفع الملف بنجاح");
 
     if(
-      addingToContent &&
+      addingToContent&&
       selectedPlaylistId
     ){
 
-      await addMediaToPlaylist(
-        data.id
-      );
+      await addMediaToPlaylist(data.id);
 
     }
 
-
   }catch(error){
 
-    console.error(
-      error
-    );
-
+    console.error(error);
 
     showToast(
-      "فشل رفع الملف: " +
-      (
-        error.message ||
-        "خطأ غير معروف"
-      )
+      "فشل رفع الملف: "+
+      (error.message||"خطأ غير معروف")
     );
-
   }
-
 }
-
 
 /* =========================
    DELETE MEDIA
 ========================= */
 
-async function deleteMedia(
-  id
-){
+async function deleteMedia(id){
 
-  const item =
-    media.find(
-      x => x.id === id
-    );
-
+  const item=media.find(x=>x.id===id);
 
   if(!item)return;
 
-
-  const isUsed =
+  const isUsed=
     playlistItems.some(
-      x =>
-        x.media_id === id
+      x=>x.media_id===id
     );
-
 
   if(isUsed){
 
@@ -3404,103 +2190,53 @@ async function deleteMedia(
     );
 
     return;
-
   }
 
-
-  if(
-    !confirm(
-      "هل تريد حذف هذه الوسائط؟"
-    )
-  ){
-
+  if(!confirm("هل تريد حذف هذه الوسائط؟")){
     return;
-
   }
-
 
   try{
 
-    /* DELETE DATABASE */
-
-    const {
-      error
-    } =
+    const {error}=
       await supabaseClient
         .from("media")
         .delete()
-        .eq(
-          "id",
-          id
-        );
+        .eq("id",id);
 
-
-    if(error){
-
-      throw error;
-
-    }
-
-
-    /* DELETE STORAGE FILE */
+    if(error)throw error;
 
     if(item.file_path){
 
       const {
-        error:
-          storageError
-      } =
+        error:storageError
+      }=
         await supabaseClient
           .storage
           .from(STORAGE_BUCKET)
-          .remove([
-            item.file_path
-          ]);
-
+          .remove([item.file_path]);
 
       if(storageError){
-
         console.warn(
           "Storage delete error:",
           storageError
         );
-
       }
-
     }
 
-
-    media =
-      media.filter(
-        x => x.id !== id
-      );
-
+    media=media.filter(x=>x.id!==id);
 
     renderMedia();
-
     updateStats();
 
-
-    showToast(
-      "تم حذف الوسائط"
-    );
-
+    showToast("تم حذف الوسائط");
 
   }catch(error){
 
-    console.error(
-      error
-    );
-
-
-    showToast(
-      "فشل حذف الوسائط"
-    );
-
+    console.error(error);
+    showToast("فشل حذف الوسائط");
   }
-
 }
-
 
 /* =========================
    CONTENT
@@ -3508,753 +2244,473 @@ async function deleteMedia(
 
 function prepareContentSelector(){
 
-  const select =
+  const select=
     document.getElementById(
       "contentScreenSelect"
     );
 
+  select.innerHTML=
+    screens.map(screen=>`
 
-  select.innerHTML =
-    screens
-      .map(
-        screen => `
+      <option value="${screen.id}">
+        ${escapeHtml(screen.name)}
+      </option>
 
-        <option
-          value="${screen.id}">
-
-          ${escapeHtml(
-            screen.name
-          )}
-
-        </option>
-
-        `
-      )
-      .join("");
-
+    `).join("");
 
   if(
-    selectedScreenId &&
+    selectedScreenId&&
     screens.some(
-      x =>
-        Number(x.id) ===
-        Number(selectedScreenId)
+      x=>Number(x.id)===Number(selectedScreenId)
     )
   ){
 
-    select.value =
-      selectedScreenId;
-
+    select.value=selectedScreenId;
   }
 
-
   loadContentEditor();
-
 }
-
 
 function loadContentEditor(){
 
-  const value =
+  const value=
     document.getElementById(
       "contentScreenSelect"
     ).value;
-
 
   if(!value){
 
     document.getElementById(
       "contentEditor"
-    ).style.display =
-      "none";
+    ).style.display="none";
 
     return;
-
   }
 
+  selectedScreenId=Number(value);
 
-  selectedScreenId =
-    Number(value);
-
-
-  const playlist =
+  const playlist=
     playlists.find(
-      x =>
-        Number(x.screen_id) ===
-        selectedScreenId
+      x=>Number(x.screen_id)===selectedScreenId
     );
-
 
   if(!playlist){
 
     document.getElementById(
       "contentEditor"
-    ).style.display =
-      "none";
+    ).style.display="none";
 
     return;
-
   }
 
-
-  selectedPlaylistId =
-    playlist.id;
-
+  selectedPlaylistId=playlist.id;
 
   document.getElementById(
     "contentEditor"
-  ).style.display =
-    "block";
+  ).style.display="block";
 
-
-  const screen =
+  const screen=
     screens.find(
-      x =>
-        Number(x.id) ===
-        selectedScreenId
+      x=>Number(x.id)===selectedScreenId
     );
-
 
   document.getElementById(
     "contentScreenTitle"
-  ).textContent =
-    screen?.name ||
-    "المحتوى";
-
+  ).textContent=
+    screen?.name||"المحتوى";
 
   document.getElementById(
     "repeatAll"
-  ).checked =
-    playlist.repeat_all !== false;
-
+  ).checked=
+    playlist.repeat_all!==false;
 
   document.getElementById(
     "defaultDuration"
-  ).value =
-    playlist.default_duration ||
-    10;
-
+  ).value=
+    playlist.default_duration||10;
 
   document.getElementById(
     "defaultTransition"
-  ).value =
-    playlist.default_transition ||
-    "fade";
-
+  ).value=
+    playlist.default_transition||"fade";
 
   document.getElementById(
     "fitMode"
-  ).value =
-    playlist.fit_mode ||
-    "contain";
-
+  ).value=
+    playlist.fit_mode||"contain";
 
   renderContentItems();
-
 }
-
 
 function renderContentItems(){
 
-  const container =
-    document.getElementById(
-      "contentItems"
-    );
+  const container=
+    document.getElementById("contentItems");
 
-
-  const items =
+  const items=
     playlistItems
-
       .filter(
-        item =>
-          item.playlist_id ===
-          selectedPlaylistId
+        item=>item.playlist_id===selectedPlaylistId
       )
-
       .sort(
-        (a,b) =>
-          Number(a.position) -
-          Number(b.position)
+        (a,b)=>Number(a.position)-Number(b.position)
       );
-
 
   if(!items.length){
 
-    container.innerHTML = `
-
+    container.innerHTML=`
       <div class="empty">
 
         لا يوجد محتوى حاليًا
 
-        <br>
-        <br>
+        <br><br>
 
         اضغط «إضافة صورة أو فيديو»
 
-      </div>
-
-    `;
+      </div>`;
 
     return;
-
   }
 
+  container.innerHTML=
+    items.map((item,index)=>{
 
-  container.innerHTML =
+      const mediaItem=
+        media.find(
+          x=>x.id===item.media_id
+        );
 
-    items.map(
-      (item,index)=>{
+      if(!mediaItem)return "";
 
-        const mediaItem =
-          media.find(
-            x =>
-              x.id ===
-              item.media_id
-          );
+      return `
 
+      <div
+        class="content-item"
+        draggable="true"
+        data-item-id="${item.id}"
+        ondragstart="dragStart(event)"
+        ondragover="dragOver(event)"
+        ondrop="dropItem(event)">
 
-        if(!mediaItem)
-          return "";
+        <div class="drag">☷</div>
 
-
-        return `
-
-        <div
-          class="content-item"
-          draggable="true"
-          data-item-id="${item.id}"
-          ondragstart="dragStart(event)"
-          ondragover="dragOver(event)"
-          ondrop="dropItem(event)">
-
-
-          <div class="drag">
-            ☷
-          </div>
-
-
-          <div class="media-thumb">
-
-            ${
-              mediaItem.type === "image"
-
-                ?
-
-                `
-                <img
-                  src="${escapeHtml(
-                    mediaItem.file_url
-                  )}"
-                  alt="">
-                `
-
-                :
-
-                `
-                <video
-                  src="${escapeHtml(
-                    mediaItem.file_url
-                  )}"
-                  muted>
-                </video>
-                `
-
-            }
-
-          </div>
-
-
-          <div class="item-info">
-
-            <div class="item-name">
-
-              ${escapeHtml(
-                mediaItem.name
-              )}
-
-            </div>
-
-
-            <div class="item-type">
-
-              ${
-                mediaItem.type === "image"
-                  ? "صورة"
-                  : "فيديو"
-              }
-
-              ·
-
-              ${index + 1}
-
-            </div>
-
-          </div>
-
+        <div class="media-thumb">
 
           ${
-            mediaItem.type === "image"
+            mediaItem.type==="image"
 
-              ?
+            ?`
+              <img
+                src="${escapeHtml(mediaItem.file_url)}"
+                alt="">
+            `
 
-              `
+            :`
+              <video
+                src="${escapeHtml(mediaItem.file_url)}"
+                muted>
+              </video>
+            `
+          }
 
-              <div class="item-controls">
+        </div>
 
-                <label
-                  style="margin:0;font-size:9px">
+        <div class="item-info">
 
-                  ثانية
+          <div class="item-name">
+            ${escapeHtml(mediaItem.name)}
+          </div>
 
-                </label>
+          <div class="item-type">
 
-                <input
-                  type="number"
-                  min="1"
-                  value="${
-                    item.duration ||
-                    mediaItem.duration ||
-                    10
-                  }"
-                  onchange="
-                    updateItemDuration(
-                      '${item.id}',
-                      this.value
-                    )
-                  ">
+            ${
+              mediaItem.type==="image"
+                ?"صورة"
+                :"فيديو"
+            }
 
-              </div>
+            ·
 
-              `
+            ${index+1}
 
-              :
+          </div>
 
-              `
+        </div>
 
-              <select
-                style="width:85px"
+        ${
+          mediaItem.type==="image"
+
+          ?`
+
+            <div class="item-controls">
+
+              <label style="margin:0;font-size:9px">
+                ثانية
+              </label>
+
+              <input
+                type="number"
+                min="1"
+                value="${
+                  item.duration||
+                  mediaItem.duration||
+                  10
+                }"
                 onchange="
-                  updateVideoMode(
+                  updateItemDuration(
                     '${item.id}',
                     this.value
                   )
                 ">
 
-                <option
-                  value="next"
-                  ${
-                    item.video_mode === "next"
-                      ? "selected"
-                      : ""
-                  }>
+            </div>
 
-                  التالي
+          `
 
-                </option>
+          :`
 
-                <option
-                  value="loop"
-                  ${
-                    item.video_mode === "loop"
-                      ? "selected"
-                      : ""
-                  }>
+            <select
+              style="width:85px"
+              onchange="
+                updateVideoMode(
+                  '${item.id}',
+                  this.value
+                )
+              ">
 
-                  تكرار
+              <option
+                value="next"
+                ${item.video_mode==="next"?"selected":""}>
+                التالي
+              </option>
 
-                </option>
+              <option
+                value="loop"
+                ${item.video_mode==="loop"?"selected":""}>
+                تكرار
+              </option>
 
-              </select>
+            </select>
 
-              `
+          `
+        }
 
-          }
+        <select
+          style="width:85px"
+          onchange="
+            updateItemTransition(
+              '${item.id}',
+              this.value
+            )
+          ">
 
+          <option
+            value="fade"
+            ${item.transition==="fade"?"selected":""}>
+            Fade
+          </option>
 
-          <select
-            style="width:85px"
-            onchange="
-              updateItemTransition(
-                '${item.id}',
-                this.value
-              )
-            ">
+          <option
+            value="slide"
+            ${item.transition==="slide"?"selected":""}>
+            Slide
+          </option>
 
-            <option
-              value="fade"
-              ${
-                item.transition === "fade"
-                  ? "selected"
-                  : ""
-              }>
+          <option
+            value="zoom"
+            ${item.transition==="zoom"?"selected":""}>
+            Zoom
+          </option>
 
-              Fade
+          <option
+            value="none"
+            ${item.transition==="none"?"selected":""}>
+            بدون
+          </option>
 
-            </option>
+        </select>
 
-            <option
-              value="slide"
-              ${
-                item.transition === "slide"
-                  ? "selected"
-                  : ""
-              }>
+        <button
+          class="btn btn-small btn-danger"
+          onclick="
+            deletePlaylistItem(
+              '${item.id}'
+            )
+          ">
+          حذف
+        </button>
 
-              Slide
+      </div>
 
-            </option>
+      `;
 
-            <option
-              value="zoom"
-              ${
-                item.transition === "zoom"
-                  ? "selected"
-                  : ""
-              }>
-
-              Zoom
-
-            </option>
-
-            <option
-              value="none"
-              ${
-                item.transition === "none"
-                  ? "selected"
-                  : ""
-              }>
-
-              بدون
-
-            </option>
-
-          </select>
-
-
-          <button
-            class="btn btn-small btn-danger"
-            onclick="
-              deletePlaylistItem(
-                '${item.id}'
-              )
-            ">
-
-            حذف
-
-          </button>
-
-
-        </div>
-
-        `;
-
-      }
-    ).join("");
-
+    }).join("");
 }
-
 
 /* =========================
    ADD MEDIA TO PLAYLIST
 ========================= */
 
-async function addMediaToPlaylist(
-  mediaId
-){
+async function addMediaToPlaylist(mediaId){
 
   if(!selectedPlaylistId){
 
-    showToast(
-      "اختر شاشة أولًا"
-    );
-
+    showToast("اختر شاشة أولًا");
     return;
-
   }
 
-
-  const items =
+  const items=
     playlistItems.filter(
-      x =>
-        x.playlist_id ===
-        selectedPlaylistId
+      x=>x.playlist_id===selectedPlaylistId
     );
 
-
-  const position =
+  const position=
     items.length
+      ?Math.max(
+        ...items.map(
+          x=>Number(x.position)
+        )
+      )+1
+      :0;
 
-      ?
-
-        Math.max(
-          ...items.map(
-            x =>
-              Number(x.position)
-          )
-        ) + 1
-
-      :
-
-        0;
-
-
-  const mediaItem =
-    media.find(
-      x => x.id === mediaId
-    );
-
+  const mediaItem=
+    media.find(x=>x.id===mediaId);
 
   const {
     data,
     error
-  } =
+  }=
     await supabaseClient
       .from("playlist_items")
       .insert({
 
-        playlist_id:
-          selectedPlaylistId,
-
-        media_id:
-          mediaId,
-
-        position:
-          position,
-
-        enabled:
-          true,
+        playlist_id:selectedPlaylistId,
+        media_id:mediaId,
+        position:position,
+        enabled:true,
 
         duration:
-          mediaItem?.type === "image"
-            ? mediaItem.duration || 10
-            : null,
+          mediaItem?.type==="image"
+            ?mediaItem.duration||10
+            :null,
 
-        transition:
-          "fade",
-
-        video_mode:
-          "next",
-
-        muted:
-          true
+        transition:"fade",
+        video_mode:"next",
+        muted:true
 
       })
       .select()
       .single();
 
-
   if(error){
 
     console.error(error);
 
-    showToast(
-      "فشل إضافة المحتوى"
-    );
-
+    showToast("فشل إضافة المحتوى");
     return;
-
   }
 
-
-  playlistItems.push(
-    data
-  );
-
+  playlistItems.push(data);
 
   renderContentItems();
 
-
-  showToast(
-    "تمت إضافة المحتوى"
-  );
-
+  showToast("تمت إضافة المحتوى");
 }
-
 
 /* =========================
    ITEM SETTINGS
 ========================= */
 
-async function updateItemDuration(
-  id,
-  value
-){
+async function updateItemDuration(id,value){
 
-  const duration =
+  const duration=
     Math.max(
       1,
-      Number(value) || 10
+      Number(value)||10
     );
 
-
-  const {
-    error
-  } =
+  const {error}=
     await supabaseClient
       .from("playlist_items")
       .update({
-
-        duration:
-          duration,
-
-        updated_at:
-          new Date().toISOString()
-
+        duration:duration,
+        updated_at:new Date().toISOString()
       })
-      .eq(
-        "id",
-        id
-      );
-
+      .eq("id",id);
 
   if(error){
 
-    showToast(
-      "فشل تعديل المدة"
-    );
-
+    showToast("فشل تعديل المدة");
     return;
-
   }
 
+  const item=
+    playlistItems.find(x=>x.id===id);
 
-  const item =
-    playlistItems.find(
-      x => x.id === id
-    );
-
-
-  if(item){
-
-    item.duration =
-      duration;
-
-  }
-
+  if(item)item.duration=duration;
 }
 
+async function updateVideoMode(id,value){
 
-async function updateVideoMode(
-  id,
-  value
-){
-
-  const {
-    error
-  } =
+  const {error}=
     await supabaseClient
       .from("playlist_items")
       .update({
-
-        video_mode:
-          value,
-
-        updated_at:
-          new Date().toISOString()
-
+        video_mode:value,
+        updated_at:new Date().toISOString()
       })
-      .eq(
-        "id",
-        id
-      );
-
+      .eq("id",id);
 
   if(error){
-
-    showToast(
-      "فشل تعديل الفيديو"
-    );
-
+    showToast("فشل تعديل الفيديو");
   }
-
 }
 
+async function updateItemTransition(id,value){
 
-async function updateItemTransition(
-  id,
-  value
-){
-
-  const {
-    error
-  } =
+  const {error}=
     await supabaseClient
       .from("playlist_items")
       .update({
-
-        transition:
-          value,
-
-        updated_at:
-          new Date().toISOString()
-
+        transition:value,
+        updated_at:new Date().toISOString()
       })
-      .eq(
-        "id",
-        id
-      );
-
+      .eq("id",id);
 
   if(error){
-
-    showToast(
-      "فشل تعديل الانتقال"
-    );
-
+    showToast("فشل تعديل الانتقال");
   }
-
 }
-
 
 /* =========================
    DELETE PLAYLIST ITEM
 ========================= */
 
-async function deletePlaylistItem(
-  id
-){
+async function deletePlaylistItem(id){
 
-  const {
-    error
-  } =
+  const {error}=
     await supabaseClient
       .from("playlist_items")
       .delete()
-      .eq(
-        "id",
-        id
-      );
-
+      .eq("id",id);
 
   if(error){
 
-    showToast(
-      "فشل حذف المحتوى"
-    );
-
+    showToast("فشل حذف المحتوى");
     return;
-
   }
 
-
-  playlistItems =
+  playlistItems=
     playlistItems.filter(
-      x => x.id !== id
+      x=>x.id!==id
     );
-
 
   await normalizePositions();
 
-
   renderContentItems();
 
-
-  showToast(
-    "تم حذف المحتوى"
-  );
-
+  showToast("تم حذف المحتوى");
 }
-
 
 /* =========================
    DRAG & DROP
@@ -4262,135 +2718,76 @@ async function deletePlaylistItem(
 
 function dragStart(event){
 
-  draggedItemId =
-    event.currentTarget
-      .dataset
-      .itemId;
-
+  draggedItemId=
+    event.currentTarget.dataset.itemId;
 }
-
 
 function dragOver(event){
-
   event.preventDefault();
-
 }
-
 
 async function dropItem(event){
 
   event.preventDefault();
 
-
-  const targetId =
-    event.currentTarget
-      .dataset
-      .itemId;
-
+  const targetId=
+    event.currentTarget.dataset.itemId;
 
   if(
-    !draggedItemId ||
-    draggedItemId === targetId
+    !draggedItemId||
+    draggedItemId===targetId
   ){
-
     return;
-
   }
 
-
-  const items =
+  const items=
     playlistItems
-
       .filter(
-        x =>
-          x.playlist_id ===
-          selectedPlaylistId
+        x=>x.playlist_id===selectedPlaylistId
       )
-
       .sort(
-        (a,b) =>
-          Number(a.position) -
-          Number(b.position)
+        (a,b)=>Number(a.position)-Number(b.position)
       );
 
-
-  const from =
+  const from=
     items.findIndex(
-      x =>
-        x.id ===
-        draggedItemId
+      x=>x.id===draggedItemId
     );
 
-
-  const to =
+  const to=
     items.findIndex(
-      x =>
-        x.id ===
-        targetId
+      x=>x.id===targetId
     );
 
+  if(from<0||to<0)return;
 
-  if(from < 0 || to < 0)
-    return;
+  const moved=
+    items.splice(from,1)[0];
 
+  items.splice(to,0,moved);
 
-  const moved =
-    items.splice(
-      from,
-      1
-    )[0];
+  for(let index=0;index<items.length;index++){
 
-
-  items.splice(
-    to,
-    0,
-    moved
-  );
-
-
-  for(
-    let index = 0;
-    index < items.length;
-    index++
-  ){
-
-    items[index].position =
-      index;
-
+    items[index].position=index;
 
     await supabaseClient
       .from("playlist_items")
       .update({
-
-        position:
-          index,
-
-        updated_at:
-          new Date().toISOString()
-
+        position:index,
+        updated_at:new Date().toISOString()
       })
-      .eq(
-        "id",
-        items[index].id
-      );
-
+      .eq("id",items[index].id);
   }
 
-
-  playlistItems =
+  playlistItems=
     playlistItems
       .filter(
-        x =>
-          x.playlist_id !==
-          selectedPlaylistId
+        x=>x.playlist_id!==selectedPlaylistId
       )
       .concat(items);
 
-
   renderContentItems();
-
 }
-
 
 /* =========================
    NORMALIZE POSITIONS
@@ -4398,46 +2795,31 @@ async function dropItem(event){
 
 async function normalizePositions(){
 
-  const items =
+  const items=
     playlistItems
-
       .filter(
-        x =>
-          x.playlist_id ===
-          selectedPlaylistId
+        x=>x.playlist_id===selectedPlaylistId
       )
-
       .sort(
-        (a,b) =>
-          Number(a.position) -
-          Number(b.position)
+        (a,b)=>Number(a.position)-Number(b.position)
       );
 
-
   for(
-    let index = 0;
-    index < items.length;
+    let index=0;
+    index<items.length;
     index++
   ){
 
-    items[index].position =
-      index;
-
+    items[index].position=index;
 
     await supabaseClient
       .from("playlist_items")
       .update({
         position:index
       })
-      .eq(
-        "id",
-        items[index].id
-      );
-
+      .eq("id",items[index].id);
   }
-
 }
-
 
 /* =========================
    PLAYLIST SETTINGS
@@ -4445,67 +2827,44 @@ async function normalizePositions(){
 
 async function savePlaylistSettings(){
 
-  if(!selectedPlaylistId)
-    return;
+  if(!selectedPlaylistId)return;
 
-
-  const data = {
+  const data={
 
     repeat_all:
-      document.getElementById(
-        "repeatAll"
-      ).checked,
+      document.getElementById("repeatAll").checked,
 
     default_duration:
       Math.max(
         1,
         Number(
-          document.getElementById(
-            "defaultDuration"
-          ).value
-        ) || 10
+          document.getElementById("defaultDuration").value
+        )||10
       ),
 
     default_transition:
-      document.getElementById(
-        "defaultTransition"
-      ).value,
+      document.getElementById("defaultTransition").value,
 
     fit_mode:
-      document.getElementById(
-        "fitMode"
-      ).value,
+      document.getElementById("fitMode").value,
 
     updated_at:
       new Date().toISOString()
-
   };
 
-
-  const {
-    error
-  } =
+  const {error}=
     await supabaseClient
       .from("playlists")
       .update(data)
-      .eq(
-        "id",
-        selectedPlaylistId
-      );
-
+      .eq("id",selectedPlaylistId);
 
   if(error){
 
     console.error(error);
 
-    showToast(
-      "فشل حفظ إعدادات المحتوى"
-    );
-
+    showToast("فشل حفظ إعدادات المحتوى");
   }
-
 }
-
 
 /* =========================
    PUBLISH
@@ -4514,89 +2873,54 @@ async function savePlaylistSettings(){
 async function publishCurrentScreen(){
 
   if(
-    !selectedScreenId ||
+    !selectedScreenId||
     !selectedPlaylistId
   ){
 
-    showToast(
-      "اختر شاشة أولًا"
-    );
-
+    showToast("اختر شاشة أولًا");
     return;
-
   }
 
-
-  const now =
+  const now=
     new Date().toISOString();
 
-
-  const {
-    error
-  } =
+  const {error}=
     await supabaseClient
-      .from(
-        "screen_publish_state"
-      )
+      .from("screen_publish_state")
       .upsert({
 
-        screen_id:
-          selectedScreenId,
+        screen_id:selectedScreenId,
 
         published_playlist_id:
           selectedPlaylistId,
 
-        version:
-          Date.now(),
+        version:Date.now(),
 
-        published_at:
-          now,
+        published_at:now,
 
-        updated_at:
-          now
+        updated_at:now
 
       });
-
 
   if(error){
 
     console.error(error);
 
-    showToast(
-      "فشل نشر المحتوى"
-    );
-
+    showToast("فشل نشر المحتوى");
     return;
-
   }
-
 
   await supabaseClient
     .from("playlists")
     .update({
-
-      published:
-        true,
-
-      published_at:
-        now,
-
-      updated_at:
-        now
-
+      published:true,
+      published_at:now,
+      updated_at:now
     })
-    .eq(
-      "id",
-      selectedPlaylistId
-    );
+    .eq("id",selectedPlaylistId);
 
-
-  showToast(
-    "🚀 تم نشر المحتوى على الشاشة"
-  );
-
+  showToast("🚀 تم نشر المحتوى على الشاشة");
 }
-
 
 /* =========================
    SCHEDULES
@@ -4604,144 +2928,94 @@ async function publishCurrentScreen(){
 
 function renderSchedules(){
 
-  const table =
-    document.getElementById(
-      "scheduleTable"
-    );
-
+  const table=
+    document.getElementById("scheduleTable");
 
   if(!schedules.length){
 
-    table.innerHTML = `
+    table.innerHTML=`
+      <tr>
+        <td colspan="7" class="empty">
+          لا توجد جدولات حتى الآن
+        </td>
+      </tr>`;
+
+    return;
+  }
+
+  table.innerHTML=
+    schedules.map(schedule=>{
+
+      const screen=
+        screens.find(
+          x=>Number(x.id)===Number(schedule.screen_id)
+        );
+
+      const playlist=
+        playlists.find(
+          x=>x.id===schedule.playlist_id
+        );
+
+      return `
 
       <tr>
 
-        <td
-          colspan="7"
-          class="empty">
+        <td>
+          ${escapeHtml(screen?.name||"-")}
+        </td>
 
-          لا توجد جدولات حتى الآن
+        <td>
+          ${escapeHtml(playlist?.name||"-")}
+        </td>
+
+        <td>
+          ${schedule.start_date||"-"}
+          ${schedule.start_time||""}
+        </td>
+
+        <td>
+          ${schedule.end_date||"-"}
+          ${schedule.end_time||""}
+        </td>
+
+        <td>${schedule.priority}</td>
+
+        <td>
+
+          <span class="status ${
+            schedule.enabled?"on":"off"
+          }">
+
+            ${
+              schedule.enabled
+                ?"مفعلة"
+                :"متوقفة"
+            }
+
+          </span>
+
+        </td>
+
+        <td>
+
+          <button
+            class="btn btn-small btn-danger"
+            onclick="
+              deleteSchedule(
+                '${schedule.id}'
+              )
+            ">
+            حذف
+          </button>
 
         </td>
 
       </tr>
 
-    `;
+      `;
 
-    return;
-
-  }
-
-
-  table.innerHTML =
-
-    schedules.map(
-      schedule => {
-
-        const screen =
-          screens.find(
-            x =>
-              Number(x.id) ===
-              Number(
-                schedule.screen_id
-              )
-          );
-
-
-        const playlist =
-          playlists.find(
-            x =>
-              x.id ===
-              schedule.playlist_id
-          );
-
-
-        return `
-
-        <tr>
-
-          <td>
-            ${escapeHtml(
-              screen?.name || "-"
-            )}
-          </td>
-
-          <td>
-            ${escapeHtml(
-              playlist?.name || "-"
-            )}
-          </td>
-
-          <td>
-
-            ${
-              schedule.start_date ||
-              "-"
-            }
-
-            ${schedule.start_time || ""}
-
-          </td>
-
-          <td>
-
-            ${
-              schedule.end_date ||
-              "-"
-            }
-
-            ${schedule.end_time || ""}
-
-          </td>
-
-          <td>
-            ${schedule.priority}
-          </td>
-
-          <td>
-
-            <span
-              class="status ${
-                schedule.enabled
-                  ? "on"
-                  : "off"
-              }">
-
-              ${
-                schedule.enabled
-                  ? "مفعلة"
-                  : "متوقفة"
-              }
-
-            </span>
-
-          </td>
-
-          <td>
-
-            <button
-              class="btn btn-small btn-danger"
-              onclick="
-                deleteSchedule(
-                  '${schedule.id}'
-                )
-              ">
-
-              حذف
-
-            </button>
-
-          </td>
-
-        </tr>
-
-        `;
-
-      }
-    ).join("");
-
+    }).join("");
 }
-
 
 /* =========================
    SCHEDULE MODAL
@@ -4749,93 +3023,54 @@ function renderSchedules(){
 
 function openScheduleModal(){
 
-  const screenSelect =
-    document.getElementById(
-      "scheduleScreen"
-    );
+  const screenSelect=
+    document.getElementById("scheduleScreen");
 
+  screenSelect.innerHTML=
+    screens.map(screen=>`
 
-  screenSelect.innerHTML =
-    screens
-      .map(
-        screen => `
+      <option value="${screen.id}">
+        ${escapeHtml(screen.name)}
+      </option>
 
-        <option
-          value="${screen.id}">
+    `).join("");
 
-          ${escapeHtml(
-            screen.name
-          )}
-
-        </option>
-
-        `
-      )
-      .join("");
-
-
-  screenSelect.onchange =
+  screenSelect.onchange=
     renderSchedulePlaylists;
-
 
   renderSchedulePlaylists();
 
-
-  document
-    .getElementById(
-      "scheduleModal"
-    )
+  document.getElementById("scheduleModal")
     .classList.add("show");
-
 }
-
 
 function renderSchedulePlaylists(){
 
-  const screenId =
+  const screenId=
     Number(
-      document.getElementById(
-        "scheduleScreen"
-      ).value
+      document.getElementById("scheduleScreen").value
     );
 
+  const select=
+    document.getElementById("schedulePlaylist");
 
-  const select =
-    document.getElementById(
-      "schedulePlaylist"
-    );
-
-
-  select.innerHTML =
-
+  select.innerHTML=
     playlists
-
       .filter(
-        playlist =>
-          Number(
-            playlist.screen_id
-          ) === screenId
+        playlist=>
+          Number(playlist.screen_id)===screenId
       )
-
       .map(
-        playlist => `
+        playlist=>`
 
-        <option
-          value="${playlist.id}">
-
-          ${escapeHtml(
-            playlist.name
-          )}
-
-        </option>
+          <option value="${playlist.id}">
+            ${escapeHtml(playlist.name)}
+          </option>
 
         `
       )
-
       .join("");
-
 }
-
 
 /* =========================
    SAVE SCHEDULE
@@ -4843,159 +3078,97 @@ function renderSchedulePlaylists(){
 
 async function saveSchedule(){
 
-  const screenId =
+  const screenId=
     Number(
-      document.getElementById(
-        "scheduleScreen"
-      ).value
+      document.getElementById("scheduleScreen").value
     );
 
-
-  const playlistId =
-    document.getElementById(
-      "schedulePlaylist"
-    ).value;
-
+  const playlistId=
+    document.getElementById("schedulePlaylist").value;
 
   if(!playlistId){
 
-    showToast(
-      "لا يوجد محتوى لهذه الشاشة"
-    );
-
+    showToast("لا يوجد محتوى لهذه الشاشة");
     return;
-
   }
 
+  const data={
 
-  const data = {
+    screen_id:screenId,
 
-    screen_id:
-      screenId,
-
-    playlist_id:
-      playlistId,
+    playlist_id:playlistId,
 
     start_date:
-      document.getElementById(
-        "scheduleStartDate"
-      ).value ||
+      document.getElementById("scheduleStartDate").value||
       null,
 
     end_date:
-      document.getElementById(
-        "scheduleEndDate"
-      ).value ||
+      document.getElementById("scheduleEndDate").value||
       null,
 
     start_time:
-      document.getElementById(
-        "scheduleStartTime"
-      ).value ||
+      document.getElementById("scheduleStartTime").value||
       null,
 
     end_time:
-      document.getElementById(
-        "scheduleEndTime"
-      ).value ||
+      document.getElementById("scheduleEndTime").value||
       null,
 
     priority:
       Number(
-        document.getElementById(
-          "schedulePriority"
-        ).value
+        document.getElementById("schedulePriority").value
       ),
 
-    enabled:
-      true
-
+    enabled:true
   };
 
-
-  const {
-    error
-  } =
+  const {error}=
     await supabaseClient
       .from("schedules")
       .insert(data);
-
 
   if(error){
 
     console.error(error);
 
-    showToast(
-      "فشل حفظ الجدولة"
-    );
-
+    showToast("فشل حفظ الجدولة");
     return;
-
   }
 
-
-  closeModal(
-    "scheduleModal"
-  );
-
+  closeModal("scheduleModal");
 
   await loadAll();
 
-
-  showToast(
-    "تم حفظ الجدولة"
-  );
-
+  showToast("تم حفظ الجدولة");
 }
-
 
 /* =========================
    DELETE SCHEDULE
 ========================= */
 
-async function deleteSchedule(
-  id
-){
+async function deleteSchedule(id){
 
-  const {
-    error
-  } =
+  const {error}=
     await supabaseClient
       .from("schedules")
       .delete()
-      .eq(
-        "id",
-        id
-      );
-
+      .eq("id",id);
 
   if(error){
 
-    showToast(
-      "فشل حذف الجدولة"
-    );
-
+    showToast("فشل حذف الجدولة");
     return;
-
   }
 
-
-  schedules =
+  schedules=
     schedules.filter(
-      x =>
-        x.id !== id
+      x=>x.id!==id
     );
-
 
   renderSchedules();
 
-
-  showToast(
-    "تم حذف الجدولة"
-  );
-
+  showToast("تم حذف الجدولة");
 }
-
 
 /* =========================
    MODALS
@@ -5003,39 +3176,23 @@ async function deleteSchedule(
 
 function closeModal(id){
 
-  document
-    .getElementById(id)
+  document.getElementById(id)
     .classList.remove("show");
-
 }
 
+document.querySelectorAll(".modal-backdrop")
+  .forEach(modal=>{
 
-document
-  .querySelectorAll(
-    ".modal-backdrop"
-  )
-  .forEach(
-    modal => {
+    modal.onclick=event=>{
 
-      modal.onclick =
-        event => {
+      if(event.target===modal){
 
-          if(
-            event.target ===
-            modal
-          ){
+        modal.classList.remove("show");
 
-            modal.classList.remove(
-              "show"
-            );
+      }
+    };
 
-          }
-
-        };
-
-    }
-  );
-
+  });
 
 /* =========================
    REALTIME
@@ -5043,85 +3200,75 @@ document
 
 function setupRealtime(){
 
-  const channel =
-    supabaseClient
-      .channel(
-        "innovation-screens-dashboard"
-      )
+  supabaseClient
+    .channel("innovation-screens-dashboard")
 
-      .on(
-        "postgres_changes",
-        {
-          event:"*",
-          schema:"public",
-          table:"screens"
-        },
-        () => loadAll()
-      )
+    .on(
+      "postgres_changes",
+      {
+        event:"*",
+        schema:"public",
+        table:"screens"
+      },
+      ()=>loadAll()
+    )
 
-      .on(
-        "postgres_changes",
-        {
-          event:"*",
-          schema:"public",
-          table:"media"
-        },
-        () => loadAll()
-      )
+    .on(
+      "postgres_changes",
+      {
+        event:"*",
+        schema:"public",
+        table:"media"
+      },
+      ()=>loadAll()
+    )
 
-      .on(
-        "postgres_changes",
-        {
-          event:"*",
-          schema:"public",
-          table:"playlists"
-        },
-        () => loadAll()
-      )
+    .on(
+      "postgres_changes",
+      {
+        event:"*",
+        schema:"public",
+        table:"playlists"
+      },
+      ()=>loadAll()
+    )
 
-      .on(
-        "postgres_changes",
-        {
-          event:"*",
-          schema:"public",
-          table:"playlist_items"
-        },
-        () => loadAll()
-      )
+    .on(
+      "postgres_changes",
+      {
+        event:"*",
+        schema:"public",
+        table:"playlist_items"
+      },
+      ()=>loadAll()
+    )
 
-      .on(
-        "postgres_changes",
-        {
-          event:"*",
-          schema:"public",
-          table:"schedules"
-        },
-        () => loadAll()
-      )
+    .on(
+      "postgres_changes",
+      {
+        event:"*",
+        schema:"public",
+        table:"schedules"
+      },
+      ()=>loadAll()
+    )
 
-      .on(
-        "postgres_changes",
-        {
-          event:"*",
-          schema:"public",
-          table:"screen_publish_state"
-        },
-        () => loadAll()
-      )
+    .on(
+      "postgres_changes",
+      {
+        event:"*",
+        schema:"public",
+        table:"screen_publish_state"
+      },
+      ()=>loadAll()
+    )
 
-      .subscribe(
-        status => {
+    .subscribe(status=>{
 
-          console.log(
-            "Realtime:",
-            status
-          );
+      console.log("Realtime:",status);
 
-        }
-      );
-
+    });
 }
-
 
 /* =========================
    CONNECTION
@@ -5129,43 +3276,40 @@ function setupRealtime(){
 
 window.addEventListener(
   "online",
-  () =>
+  ()=>{
     setConnection(
       true,
       "متصل بالسحابة"
-    )
-);
+    );
 
+    loadAll();
+  }
+);
 
 window.addEventListener(
   "offline",
-  () =>
+  ()=>{
     setConnection(
       false,
       "لا يوجد اتصال بالإنترنت"
-    )
+    );
+  }
 );
-
 
 /* =========================
    LANGUAGE
 ========================= */
 
-document.getElementById(
-  "settingsLanguage"
-).value =
+document.getElementById("settingsLanguage").value=
   currentLanguage;
 
+document.documentElement.dir=
+  currentLanguage==="ar"
+    ?"rtl"
+    :"ltr";
 
-document.documentElement.dir =
-  currentLanguage === "ar"
-    ? "rtl"
-    : "ltr";
-
-
-document.documentElement.lang =
+document.documentElement.lang=
   currentLanguage;
-
 
 /* =========================
    START
