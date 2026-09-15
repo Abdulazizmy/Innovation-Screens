@@ -1,23 +1,14 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
 <title>Innovation Screens</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-
-/* =====================================================
-   RESET
-===================================================== */
 
 *{
   box-sizing:border-box;
@@ -27,2197 +18,1380 @@ html,
 body{
   margin:0;
   padding:0;
-  width:100%;
   min-height:100%;
-}
-
-body{
+  font-family:Arial,Tahoma,sans-serif;
   background:#f5f5f7;
   color:#202024;
-  font-family:
-    Arial,
-    Tahoma,
-    sans-serif;
 }
-
-
-/* =====================================================
-   VARIABLES
-===================================================== */
 
 :root{
-
-  --primary:#2A206A;
-  --primary-dark:#211953;
-  --primary-light:#eeeafd;
-
+  --p:#2A206A;
+  --pd:#211953;
+  --pl:#eeeafd;
   --bg:#f5f5f7;
-  --card:#ffffff;
-
-  --text:#202024;
+  --card:#fff;
   --muted:#777784;
-
   --border:#e5e5ea;
-
-  --success:#18864b;
+  --ok:#18864b;
   --danger:#c83232;
-  --warning:#b77900;
-
-  --sidebar-width:235px;
-
+  --side:235px;
 }
-
-
-/* =====================================================
-   APP
-===================================================== */
 
 .app{
   min-height:100vh;
   display:flex;
 }
 
-
-/* =====================================================
-   SIDEBAR
-===================================================== */
-
 .sidebar{
-
   position:fixed;
-
   top:0;
   right:0;
   bottom:0;
-
-  width:var(--sidebar-width);
-
+  width:var(--side);
   background:#fff;
-
   border-left:1px solid var(--border);
-
-  z-index:100;
-
+  z-index:10;
   display:flex;
   flex-direction:column;
-
 }
-
 
 .logo{
-
   height:72px;
-
   display:flex;
   align-items:center;
-
   padding:0 22px;
-
   border-bottom:1px solid var(--border);
-
 }
 
-
 .logo-mark{
-
   width:38px;
   height:38px;
-
   border-radius:10px;
-
-  background:var(--primary);
-
+  background:var(--p);
   color:#fff;
-
   display:flex;
   align-items:center;
   justify-content:center;
-
   font-weight:800;
-
   margin-left:10px;
-
 }
-
 
 .logo-text{
-
   font-size:16px;
   font-weight:800;
-
 }
-
 
 .logo-sub{
-
   font-size:10px;
   color:var(--muted);
-
   margin-top:3px;
-
 }
-
 
 .nav{
-
   padding:15px 10px;
-
   flex:1;
-
 }
-
 
 .nav-button{
-
   width:100%;
-
   border:0;
-
   background:transparent;
-
   padding:11px 12px;
-
   margin-bottom:4px;
-
   border-radius:9px;
-
   cursor:pointer;
-
   text-align:right;
-
   color:#555;
-
   font-size:13px;
-
   display:flex;
-
   align-items:center;
-
   gap:10px;
-
 }
 
-
-.nav-button:hover{
-
-  background:#f5f4fa;
-
+.nav-button:hover,
+.nav-button.active{
+  background:var(--pl);
+  color:var(--p);
 }
-
 
 .nav-button.active{
-
-  background:var(--primary-light);
-
-  color:var(--primary);
-
   font-weight:700;
-
 }
-
 
 .nav-icon{
-
   width:24px;
   text-align:center;
-
-  font-size:15px;
-
 }
-
 
 .sidebar-bottom{
-
   padding:12px;
-
   border-top:1px solid var(--border);
-
 }
-
 
 .connection{
-
   padding:10px;
-
   background:#f7f7f9;
-
   border-radius:9px;
-
   font-size:11px;
-
 }
-
 
 .connection-row{
-
   display:flex;
-
   align-items:center;
-
   gap:7px;
-
 }
-
 
 .dot{
-
   width:8px;
   height:8px;
-
   border-radius:50%;
-
   background:#999;
-
 }
-
 
 .dot.online{
-
   background:#20a15a;
-
 }
-
 
 .dot.offline{
-
   background:#c83232;
-
 }
-
-
-/* =====================================================
-   MAIN
-===================================================== */
 
 .main{
-
   width:100%;
-
-  margin-right:var(--sidebar-width);
-
+  margin-right:var(--side);
   min-height:100vh;
-
 }
-
 
 .topbar{
-
   height:72px;
-
   background:#fff;
-
   border-bottom:1px solid var(--border);
-
   display:flex;
-
   align-items:center;
-
   justify-content:space-between;
-
   padding:0 25px;
-
 }
-
 
 .page-title{
-
   font-size:19px;
   font-weight:800;
-
 }
-
 
 .page-subtitle{
-
   font-size:11px;
   color:var(--muted);
-
   margin-top:4px;
-
 }
 
-
 .top-actions{
-
   display:flex;
   align-items:center;
   gap:8px;
-
 }
 
-
-.lang-button{
-
-  border:1px solid var(--border);
-
-  background:#fff;
-
-  padding:7px 12px;
-
-  border-radius:7px;
-
-  cursor:pointer;
-
-  font-size:11px;
-
-}
-
-
-.refresh-button{
-
-  border:0;
-
-  background:var(--primary);
-
-  color:#fff;
-
-  padding:8px 13px;
-
-  border-radius:7px;
-
-  cursor:pointer;
-
-  font-size:11px;
-
-}
-
-
-/* =====================================================
-   CONTENT
-===================================================== */
-
-.content{
-
-  padding:22px;
-
-}
-
-
-.page{
-
-  display:none;
-
-}
-
-
-.page.active{
-
-  display:block;
-
-}
-
-
-/* =====================================================
-   CARDS
-===================================================== */
-
-.card{
-
-  background:#fff;
-
-  border:1px solid var(--border);
-
-  border-radius:12px;
-
-  padding:16px;
-
-  margin-bottom:15px;
-
-}
-
-
-.card-header{
-
-  display:flex;
-
-  justify-content:space-between;
-
-  align-items:center;
-
-  margin-bottom:14px;
-
-}
-
-
-.card-title{
-
-  font-size:14px;
-  font-weight:800;
-
-}
-
-
-.card-subtitle{
-
-  color:var(--muted);
-
-  font-size:10px;
-
-  margin-top:3px;
-
-}
-
-
-/* =====================================================
-   DASHBOARD STATS
-===================================================== */
-
-.stats{
-
-  display:grid;
-
-  grid-template-columns:
-    repeat(4,1fr);
-
-  gap:12px;
-
-  margin-bottom:15px;
-
-}
-
-
-.stat{
-
-  background:#fff;
-
-  border:1px solid var(--border);
-
-  border-radius:12px;
-
-  padding:15px;
-
-}
-
-
-.stat-label{
-
-  color:var(--muted);
-
-  font-size:10px;
-
-}
-
-
-.stat-value{
-
-  font-size:25px;
-
-  font-weight:800;
-
-  color:var(--primary);
-
-  margin-top:6px;
-
-}
-
-
-/* =====================================================
-   SCREEN GRID
-===================================================== */
-
-.screen-grid{
-
-  display:grid;
-
-  grid-template-columns:
-    repeat(4,1fr);
-
-  gap:12px;
-
-}
-
-
-.screen-card{
-
-  border:1px solid var(--border);
-
-  border-radius:11px;
-
-  padding:13px;
-
-  background:#fff;
-
-  cursor:pointer;
-
-  transition:.15s;
-
-}
-
-
-.screen-card:hover{
-
-  border-color:#bbb4d8;
-
-  transform:translateY(-1px);
-
-}
-
-
-.screen-head{
-
-  display:flex;
-
-  justify-content:space-between;
-
-  align-items:flex-start;
-
-}
-
-
-.screen-number{
-
-  font-size:10px;
-
-  color:var(--muted);
-
-}
-
-
-.screen-name{
-
-  font-size:13px;
-
-  font-weight:800;
-
-  margin-top:5px;
-
-}
-
-
-.screen-location{
-
-  font-size:10px;
-
-  color:var(--muted);
-
-  margin-top:3px;
-
-}
-
-
-.status{
-
-  font-size:9px;
-
-  padding:4px 7px;
-
-  border-radius:20px;
-
-}
-
-
-.status.on{
-
-  color:var(--success);
-
-  background:#eaf8f0;
-
-}
-
-
-.status.off{
-
-  color:var(--danger);
-
-  background:#fdeeee;
-
-}
-
-
-.screen-size{
-
-  margin-top:12px;
-
-  background:#f7f7f9;
-
-  padding:8px;
-
-  border-radius:7px;
-
-  font-size:10px;
-
-}
-
-
-.screen-actions{
-
-  display:flex;
-
-  gap:5px;
-
-  margin-top:9px;
-
-}
-
-
-.screen-actions button{
-
-  flex:1;
-
-}
-
-
-/* =====================================================
-   BUTTONS
-===================================================== */
-
+.lang-button,
 .btn{
-
   border:1px solid var(--border);
-
   background:#fff;
-
-  color:#333;
-
   padding:8px 11px;
-
   border-radius:7px;
-
   cursor:pointer;
-
   font-size:11px;
-
 }
 
-
-.btn:hover{
-
-  background:#f7f7f9;
-
-}
-
-
+.refresh-button,
 .btn-primary{
-
-  background:var(--primary);
-
-  border-color:var(--primary);
-
+  border:0;
+  background:var(--p);
   color:#fff;
-
+  padding:8px 13px;
+  border-radius:7px;
+  cursor:pointer;
+  font-size:11px;
 }
 
-
+.refresh-button:hover,
 .btn-primary:hover{
-
-  background:var(--primary-dark);
-
+  background:var(--pd);
 }
-
 
 .btn-danger{
-
   color:var(--danger);
-
 }
-
 
 .btn-small{
-
   padding:6px 8px;
-
   font-size:10px;
-
 }
 
+.content{
+  padding:22px;
+}
 
-/* =====================================================
-   TABLE
-===================================================== */
+.page{
+  display:none;
+}
+
+.page.active{
+  display:block;
+}
+
+.card,
+.stat{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:16px;
+  margin-bottom:15px;
+}
+
+.card-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:14px;
+}
+
+.card-title{
+  font-size:14px;
+  font-weight:800;
+}
+
+.card-subtitle{
+  color:var(--muted);
+  font-size:10px;
+  margin-top:3px;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  margin-bottom:15px;
+}
+
+.stat{
+  margin:0;
+}
+
+.stat-label{
+  color:var(--muted);
+  font-size:10px;
+}
+
+.stat-value{
+  font-size:25px;
+  font-weight:800;
+  color:var(--p);
+  margin-top:6px;
+}
+
+.screen-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+}
+
+.screen-card{
+  border:1px solid var(--border);
+  border-radius:11px;
+  padding:13px;
+  background:#fff;
+  cursor:pointer;
+}
+
+.screen-card:hover{
+  border-color:#bbb4d8;
+}
+
+.screen-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+}
+
+.screen-number{
+  font-size:10px;
+  color:var(--muted);
+}
+
+.screen-name{
+  font-size:13px;
+  font-weight:800;
+  margin-top:5px;
+}
+
+.screen-location{
+  font-size:10px;
+  color:var(--muted);
+  margin-top:3px;
+}
+
+.status{
+  font-size:9px;
+  padding:4px 7px;
+  border-radius:20px;
+}
+
+.status.on{
+  color:var(--ok);
+  background:#eaf8f0;
+}
+
+.status.off{
+  color:var(--danger);
+  background:#fdeeee;
+}
+
+.screen-size{
+  margin-top:12px;
+  background:#f7f7f9;
+  padding:8px;
+  border-radius:7px;
+  font-size:10px;
+}
+
+.screen-actions{
+  display:flex;
+  gap:5px;
+  margin-top:9px;
+}
+
+.screen-actions button{
+  flex:1;
+}
 
 .table-wrap{
-
   overflow:auto;
-
 }
-
 
 table{
-
   width:100%;
-
   border-collapse:collapse;
-
   font-size:11px;
-
 }
-
 
 th{
-
   background:#f7f7f9;
-
   color:#666;
-
   font-weight:700;
-
 }
-
 
 th,
 td{
-
   padding:10px;
-
   border-bottom:1px solid var(--border);
-
   text-align:right;
-
 }
 
-
-tr:last-child td{
-
-  border-bottom:0;
-
+.empty{
+  text-align:center;
+  padding:35px 15px;
+  color:var(--muted);
+  font-size:11px;
 }
-
-
-/* =====================================================
-   CONTENT EDITOR
-===================================================== */
 
 .editor-layout{
-
   display:grid;
-
-  grid-template-columns:
-    1fr 320px;
-
+  grid-template-columns:1fr 320px;
   gap:15px;
-
 }
-
-
-.content-list{
-
-  min-height:100px;
-
-}
-
 
 .content-item{
-
   border:1px solid var(--border);
-
   border-radius:10px;
-
   padding:11px;
-
   margin-bottom:8px;
-
   background:#fff;
-
   display:flex;
-
   align-items:center;
-
   gap:10px;
-
 }
-
 
 .drag{
-
   color:#aaa;
-
   cursor:grab;
-
-  font-size:15px;
-
 }
-
 
 .media-thumb{
-
   width:65px;
   height:48px;
-
   border-radius:6px;
-
   background:#eee;
-
   overflow:hidden;
-
   flex-shrink:0;
-
   display:flex;
-
   align-items:center;
-
   justify-content:center;
-
 }
-
 
 .media-thumb img,
 .media-thumb video{
-
   width:100%;
   height:100%;
-
   object-fit:cover;
-
 }
-
-
-.media-placeholder{
-
-  font-size:18px;
-
-}
-
 
 .item-info{
-
   flex:1;
-
   min-width:0;
-
 }
-
 
 .item-name{
-
   font-size:11px;
-
   font-weight:700;
-
   overflow:hidden;
-
   text-overflow:ellipsis;
-
   white-space:nowrap;
-
 }
-
 
 .item-type{
-
   color:var(--muted);
-
   font-size:9px;
-
   margin-top:3px;
-
 }
-
 
 .item-controls{
-
   display:flex;
-
   align-items:center;
-
   gap:5px;
-
 }
-
-
-.item-controls input{
-
-  width:55px;
-
-}
-
-
-/* =====================================================
-   FORMS
-===================================================== */
 
 .form-grid{
-
   display:grid;
-
-  grid-template-columns:
-    repeat(2,1fr);
-
+  grid-template-columns:repeat(2,1fr);
   gap:10px;
-
 }
-
 
 .form-group{
-
   margin-bottom:9px;
-
 }
-
 
 .form-group.full{
-
-  grid-column:
-    1 / -1;
-
+  grid-column:1/-1;
 }
-
 
 label{
-
   display:block;
-
   font-size:10px;
-
   font-weight:700;
-
   margin-bottom:5px;
-
 }
-
 
 input,
 select{
-
   width:100%;
-
   border:1px solid var(--border);
-
   background:#fff;
-
   border-radius:7px;
-
   padding:8px 9px;
-
   font-size:11px;
-
   outline:none;
-
 }
-
 
 input:focus,
 select:focus{
-
-  border-color:var(--primary);
-
+  border-color:var(--p);
 }
-
-
-/* =====================================================
-   TOGGLE
-===================================================== */
 
 .toggle-row{
-
   display:flex;
-
   align-items:center;
-
   justify-content:space-between;
-
   padding:9px 0;
-
   border-bottom:1px solid #f0f0f2;
-
 }
-
-
-.toggle-row:last-child{
-
-  border-bottom:0;
-
-}
-
 
 .toggle{
-
   position:relative;
-
   width:38px;
   height:20px;
-
 }
-
 
 .toggle input{
-
   display:none;
-
 }
-
 
 .toggle-slider{
-
   position:absolute;
-
   inset:0;
-
   background:#ccc;
-
   border-radius:20px;
-
   cursor:pointer;
-
 }
 
-
 .toggle-slider:before{
-
   content:"";
-
   position:absolute;
-
   width:16px;
   height:16px;
-
   top:2px;
   right:2px;
-
   border-radius:50%;
-
   background:#fff;
-
   transition:.2s;
-
 }
 
-
-.toggle input:checked
-+
-.toggle-slider{
-
-  background:var(--primary);
-
+.toggle input:checked+.toggle-slider{
+  background:var(--p);
 }
 
-
-.toggle input:checked
-+
-.toggle-slider:before{
-
-  transform:
-    translateX(-18px);
-
+.toggle input:checked+.toggle-slider:before{
+  transform:translateX(-18px);
 }
-
-
-/* =====================================================
-   EMPTY
-===================================================== */
-
-.empty{
-
-  text-align:center;
-
-  padding:35px 15px;
-
-  color:var(--muted);
-
-  font-size:11px;
-
-}
-
-
-/* =====================================================
-   MODAL
-===================================================== */
 
 .modal-backdrop{
-
   position:fixed;
-
   inset:0;
-
   background:rgba(0,0,0,.45);
-
   z-index:500;
-
   display:none;
-
   align-items:center;
-
   justify-content:center;
-
   padding:20px;
-
 }
-
 
 .modal-backdrop.show{
-
   display:flex;
-
 }
-
 
 .modal{
-
   width:100%;
-
   max-width:620px;
-
   max-height:90vh;
-
   overflow:auto;
-
   background:#fff;
-
   border-radius:13px;
-
   padding:18px;
-
 }
-
 
 .modal-title{
-
   font-size:15px;
   font-weight:800;
-
 }
-
 
 .modal-actions{
-
   display:flex;
-
   justify-content:flex-start;
-
   gap:7px;
-
   margin-top:15px;
-
 }
-
-
-/* =====================================================
-   TOAST
-===================================================== */
 
 .toast{
-
   position:fixed;
-
   bottom:20px;
-
   left:20px;
-
   z-index:900;
-
   background:#202024;
-
   color:#fff;
-
   padding:10px 14px;
-
   border-radius:8px;
-
   font-size:11px;
-
   opacity:0;
-
   transform:translateY(10px);
-
   pointer-events:none;
-
   transition:.2s;
-
 }
-
 
 .toast.show{
-
   opacity:1;
-
   transform:translateY(0);
-
 }
 
-
-/* =====================================================
-   RTL / LTR
-===================================================== */
-
-html[dir="ltr"] .sidebar{
-
+html[dir=ltr] .sidebar{
   right:auto;
   left:0;
-
   border-left:0;
   border-right:1px solid var(--border);
-
 }
 
-
-html[dir="ltr"] .main{
-
+html[dir=ltr] .main{
   margin-right:0;
-  margin-left:var(--sidebar-width);
-
+  margin-left:var(--side);
 }
 
-
-html[dir="ltr"] .nav-button{
-
+html[dir=ltr] .nav-button{
   text-align:left;
-
 }
 
-
-html[dir="ltr"] th,
-html[dir="ltr"] td{
-
+html[dir=ltr] th,
+html[dir=ltr] td{
   text-align:left;
-
 }
-
-
-/* =====================================================
-   RESPONSIVE
-===================================================== */
 
 @media(max-width:1100px){
 
   .screen-grid{
-
-    grid-template-columns:
-      repeat(3,1fr);
-
+    grid-template-columns:repeat(3,1fr);
   }
 
   .stats{
-
-    grid-template-columns:
-      repeat(2,1fr);
-
+    grid-template-columns:repeat(2,1fr);
   }
 
 }
-
 
 @media(max-width:800px){
 
   :root{
-
-    --sidebar-width:0px;
-
+    --side:0px;
   }
 
   .sidebar{
-
     display:none;
-
   }
 
   .main{
-
-    margin:0 !important;
-
+    margin:0!important;
   }
 
   .screen-grid{
-
-    grid-template-columns:
-      repeat(2,1fr);
-
+    grid-template-columns:repeat(2,1fr);
   }
 
   .editor-layout{
-
     grid-template-columns:1fr;
-
   }
 
 }
 
-
 @media(max-width:520px){
 
   .content{
-
     padding:12px;
-
   }
 
-  .screen-grid{
-
-    grid-template-columns:1fr;
-
-  }
-
+  .screen-grid,
   .stats{
-
     grid-template-columns:1fr;
-
   }
 
   .topbar{
-
     padding:0 12px;
-
   }
 
 }
 
 </style>
-
 </head>
-
 
 <body>
 
-
 <div class="app">
-
-
-<!-- =====================================================
-     SIDEBAR
-===================================================== -->
 
 <aside class="sidebar">
 
-  <div class="logo">
+<div class="logo">
 
-    <div class="logo-mark">
-      IS
-    </div>
+<div class="logo-mark">
+IS
+</div>
 
-    <div>
+<div>
 
-      <div class="logo-text">
-        Innovation Screens
-      </div>
+<div class="logo-text">
+Innovation Screens
+</div>
 
-      <div class="logo-sub">
-        Digital Signage
-      </div>
+<div class="logo-sub">
+Digital Signage
+</div>
 
-    </div>
+</div>
 
-  </div>
+</div>
 
+<nav class="nav">
 
-  <nav class="nav">
+<button class="nav-button active" data-page="dashboard">
+<span class="nav-icon">⌂</span>
+<span>لوحة التحكم</span>
+</button>
 
-    <button
-      class="nav-button active"
-      data-page="dashboard">
+<button class="nav-button" data-page="screens">
+<span class="nav-icon">▣</span>
+<span>الشاشات</span>
+</button>
 
-      <span class="nav-icon">⌂</span>
+<button class="nav-button" data-page="media">
+<span class="nav-icon">▧</span>
+<span>مكتبة الوسائط</span>
+</button>
 
-      <span data-ar="لوحة التحكم"
-            data-en="Dashboard">
-        لوحة التحكم
-      </span>
+<button class="nav-button" data-page="content">
+<span class="nav-icon">☷</span>
+<span>المحتوى</span>
+</button>
 
-    </button>
+<button class="nav-button" data-page="scheduling">
+<span class="nav-icon">◷</span>
+<span>الجدولة</span>
+</button>
 
+<button class="nav-button" data-page="settings">
+<span class="nav-icon">⚙</span>
+<span>الإعدادات</span>
+</button>
 
-    <button
-      class="nav-button"
-      data-page="screens">
+</nav>
 
-      <span class="nav-icon">▣</span>
+<div class="sidebar-bottom">
 
-      <span data-ar="الشاشات"
-            data-en="Screens">
-        الشاشات
-      </span>
+<div class="connection">
 
-    </button>
+<div class="connection-row">
 
+<span id="connectionDot" class="dot online"></span>
 
-    <button
-      class="nav-button"
-      data-page="media">
+<span id="connectionText">
+متصل بالسحابة
+</span>
 
-      <span class="nav-icon">▧</span>
+</div>
 
-      <span data-ar="مكتبة الوسائط"
-            data-en="Media Library">
-        مكتبة الوسائط
-      </span>
+</div>
 
-    </button>
-
-
-    <button
-      class="nav-button"
-      data-page="content">
-
-      <span class="nav-icon">☷</span>
-
-      <span data-ar="المحتوى"
-            data-en="Content">
-        المحتوى
-      </span>
-
-    </button>
-
-
-    <button
-      class="nav-button"
-      data-page="scheduling">
-
-      <span class="nav-icon">◷</span>
-
-      <span data-ar="الجدولة"
-            data-en="Scheduling">
-        الجدولة
-      </span>
-
-    </button>
-
-
-    <button
-      class="nav-button"
-      data-page="settings">
-
-      <span class="nav-icon">⚙</span>
-
-      <span data-ar="الإعدادات"
-            data-en="Settings">
-        الإعدادات
-      </span>
-
-    </button>
-
-  </nav>
-
-
-  <div class="sidebar-bottom">
-
-    <div class="connection">
-
-      <div class="connection-row">
-
-        <span
-          id="connectionDot"
-          class="dot online">
-        </span>
-
-        <span
-          id="connectionText">
-          متصل بالسحابة
-        </span>
-
-      </div>
-
-    </div>
-
-  </div>
+</div>
 
 </aside>
 
 
-
-<!-- =====================================================
-     MAIN
-===================================================== -->
-
 <main class="main">
-
 
 <header class="topbar">
 
-  <div>
+<div>
 
-    <div
-      id="pageTitle"
-      class="page-title">
-      لوحة التحكم
-    </div>
+<div id="pageTitle" class="page-title">
+لوحة التحكم
+</div>
 
-    <div
-      id="pageSubtitle"
-      class="page-subtitle">
-      إدارة الشاشات والمحتوى
-    </div>
+<div class="page-subtitle">
+إدارة الشاشات والمحتوى
+</div>
 
-  </div>
+</div>
 
+<div class="top-actions">
 
-  <div class="top-actions">
+<button
+id="languageButton"
+class="lang-button">
+English
+</button>
 
-    <button
-      id="languageButton"
-      class="lang-button">
-      English
-    </button>
+<button
+class="refresh-button"
+onclick="loadAll()">
+↻ تحديث
+</button>
 
-    <button
-      class="refresh-button"
-      onclick="loadAll()">
-      ↻ تحديث
-    </button>
-
-  </div>
+</div>
 
 </header>
-
 
 
 <div class="content">
 
 
-<!-- =====================================================
-     DASHBOARD
-===================================================== -->
+<section id="page-dashboard" class="page active">
 
-<section
-  id="page-dashboard"
-  class="page active">
+<div class="stats">
 
+<div class="stat">
 
-  <div class="stats">
+<div class="stat-label">
+إجمالي الشاشات
+</div>
 
-    <div class="stat">
+<div id="statScreens" class="stat-value">
+0
+</div>
 
-      <div
-        class="stat-label"
-        data-ar="إجمالي الشاشات"
-        data-en="Total Screens">
-        إجمالي الشاشات
-      </div>
-
-      <div
-        id="statScreens"
-        class="stat-value">
-        0
-      </div>
-
-    </div>
+</div>
 
 
-    <div class="stat">
+<div class="stat">
 
-      <div
-        class="stat-label"
-        data-ar="الشاشات المفعلة"
-        data-en="Enabled Screens">
-        الشاشات المفعلة
-      </div>
+<div class="stat-label">
+الشاشات المفعلة
+</div>
 
-      <div
-        id="statEnabled"
-        class="stat-value">
-        0
-      </div>
+<div id="statEnabled" class="stat-value">
+0
+</div>
 
-    </div>
+</div>
 
 
-    <div class="stat">
+<div class="stat">
 
-      <div
-        class="stat-label"
-        data-ar="الوسائط"
-        data-en="Media">
-        الوسائط
-      </div>
+<div class="stat-label">
+الوسائط
+</div>
 
-      <div
-        id="statMedia"
-        class="stat-value">
-        0
-      </div>
+<div id="statMedia" class="stat-value">
+0
+</div>
 
-    </div>
+</div>
 
 
-    <div class="stat">
+<div class="stat">
 
-      <div
-        class="stat-label"
-        data-ar="قوائم المحتوى"
-        data-en="Playlists">
-        قوائم المحتوى
-      </div>
+<div class="stat-label">
+قوائم المحتوى
+</div>
 
-      <div
-        id="statPlaylists"
-        class="stat-value">
-        0
-      </div>
+<div id="statPlaylists" class="stat-value">
+0
+</div>
 
-    </div>
+</div>
 
-  </div>
+</div>
 
 
+<div class="card">
 
-  <div class="card">
+<div class="card-header">
 
-    <div class="card-header">
+<div>
 
-      <div>
+<div class="card-title">
+الشاشات
+</div>
 
-        <div class="card-title">
-          الشاشات
-        </div>
+<div class="card-subtitle">
+نظرة سريعة على الشاشات الثماني
+</div>
 
-        <div class="card-subtitle">
-          نظرة سريعة على الشاشات الثماني
-        </div>
+</div>
 
-      </div>
+<button
+class="btn btn-primary"
+onclick="openPage('screens')">
+إدارة الشاشات
+</button>
 
+</div>
 
-      <button
-        class="btn btn-primary"
-        onclick="openPage('screens')">
+<div
+id="dashboardScreens"
+class="screen-grid">
+</div>
 
-        إدارة الشاشات
-
-      </button>
-
-    </div>
-
-
-    <div
-      id="dashboardScreens"
-      class="screen-grid">
-    </div>
-
-  </div>
+</div>
 
 </section>
 
 
+<section id="page-screens" class="page">
 
-<!-- =====================================================
-     SCREENS
-===================================================== -->
+<div class="card">
 
-<section
-  id="page-screens"
-  class="page">
+<div class="card-header">
 
+<div>
 
-  <div class="card">
+<div class="card-title">
+إدارة الشاشات
+</div>
 
-    <div class="card-header">
+<div class="card-subtitle">
+إعدادات كل شاشة ورابطها المستقل
+</div>
 
-      <div>
+</div>
 
-        <div class="card-title">
-          إدارة الشاشات
-        </div>
+</div>
 
-        <div class="card-subtitle">
-          إعدادات كل شاشة ورابطها المستقل
-        </div>
+<div
+id="screensGrid"
+class="screen-grid">
+</div>
 
-      </div>
-
-    </div>
-
-
-    <div
-      id="screensGrid"
-      class="screen-grid">
-    </div>
-
-  </div>
+</div>
 
 </section>
 
 
+<section id="page-media" class="page">
 
-<!-- =====================================================
-     MEDIA
-===================================================== -->
+<div class="card">
 
-<section
-  id="page-media"
-  class="page">
+<div class="card-header">
 
+<div>
 
-  <div class="card">
+<div class="card-title">
+مكتبة الوسائط
+</div>
 
-    <div class="card-header">
+<div class="card-subtitle">
+الصور والفيديوهات المستخدمة في الشاشات
+</div>
 
-      <div>
+</div>
 
-        <div class="card-title">
-          مكتبة الوسائط
-        </div>
+<button
+class="btn btn-primary"
+onclick="openMediaModal()">
++ إضافة وسائط
+</button>
 
-        <div class="card-subtitle">
-          الصور والفيديوهات المستخدمة في الشاشات
-        </div>
-
-      </div>
-
-
-      <button
-        class="btn btn-primary"
-        onclick="openMediaModal()">
-
-        + إضافة وسائط
-
-      </button>
-
-    </div>
+</div>
 
 
-    <div class="table-wrap">
+<div class="table-wrap">
 
-      <table>
+<table>
 
-        <thead>
+<thead>
 
-          <tr>
+<tr>
 
-            <th>المعاينة</th>
+<th>
+المعاينة
+</th>
 
-            <th>الاسم</th>
+<th>
+الاسم
+</th>
 
-            <th>النوع</th>
+<th>
+النوع
+</th>
 
-            <th>المقاس</th>
+<th>
+المقاس
+</th>
 
-            <th>المدة</th>
+<th>
+المدة
+</th>
 
-            <th>الحالة</th>
+<th>
+الحالة
+</th>
 
-            <th></th>
+<th>
+</th>
 
-          </tr>
+</tr>
 
-        </thead>
+</thead>
 
-        <tbody id="mediaTable">
+<tbody id="mediaTable">
+</tbody>
 
-        </tbody>
+</table>
 
-      </table>
+</div>
 
-    </div>
-
-  </div>
+</div>
 
 </section>
 
 
+<section id="page-content" class="page">
 
-<!-- =====================================================
-     CONTENT
-===================================================== -->
+<div class="card">
 
-<section
-  id="page-content"
-  class="page">
+<div class="card-header">
 
+<div>
 
-  <div class="card">
+<div class="card-title">
+المحتوى
+</div>
 
-    <div class="card-header">
+<div class="card-subtitle">
+اختر شاشة لإدارة المحتوى الخاص بها
+</div>
 
-      <div>
+</div>
 
-        <div class="card-title">
-          المحتوى
-        </div>
+</div>
 
-        <div class="card-subtitle">
-          اختر شاشة لإدارة المحتوى الخاص بها
-        </div>
 
-      </div>
+<div class="form-group">
 
-    </div>
+<label>
+الشاشة
+</label>
 
+<select
+id="contentScreenSelect"
+onchange="loadContentEditor()">
+</select>
 
-    <div
-      class="form-group">
+</div>
 
-      <label>
-        الشاشة
-      </label>
+</div>
 
-      <select
-        id="contentScreenSelect"
-        onchange="loadContentEditor()">
-      </select>
 
-    </div>
+<div
+id="contentEditor"
+style="display:none">
 
-  </div>
+<div class="editor-layout">
 
 
+<div class="card">
 
-  <div
-    id="contentEditor"
-    style="display:none;">
+<div class="card-header">
 
+<div>
 
-    <div class="editor-layout">
+<div
+id="contentScreenTitle"
+class="card-title">
+المحتوى
+</div>
 
+<div class="card-subtitle">
+ترتيب الصور والفيديوهات
+</div>
 
-      <div class="card">
+</div>
 
-        <div class="card-header">
+<button
+class="btn btn-primary"
+onclick="openMediaModal(true)">
++ إضافة صورة أو فيديو
+</button>
 
-          <div>
+</div>
 
-            <div
-              id="contentScreenTitle"
-              class="card-title">
-              المحتوى
-            </div>
 
-            <div class="card-subtitle">
-              ترتيب الصور والفيديوهات
-            </div>
+<div id="contentItems">
+</div>
 
-          </div>
 
+<button
+class="btn"
+style="width:100%"
+onclick="openMediaModal(true)">
++ إضافة صورة أو فيديو
+</button>
 
-          <button
-            class="btn btn-primary"
-            onclick="openMediaModal(true)">
+</div>
 
-            + إضافة صورة أو فيديو
 
-          </button>
+<div class="card">
 
-        </div>
+<div class="card-header">
 
+<div class="card-title">
+إعدادات المحتوى
+</div>
 
-        <div
-          id="contentItems"
-          class="content-list">
-        </div>
+</div>
 
 
-        <button
-          class="btn"
-          style="width:100%;"
-          onclick="openMediaModal(true)">
+<div class="toggle-row">
 
-          + إضافة صورة أو فيديو
+<span>
+تكرار المحتوى بالكامل
+</span>
 
-        </button>
+<label class="toggle">
 
+<input
+id="repeatAll"
+type="checkbox"
+onchange="savePlaylistSettings()"
+checked>
 
-      </div>
+<span class="toggle-slider">
+</span>
 
+</label>
 
+</div>
 
-      <div class="card">
 
-        <div class="card-header">
+<div
+class="form-group"
+style="margin-top:12px">
 
-          <div class="card-title">
-            إعدادات المحتوى
-          </div>
+<label>
+المدة الافتراضية للصورة — بالثواني
+</label>
 
-        </div>
+<input
+id="defaultDuration"
+type="number"
+min="1"
+value="10"
+onchange="savePlaylistSettings()">
 
+</div>
 
-        <div class="toggle-row">
 
-          <span>
-            تكرار المحتوى بالكامل
-          </span>
+<div class="form-group">
 
-          <label class="toggle">
+<label>
+الانتقال الافتراضي
+</label>
 
-            <input
-              id="repeatAll"
-              type="checkbox"
-              onchange="savePlaylistSettings()"
-              checked>
+<select
+id="defaultTransition"
+onchange="savePlaylistSettings()">
 
-            <span class="toggle-slider"></span>
+<option value="fade">
+Fade
+</option>
 
-          </label>
+<option value="slide">
+Slide
+</option>
 
-        </div>
+<option value="zoom">
+Zoom
+</option>
 
+<option value="none">
+بدون انتقال
+</option>
 
-        <div
-          class="form-group"
-          style="margin-top:12px;">
+</select>
 
-          <label>
-            المدة الافتراضية للصورة — بالثواني
-          </label>
+</div>
 
-          <input
-            id="defaultDuration"
-            type="number"
-            min="1"
-            value="10"
-            onchange="savePlaylistSettings()">
 
-        </div>
+<div class="form-group">
 
+<label>
+طريقة عرض المحتوى
+</label>
 
-        <div class="form-group">
+<select
+id="fitMode"
+onchange="savePlaylistSettings()">
 
-          <label>
-            الانتقال الافتراضي
-          </label>
+<option value="contain">
+احتواء
+</option>
 
-          <select
-            id="defaultTransition"
-            onchange="savePlaylistSettings()">
+<option value="cover">
+ملء الشاشة
+</option>
 
-            <option value="fade">
-              Fade
-            </option>
+<option value="background">
+خلفية
+</option>
 
-            <option value="slide">
-              Slide
-            </option>
+</select>
 
-            <option value="zoom">
-              Zoom
-            </option>
+</div>
 
-            <option value="none">
-              بدون انتقال
-            </option>
 
-          </select>
+<button
+class="btn btn-primary"
+style="width:100%;margin-top:5px"
+onclick="publishCurrentScreen()">
 
-        </div>
+🚀 نشر على الشاشة
 
+</button>
 
-        <div class="form-group">
+</div>
 
-          <label>
-            طريقة عرض المحتوى
-          </label>
+</div>
 
-          <select
-            id="fitMode"
-            onchange="savePlaylistSettings()">
-
-            <option value="contain">
-              احتواء
-            </option>
-
-            <option value="cover">
-              ملء الشاشة
-            </option>
-
-            <option value="background">
-              خلفية
-            </option>
-
-          </select>
-
-        </div>
-
-
-        <button
-          class="btn btn-primary"
-          style="width:100%;margin-top:5px;"
-          onclick="publishCurrentScreen()">
-
-          🚀 نشر على الشاشة
-
-        </button>
-
-
-      </div>
-
-    </div>
-
-  </div>
+</div>
 
 </section>
 
 
+<section id="page-scheduling" class="page">
 
-<!-- =====================================================
-     SCHEDULING
-===================================================== -->
+<div class="card">
 
-<section
-  id="page-scheduling"
-  class="page">
+<div class="card-header">
 
+<div>
 
-  <div class="card">
+<div class="card-title">
+الجدولة
+</div>
 
-    <div class="card-header">
+<div class="card-subtitle">
+إدارة المحتوى حسب التاريخ والوقت
+</div>
 
-      <div>
+</div>
 
-        <div class="card-title">
-          الجدولة
-        </div>
+<button
+class="btn btn-primary"
+onclick="openScheduleModal()">
 
-        <div class="card-subtitle">
-          إدارة المحتوى حسب التاريخ والوقت
-        </div>
++ إضافة جدولة
 
-      </div>
+</button>
 
-
-      <button
-        class="btn btn-primary"
-        onclick="openScheduleModal()">
-
-        + إضافة جدولة
-
-      </button>
-
-    </div>
+</div>
 
 
-    <div class="table-wrap">
+<div class="table-wrap">
 
-      <table>
+<table>
 
-        <thead>
+<thead>
 
-          <tr>
+<tr>
 
-            <th>الشاشة</th>
+<th>
+الشاشة
+</th>
 
-            <th>المحتوى</th>
+<th>
+المحتوى
+</th>
 
-            <th>البداية</th>
+<th>
+البداية
+</th>
 
-            <th>النهاية</th>
+<th>
+النهاية
+</th>
 
-            <th>الأولوية</th>
+<th>
+الأولوية
+</th>
 
-            <th>الحالة</th>
+<th>
+الحالة
+</th>
 
-            <th></th>
+<th>
+</th>
 
-          </tr>
+</tr>
 
-        </thead>
+</thead>
 
-        <tbody id="scheduleTable">
+<tbody id="scheduleTable">
+</tbody>
 
-        </tbody>
+</table>
 
-      </table>
+</div>
 
-    </div>
-
-  </div>
+</div>
 
 </section>
 
 
+<section id="page-settings" class="page">
 
-<!-- =====================================================
-     SETTINGS
-===================================================== -->
+<div class="card">
 
-<section
-  id="page-settings"
-  class="page">
+<div class="card-header">
 
+<div>
 
-  <div class="card">
+<div class="card-title">
+الإعدادات
+</div>
 
-    <div class="card-header">
+<div class="card-subtitle">
+إعدادات النظام العامة
+</div>
 
-      <div>
+</div>
 
-        <div class="card-title">
-          الإعدادات
-        </div>
-
-        <div class="card-subtitle">
-          إعدادات النظام العامة
-        </div>
-
-      </div>
-
-    </div>
+</div>
 
 
-    <div class="form-grid">
+<div class="form-grid">
+
+<div class="form-group">
+
+<label>
+اللغة
+</label>
+
+<select
+id="settingsLanguage"
+onchange="changeLanguage(this.value)">
+
+<option value="ar">
+العربية
+</option>
+
+<option value="en">
+English
+</option>
+
+</select>
+
+</div>
 
 
-      <div class="form-group">
+<div class="form-group">
 
-        <label>
-          اللغة
-        </label>
+<label>
+التحديث التلقائي
+</label>
 
-        <select
-          id="settingsLanguage"
-          onchange="changeLanguage(this.value)">
+<select>
 
-          <option value="ar">
-            العربية
-          </option>
+<option>
+Realtime
+</option>
 
-          <option value="en">
-            English
-          </option>
+<option>
+يدوي
+</option>
 
-        </select>
+</select>
 
-      </div>
+</div>
 
+</div>
 
-      <div class="form-group">
-
-        <label>
-          التحديث التلقائي
-        </label>
-
-        <select
-          id="autoRefreshSetting">
-
-          <option value="realtime">
-            Realtime
-          </option>
-
-          <option value="manual">
-            يدوي
-          </option>
-
-        </select>
-
-      </div>
+</div>
 
 
-    </div>
+<div class="card">
 
-  </div>
+<div class="card-header">
 
+<div class="card-title">
+معلومات الاتصال
+</div>
 
+</div>
 
-  <div class="card">
+<div
+style="font-size:11px;color:#666;line-height:1.8">
 
-    <div class="card-header">
+قاعدة البيانات:
+<strong>
+Supabase
+</strong>
 
-      <div class="card-title">
-        معلومات الاتصال
-      </div>
+<br>
 
-    </div>
+المزامنة:
+<strong>
+Realtime
+</strong>
 
+<br>
 
-    <div
-      style="font-size:11px;color:#666;line-height:1.8;">
+عدد الشاشات:
+<strong id="settingsScreenCount">
+8
+</strong>
 
-      قاعدة البيانات:
-      <strong>
-        Supabase
-      </strong>
+</div>
 
-      <br>
-
-      المزامنة:
-      <strong>
-        Realtime
-      </strong>
-
-      <br>
-
-      عدد الشاشات:
-      <strong id="settingsScreenCount">
-        8
-      </strong>
-
-    </div>
-
-  </div>
+</div>
 
 </section>
 
@@ -2229,596 +1403,551 @@ html[dir="ltr"] td{
 </div>
 
 
-
-<!-- =====================================================
-     SCREEN MODAL
-===================================================== -->
+<!-- SCREEN MODAL -->
 
 <div
-  id="screenModal"
-  class="modal-backdrop">
+id="screenModal"
+class="modal-backdrop">
 
-  <div class="modal">
+<div class="modal">
 
-    <div class="modal-title">
-      إعدادات الشاشة
-    </div>
+<div class="modal-title">
+إعدادات الشاشة
+</div>
 
 
-    <div
-      class="form-grid"
-      style="margin-top:15px;">
+<div
+class="form-grid"
+style="margin-top:15px">
 
 
-      <div class="form-group">
+<div class="form-group">
 
-        <label>
-          اسم الشاشة
-        </label>
+<label>
+اسم الشاشة
+</label>
 
-        <input
-          id="screenName">
-
-      </div>
-
-
-      <div class="form-group">
-
-        <label>
-          الموقع
-        </label>
-
-        <input
-          id="screenLocation">
-
-      </div>
-
-
-      <div class="form-group">
-
-        <label>
-          العرض
-        </label>
-
-        <input
-          id="screenWidth"
-          type="number">
-
-      </div>
-
-
-      <div class="form-group">
-
-        <label>
-          الارتفاع
-        </label>
-
-        <input
-          id="screenHeight"
-          type="number">
-
-      </div>
-
-
-      <div class="form-group full">
-
-        <label>
-          المقاس الجاهز
-        </label>
-
-        <select
-          id="screenPreset"
-          onchange="applyScreenPreset(this.value)">
-
-          <option value="">
-            اختر المقاس
-          </option>
-
-          <option value="358x1600">
-            358×1600 — عمودي
-          </option>
-
-          <option value="1080x1920">
-            1080×1920 — عمودي
-          </option>
-
-          <option value="1200x1920">
-            1200×1920 — عمودي
-          </option>
-
-          <option value="2160x3840">
-            2160×3840 — عمودي 4K
-          </option>
-
-          <option value="1080x1080">
-            1080×1080 — مربع
-          </option>
-
-          <option value="3840x3840">
-            3840×3840 — مربع 4K
-          </option>
-
-          <option value="1280x720">
-            1280×720 — أفقي
-          </option>
-
-          <option value="1920x1080">
-            1920×1080 — أفقي
-          </option>
-
-          <option value="2560x1440">
-            2560×1440 — أفقي
-          </option>
-
-          <option value="3840x2160">
-            3840×2160 — أفقي 4K
-          </option>
-
-          <option value="4096x2160">
-            4096×2160 — 4K Cinema
-          </option>
-
-        </select>
-
-      </div>
-
-
-      <div class="form-group">
-
-        <label>
-          الاتجاه
-        </label>
-
-        <select
-          id="screenOrientation">
-
-          <option value="portrait">
-            عمودي
-          </option>
-
-          <option value="landscape">
-            أفقي
-          </option>
-
-          <option value="square">
-            مربع
-          </option>
-
-        </select>
-
-      </div>
-
-
-      <div class="form-group">
-
-        <label>
-          الحالة
-        </label>
-
-        <select
-          id="screenEnabled">
-
-          <option value="true">
-            مفعلة
-          </option>
-
-          <option value="false">
-            غير مفعلة
-          </option>
-
-        </select>
-
-      </div>
-
-    </div>
-
-
-    <div
-      id="screenLinkBox"
-      style="
-        background:#f7f7f9;
-        padding:10px;
-        border-radius:8px;
-        margin-top:8px;
-        font-size:10px;
-        word-break:break-all;">
-    </div>
-
-
-    <div class="modal-actions">
-
-      <button
-        class="btn btn-primary"
-        onclick="saveScreen()">
-
-        حفظ
-
-      </button>
-
-      <button
-        class="btn"
-        onclick="closeModal('screenModal')">
-
-        إلغاء
-
-      </button>
-
-      <button
-        class="btn"
-        onclick="openSelectedScreen()">
-
-        فتح الشاشة
-
-      </button>
-
-    </div>
-
-  </div>
+<input id="screenName">
 
 </div>
 
 
+<div class="form-group">
 
-<!-- =====================================================
-     MEDIA MODAL
-===================================================== -->
+<label>
+الموقع
+</label>
 
-<div
-  id="mediaModal"
-  class="modal-backdrop">
-
-  <div class="modal">
-
-    <div class="modal-title">
-      إضافة وسائط
-    </div>
-
-
-    <div
-      class="form-grid"
-      style="margin-top:15px;">
-
-
-      <div class="form-group">
-
-        <label>
-          اسم الملف
-        </label>
-
-        <input
-          id="mediaName"
-          placeholder="مثال: شعار المركز">
-
-      </div>
-
-
-      <div class="form-group">
-
-        <label>
-          النوع
-        </label>
-
-        <select
-          id="mediaType">
-
-          <option value="image">
-            صورة
-          </option>
-
-          <option value="video">
-            فيديو
-          </option>
-
-        </select>
-
-      </div>
-
-
-      <div class="form-group full">
-
-        <label>
-          رابط الملف
-        </label>
-
-        <input
-          id="mediaUrl"
-          placeholder="https://...">
-
-      </div>
-
-
-      <div class="form-group">
-
-        <label>
-          مدة الصورة — ثانية
-        </label>
-
-        <input
-          id="mediaDuration"
-          type="number"
-          min="1"
-          value="10">
-
-      </div>
-
-
-      <div class="form-group">
-
-        <label>
-          الوسوم
-        </label>
-
-        <input
-          id="mediaTags"
-          placeholder="فعالية, مركز, إعلان">
-
-      </div>
-
-    </div>
-
-
-    <div
-      style="
-        margin-top:5px;
-        padding:9px;
-        background:#fff8e8;
-        border-radius:7px;
-        color:#856404;
-        font-size:10px;
-        line-height:1.6;">
-
-      حاليًا يتم حفظ رابط الوسائط في قاعدة البيانات.
-      رفع الملفات مباشرة إلى Supabase Storage سيكون في الخطوة التالية.
-
-    </div>
-
-
-    <div class="modal-actions">
-
-      <button
-        class="btn btn-primary"
-        onclick="saveMedia()">
-
-        إضافة
-
-      </button>
-
-      <button
-        class="btn"
-        onclick="closeModal('mediaModal')">
-
-        إلغاء
-
-      </button>
-
-    </div>
-
-  </div>
+<input id="screenLocation">
 
 </div>
 
 
+<div class="form-group">
 
-<!-- =====================================================
-     SCHEDULE MODAL
-===================================================== -->
+<label>
+العرض
+</label>
 
-<div
-  id="scheduleModal"
-  class="modal-backdrop">
-
-  <div class="modal">
-
-    <div class="modal-title">
-      إضافة جدولة
-    </div>
-
-
-    <div
-      class="form-grid"
-      style="margin-top:15px;">
-
-
-      <div class="form-group">
-
-        <label>
-          الشاشة
-        </label>
-
-        <select
-          id="scheduleScreen">
-        </select>
-
-      </div>
-
-
-      <div class="form-group">
-
-        <label>
-          المحتوى
-        </label>
-
-        <select
-          id="schedulePlaylist">
-        </select>
-
-      </div>
-
-
-      <div class="form-group">
-
-        <label>
-          تاريخ البداية
-        </label>
-
-        <input
-          id="scheduleStartDate"
-          type="date">
-
-      </div>
-
-
-      <div class="form-group">
-
-        <label>
-          تاريخ النهاية
-        </label>
-
-        <input
-          id="scheduleEndDate"
-          type="date">
-
-      </div>
-
-
-      <div class="form-group">
-
-        <label>
-          وقت البداية
-        </label>
-
-        <input
-          id="scheduleStartTime"
-          type="time">
-
-      </div>
-
-
-      <div class="form-group">
-
-        <label>
-          وقت النهاية
-        </label>
-
-        <input
-          id="scheduleEndTime"
-          type="time">
-
-      </div>
-
-
-      <div class="form-group">
-
-        <label>
-          الأولوية
-        </label>
-
-        <select
-          id="schedulePriority">
-
-          <option value="1">
-            عادية
-          </option>
-
-          <option value="2">
-            عالية
-          </option>
-
-          <option value="3">
-            عاجلة
-          </option>
-
-        </select>
-
-      </div>
-
-    </div>
-
-
-    <div class="modal-actions">
-
-      <button
-        class="btn btn-primary"
-        onclick="saveSchedule()">
-
-        حفظ
-
-      </button>
-
-      <button
-        class="btn"
-        onclick="closeModal('scheduleModal')">
-
-        إلغاء
-
-      </button>
-
-    </div>
-
-  </div>
+<input
+id="screenWidth"
+type="number">
 
 </div>
 
 
+<div class="form-group">
 
-<div
-  id="toast"
-  class="toast">
+<label>
+الارتفاع
+</label>
+
+<input
+id="screenHeight"
+type="number">
+
 </div>
 
+
+<div class="form-group full">
+
+<label>
+المقاس الجاهز
+</label>
+
+<select
+id="screenPreset"
+onchange="applyScreenPreset(this.value)">
+
+<option value="">
+اختر المقاس
+</option>
+
+<option value="358x1600">
+358×1600 — عمودي
+</option>
+
+<option value="1080x1920">
+1080×1920 — عمودي
+</option>
+
+<option value="1200x1920">
+1200×1920 — عمودي
+</option>
+
+<option value="2160x3840">
+2160×3840 — عمودي 4K
+</option>
+
+<option value="1080x1080">
+1080×1080 — مربع
+</option>
+
+<option value="3840x3840">
+3840×3840 — مربع 4K
+</option>
+
+<option value="1280x720">
+1280×720 — أفقي
+</option>
+
+<option value="1920x1080">
+1920×1080 — أفقي
+</option>
+
+<option value="2560x1440">
+2560×1440 — أفقي
+</option>
+
+<option value="3840x2160">
+3840×2160 — أفقي 4K
+</option>
+
+<option value="4096x2160">
+4096×2160 — 4K Cinema
+</option>
+
+</select>
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+الاتجاه
+</label>
+
+<select id="screenOrientation">
+
+<option value="portrait">
+عمودي
+</option>
+
+<option value="landscape">
+أفقي
+</option>
+
+<option value="square">
+مربع
+</option>
+
+</select>
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+الحالة
+</label>
+
+<select id="screenEnabled">
+
+<option value="true">
+مفعلة
+</option>
+
+<option value="false">
+غير مفعلة
+</option>
+
+</select>
+
+</div>
+
+</div>
+
+
+<div
+id="screenLinkBox"
+style="
+background:#f7f7f9;
+padding:10px;
+border-radius:8px;
+margin-top:8px;
+font-size:10px;
+word-break:break-all">
+</div>
+
+
+<div class="modal-actions">
+
+<button
+class="btn btn-primary"
+onclick="saveScreen()">
+حفظ
+</button>
+
+<button
+class="btn"
+onclick="closeModal('screenModal')">
+إلغاء
+</button>
+
+<button
+class="btn"
+onclick="openSelectedScreen()">
+فتح الشاشة
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- MEDIA MODAL -->
+
+<div
+id="mediaModal"
+class="modal-backdrop">
+
+<div class="modal">
+
+<div class="modal-title">
+إضافة وسائط
+</div>
+
+
+<div
+class="form-grid"
+style="margin-top:15px">
+
+
+<div class="form-group">
+
+<label>
+اسم الملف
+</label>
+
+<input
+id="mediaName"
+placeholder="مثال: شعار المركز">
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+نوع الملف
+</label>
+
+<select id="mediaType">
+
+<option value="image">
+صورة
+</option>
+
+<option value="video">
+فيديو
+</option>
+
+</select>
+
+</div>
+
+
+<div class="form-group full">
+
+<label>
+اختيار الملف
+</label>
+
+<input
+id="mediaFile"
+type="file"
+accept="image/*,video/*">
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+مدة الصورة — ثانية
+</label>
+
+<input
+id="mediaDuration"
+type="number"
+min="1"
+value="10">
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+الوسوم
+</label>
+
+<input
+id="mediaTags"
+placeholder="فعالية, مركز, إعلان">
+
+</div>
+
+</div>
+
+
+<div
+style="
+margin-top:5px;
+padding:9px;
+background:#f0eefb;
+border-radius:7px;
+color:#2A206A;
+font-size:10px;
+line-height:1.6;">
+
+اختر صورة أو فيديو من جهازك وسيتم رفعه تلقائيًا إلى مكتبة الوسائط.
+
+</div>
+
+
+<div class="modal-actions">
+
+<button
+class="btn btn-primary"
+onclick="saveMedia()">
+
+رفع وإضافة
+
+</button>
+
+<button
+class="btn"
+onclick="closeModal('mediaModal')">
+
+إلغاء
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- SCHEDULE MODAL -->
+
+<div
+id="scheduleModal"
+class="modal-backdrop">
+
+<div class="modal">
+
+<div class="modal-title">
+إضافة جدولة
+</div>
+
+
+<div
+class="form-grid"
+style="margin-top:15px">
+
+
+<div class="form-group">
+
+<label>
+الشاشة
+</label>
+
+<select id="scheduleScreen">
+</select>
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+المحتوى
+</label>
+
+<select id="schedulePlaylist">
+</select>
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+تاريخ البداية
+</label>
+
+<input
+id="scheduleStartDate"
+type="date">
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+تاريخ النهاية
+</label>
+
+<input
+id="scheduleEndDate"
+type="date">
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+وقت البداية
+</label>
+
+<input
+id="scheduleStartTime"
+type="time">
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+وقت النهاية
+</label>
+
+<input
+id="scheduleEndTime"
+type="time">
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+الأولوية
+</label>
+
+<select id="schedulePriority">
+
+<option value="1">
+عادية
+</option>
+
+<option value="2">
+عالية
+</option>
+
+<option value="3">
+عاجلة
+</option>
+
+</select>
+
+</div>
+
+</div>
+
+
+<div class="modal-actions">
+
+<button
+class="btn btn-primary"
+onclick="saveSchedule()">
+حفظ
+</button>
+
+<button
+class="btn"
+onclick="closeModal('scheduleModal')">
+إلغاء
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div
+id="toast"
+class="toast">
+</div>
 
 
 <script>
 
-/* =====================================================
-   SUPABASE
-===================================================== */
-
 const SUPABASE_URL =
-  "https://gkdqttzjwgyfyjbrcbdp.supabase.co";
-
+"https://gkdqttzjwgyfyjbrcbdp.supabase.co";
 
 const SUPABASE_KEY =
-  "sb_publishable_QRPg8bjUXtSxRtwBmCguug_cq8ZjbVv";
+"sb_publishable_QRPg8bjUXtSxRtwBmCguug_cq8ZjbVv";
+
+const STORAGE_BUCKET =
+"signage-media";
 
 
 const supabaseClient =
-  window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
+window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
 
-
-/* =====================================================
-   STATE
-===================================================== */
 
 let screens = [];
-
 let media = [];
-
 let playlists = [];
-
 let playlistItems = [];
-
 let schedules = [];
 
 let selectedScreenId = null;
-
 let selectedPlaylistId = null;
 
 let addingToContent = false;
+let draggedItemId = null;
 
 let currentLanguage =
-  localStorage.getItem(
-    "innovationScreensLanguage"
-  ) || "ar";
+localStorage.getItem(
+  "innovationScreensLanguage"
+) || "ar";
 
-
-/* =====================================================
-   HELPERS
-===================================================== */
 
 function escapeHtml(value){
 
-  return String(
-    value ?? ""
-  )
-  .replaceAll("&","&amp;")
-  .replaceAll("<","&lt;")
-  .replaceAll(">","&gt;")
-  .replaceAll('"',"&quot;")
-  .replaceAll("'","&#039;");
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 
 }
 
@@ -2828,8 +1957,7 @@ function showToast(message){
   const toast =
     document.getElementById("toast");
 
-  toast.textContent =
-    message;
+  toast.textContent = message;
 
   toast.classList.add("show");
 
@@ -2839,11 +1967,28 @@ function showToast(message){
 
   window.toastTimer =
     setTimeout(
-      ()=>{
-        toast.classList.remove("show");
-      },
-      2500
+      () => toast.classList.remove("show"),
+      2800
     );
+
+}
+
+
+function setConnection(
+  online,
+  text
+){
+
+  document.getElementById(
+    "connectionDot"
+  ).className =
+    "dot " +
+    (online ? "online" : "offline");
+
+
+  document.getElementById(
+    "connectionText"
+  ).textContent = text;
 
 }
 
@@ -2851,160 +1996,63 @@ function showToast(message){
 function getScreenUrl(id){
 
   return (
-    window.location.origin
-    +
-    window.location.pathname
-      .replace(
-        "index.html",
-        "screen.html"
-      )
-    +
-    "?id="
-    +
+    location.origin +
+    location.pathname
+      .replace("index.html","screen.html") +
+    "?id=" +
     id
   );
 
 }
 
 
-/* =====================================================
-   LANGUAGE
-===================================================== */
-
-function applyLanguage(){
-
-  document.documentElement.dir =
-    currentLanguage === "ar"
-      ? "rtl"
-      : "ltr";
-
-  document.documentElement.lang =
-    currentLanguage;
-
-
-  document
-    .querySelectorAll("[data-ar]")
-    .forEach(
-      element=>{
-
-        element.textContent =
-          currentLanguage === "ar"
-            ? element.dataset.ar
-            : element.dataset.en;
-
-      }
-    );
-
-
-  document.getElementById(
-    "languageButton"
-  ).textContent =
-    currentLanguage === "ar"
-      ? "English"
-      : "العربية";
-
-
-  document.getElementById(
-    "settingsLanguage"
-  ).value =
-    currentLanguage;
-
-
-  updatePageTitle();
-
-}
-
-
-function changeLanguage(language){
-
-  currentLanguage =
-    language;
-
-  localStorage.setItem(
-    "innovationScreensLanguage",
-    language
-  );
-
-  applyLanguage();
-
-}
-
-
-document
-  .getElementById(
-    "languageButton"
-  )
-  .addEventListener(
-    "click",
-    ()=>{
-
-      changeLanguage(
-        currentLanguage === "ar"
-          ? "en"
-          : "ar"
-      );
-
-    }
-  );
-
-
-/* =====================================================
-   NAVIGATION
-===================================================== */
-
 const pageNames = {
 
-  dashboard:{
-    ar:"لوحة التحكم",
-    en:"Dashboard"
-  },
+  dashboard:[
+    "لوحة التحكم",
+    "Dashboard"
+  ],
 
-  screens:{
-    ar:"الشاشات",
-    en:"Screens"
-  },
+  screens:[
+    "الشاشات",
+    "Screens"
+  ],
 
-  media:{
-    ar:"مكتبة الوسائط",
-    en:"Media Library"
-  },
+  media:[
+    "مكتبة الوسائط",
+    "Media Library"
+  ],
 
-  content:{
-    ar:"المحتوى",
-    en:"Content"
-  },
+  content:[
+    "المحتوى",
+    "Content"
+  ],
 
-  scheduling:{
-    ar:"الجدولة",
-    en:"Scheduling"
-  },
+  scheduling:[
+    "الجدولة",
+    "Scheduling"
+  ],
 
-  settings:{
-    ar:"الإعدادات",
-    en:"Settings"
-  }
+  settings:[
+    "الإعدادات",
+    "Settings"
+  ]
 
 };
 
 
 document
-  .querySelectorAll(".nav-button")
-  .forEach(
-    button=>{
+.querySelectorAll(".nav-button")
+.forEach(
+  button => {
 
-      button.addEventListener(
-        "click",
-        ()=>{
-
-          openPage(
-            button.dataset.page
-          );
-
-        }
+    button.onclick = () =>
+      openPage(
+        button.dataset.page
       );
 
-    }
-  );
+  }
+);
 
 
 function openPage(page){
@@ -3012,93 +2060,128 @@ function openPage(page){
   document
     .querySelectorAll(".nav-button")
     .forEach(
-      button=>{
+      button =>
         button.classList.toggle(
           "active",
           button.dataset.page === page
-        );
-      }
+        )
     );
 
 
   document
     .querySelectorAll(".page")
     .forEach(
-      section=>{
+      section =>
         section.classList.remove(
           "active"
-        );
-      }
+        )
     );
 
 
-  const target =
-    document.getElementById(
+  document
+    .getElementById(
       "page-" + page
-    );
-
-
-  if(target){
-
-    target.classList.add(
-      "active"
-    );
-
-  }
+    )
+    .classList.add("active");
 
 
   updatePageTitle();
 
 
-  if(page === "media")
+  if(page === "media"){
     renderMedia();
+  }
 
-  if(page === "scheduling")
+
+  if(page === "scheduling"){
     renderSchedules();
+  }
 
-  if(page === "content")
+
+  if(page === "content"){
     prepareContentSelector();
+  }
 
 }
 
 
 function updatePageTitle(){
 
-  const active =
+  const button =
     document.querySelector(
       ".nav-button.active"
     );
 
-
-  if(!active)
-    return;
-
-
-  const page =
-    active.dataset.page;
+  if(!button)return;
 
 
   const data =
-    pageNames[page];
-
-
-  if(!data)
-    return;
+    pageNames[
+      button.dataset.page
+    ];
 
 
   document.getElementById(
     "pageTitle"
   ).textContent =
     currentLanguage === "ar"
-      ? data.ar
-      : data.en;
+      ? data[0]
+      : data[1];
 
 }
 
 
-/* =====================================================
-   LOAD ALL
-===================================================== */
+function changeLanguage(value){
+
+  currentLanguage = value;
+
+  localStorage.setItem(
+    "innovationScreensLanguage",
+    value
+  );
+
+
+  document.documentElement.dir =
+    value === "ar"
+      ? "rtl"
+      : "ltr";
+
+
+  document.documentElement.lang =
+    value;
+
+
+  document.getElementById(
+    "languageButton"
+  ).textContent =
+    value === "ar"
+      ? "English"
+      : "العربية";
+
+
+  document.getElementById(
+    "settingsLanguage"
+  ).value = value;
+
+
+  updatePageTitle();
+
+}
+
+
+document.getElementById(
+  "languageButton"
+).onclick = () =>
+  changeLanguage(
+    currentLanguage === "ar"
+      ? "en"
+      : "ar"
+  );
+
+
+/* =========================
+   LOAD DATA
+========================= */
 
 async function loadAll(){
 
@@ -3129,7 +2212,9 @@ async function loadAll(){
         .select("*")
         .order(
           "created_at",
-          {ascending:false}
+          {
+            ascending:false
+          }
         ),
 
       supabaseClient
@@ -3183,15 +2268,10 @@ async function loadAll(){
 
 
     renderDashboard();
-
     renderScreens();
-
     renderMedia();
-
     renderSchedules();
-
     prepareContentSelector();
-
     updateStats();
 
 
@@ -3210,8 +2290,10 @@ async function loadAll(){
       "تعذر الاتصال بالسحابة"
     );
 
+
     showToast(
-      "تعذر تحميل البيانات"
+      "تعذر تحميل البيانات: " +
+      (error.message || "خطأ")
     );
 
   }
@@ -3219,70 +2301,9 @@ async function loadAll(){
 }
 
 
-/* =====================================================
-   CONNECTION
-===================================================== */
-
-function setConnection(
-  online,
-  text
-){
-
-  const dot =
-    document.getElementById(
-      "connectionDot"
-    );
-
-
-  const label =
-    document.getElementById(
-      "connectionText"
-    );
-
-
-  dot.classList.toggle(
-    "online",
-    online
-  );
-
-
-  dot.classList.toggle(
-    "offline",
-    !online
-  );
-
-
-  label.textContent =
-    text;
-
-}
-
-
-window.addEventListener(
-  "online",
-  ()=>{
-    setConnection(
-      true,
-      "متصل بالسحابة"
-    );
-  }
-);
-
-
-window.addEventListener(
-  "offline",
-  ()=>{
-    setConnection(
-      false,
-      "لا يوجد اتصال بالإنترنت"
-    );
-  }
-);
-
-
-/* =====================================================
+/* =========================
    STATS
-===================================================== */
+========================= */
 
 function updateStats(){
 
@@ -3321,115 +2342,18 @@ function updateStats(){
 }
 
 
-/* =====================================================
-   SCREEN CARD
-===================================================== */
-
-function screenCardHtml(
-  screen
-){
-
-  const enabled =
-    screen.enabled !== false;
-
-
-  const statusText =
-    enabled
-      ? "مفعلة"
-      : "غير مفعلة";
-
-
-  const statusClass =
-    enabled
-      ? "on"
-      : "off";
-
-
-  return `
-
-    <div
-      class="screen-card"
-      onclick="openScreenSettings(${screen.id})">
-
-      <div class="screen-head">
-
-        <div>
-
-          <div class="screen-number">
-            شاشة ${escapeHtml(screen.id)}
-          </div>
-
-          <div class="screen-name">
-            ${escapeHtml(screen.name)}
-          </div>
-
-          <div class="screen-location">
-            ${escapeHtml(screen.location)}
-          </div>
-
-        </div>
-
-        <span class="status ${statusClass}">
-          ${statusText}
-        </span>
-
-      </div>
-
-
-      <div class="screen-size">
-
-        ${screen.width} × ${screen.height}
-
-        ·
-
-        ${orientationText(
-          screen.orientation
-        )}
-
-      </div>
-
-
-      <div
-        class="screen-actions"
-        onclick="event.stopPropagation()">
-
-        <button
-          class="btn btn-small"
-          onclick="openScreenSettings(${screen.id})">
-
-          إعدادات
-
-        </button>
-
-        <button
-          class="btn btn-small btn-primary"
-          onclick="openScreenUrl(${screen.id})">
-
-          فتح الشاشة
-
-        </button>
-
-      </div>
-
-    </div>
-
-  `;
-
-}
-
+/* =========================
+   SCREENS
+========================= */
 
 function orientationText(
   orientation
 ){
 
-  if(
-    orientation === "portrait"
-  )
+  if(orientation === "portrait")
     return "عمودي";
 
-  if(
-    orientation === "square"
-  )
+  if(orientation === "square")
     return "مربع";
 
   return "أفقي";
@@ -3437,53 +2361,132 @@ function orientationText(
 }
 
 
-/* =====================================================
-   RENDER DASHBOARD
-===================================================== */
+function screenCardHtml(screen){
+
+  const enabled =
+    screen.enabled !== false;
+
+
+  return `
+
+  <div
+    class="screen-card"
+    onclick="openScreenSettings(${screen.id})">
+
+    <div class="screen-head">
+
+      <div>
+
+        <div class="screen-number">
+          شاشة ${screen.id}
+        </div>
+
+        <div class="screen-name">
+          ${escapeHtml(screen.name)}
+        </div>
+
+        <div class="screen-location">
+          ${escapeHtml(screen.location)}
+        </div>
+
+      </div>
+
+      <span
+        class="status ${enabled ? "on" : "off"}">
+
+        ${enabled ? "مفعلة" : "غير مفعلة"}
+
+      </span>
+
+    </div>
+
+
+    <div class="screen-size">
+
+      ${screen.width} × ${screen.height}
+
+      ·
+
+      ${orientationText(screen.orientation)}
+
+    </div>
+
+
+    <div
+      class="screen-actions"
+      onclick="event.stopPropagation()">
+
+      <button
+        class="btn btn-small"
+        onclick="openScreenSettings(${screen.id})">
+
+        إعدادات
+
+      </button>
+
+
+      <button
+        class="btn btn-small btn-primary"
+        onclick="openScreenUrl(${screen.id})">
+
+        فتح الشاشة
+
+      </button>
+
+    </div>
+
+  </div>
+
+  `;
+
+}
+
 
 function renderDashboard(){
 
-  document.getElementById(
-    "dashboardScreens"
-  ).innerHTML =
+  const container =
+    document.getElementById(
+      "dashboardScreens"
+    );
+
+
+  container.innerHTML =
     screens.length
-      ? screens
-          .map(screenCardHtml)
-          .join("")
-      : `<div class="empty">
+      ? screens.map(
+          screenCardHtml
+        ).join("")
+      : `
+        <div class="empty">
           لا توجد شاشات
-         </div>`;
+        </div>
+      `;
 
 }
 
-
-/* =====================================================
-   RENDER SCREENS
-===================================================== */
 
 function renderScreens(){
 
-  document.getElementById(
-    "screensGrid"
-  ).innerHTML =
+  const container =
+    document.getElementById(
+      "screensGrid"
+    );
+
+
+  container.innerHTML =
     screens.length
-      ? screens
-          .map(screenCardHtml)
-          .join("")
-      : `<div class="empty">
+      ? screens.map(
+          screenCardHtml
+        ).join("")
+      : `
+        <div class="empty">
           لا توجد شاشات
-         </div>`;
+        </div>
+      `;
 
 }
 
 
-/* =====================================================
-   SCREEN SETTINGS
-===================================================== */
-
-function openScreenSettings(
-  id
-){
+function openScreenSettings(id){
 
   const screen =
     screens.find(
@@ -3492,8 +2495,7 @@ function openScreenSettings(
     );
 
 
-  if(!screen)
-    return;
+  if(!screen)return;
 
 
   selectedScreenId =
@@ -3527,8 +2529,7 @@ function openScreenSettings(
   document.getElementById(
     "screenOrientation"
   ).value =
-    screen.orientation ||
-    "landscape";
+    screen.orientation || "landscape";
 
 
   document.getElementById(
@@ -3547,67 +2548,64 @@ function openScreenSettings(
   document.getElementById(
     "screenLinkBox"
   ).innerHTML =
-    `
-      <strong>رابط الشاشة:</strong>
-      <br>
-      ${escapeHtml(
-        getScreenUrl(id)
-      )}
-    `;
+
+    "<strong>رابط الشاشة:</strong><br>" +
+
+    escapeHtml(
+      getScreenUrl(id)
+    );
 
 
   document
-    .getElementById(
-      "screenModal"
-    )
+    .getElementById("screenModal")
     .classList.add("show");
 
 }
 
 
-function saveScreen(){
+async function saveScreen(){
 
-  if(
-    selectedScreenId === null
-  )
+  if(selectedScreenId === null)
     return;
 
 
   const data = {
 
     name:
-      document.getElementById(
-        "screenName"
-      ).value.trim(),
+      document
+        .getElementById("screenName")
+        .value
+        .trim(),
 
     location:
-      document.getElementById(
-        "screenLocation"
-      ).value.trim(),
+      document
+        .getElementById("screenLocation")
+        .value
+        .trim(),
 
     width:
       Number(
-        document.getElementById(
-          "screenWidth"
-        ).value
+        document
+          .getElementById("screenWidth")
+          .value
       ),
 
     height:
       Number(
-        document.getElementById(
-          "screenHeight"
-        ).value
+        document
+          .getElementById("screenHeight")
+          .value
       ),
 
     orientation:
-      document.getElementById(
-        "screenOrientation"
-      ).value,
+      document
+        .getElementById("screenOrientation")
+        .value,
 
     enabled:
-      document.getElementById(
-        "screenEnabled"
-      ).value === "true",
+      document
+        .getElementById("screenEnabled")
+        .value === "true",
 
     updated_at:
       new Date().toISOString()
@@ -3615,65 +2613,55 @@ function saveScreen(){
   };
 
 
-  supabaseClient
-    .from("screens")
-    .update(data)
-    .eq(
-      "id",
-      selectedScreenId
-    )
-    .then(
-      ({error})=>{
-
-        if(error){
-
-          console.error(error);
-
-          showToast(
-            "فشل حفظ إعدادات الشاشة"
-          );
-
-          return;
-
-        }
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("screens")
+      .update(data)
+      .eq(
+        "id",
+        selectedScreenId
+      );
 
 
-        showToast(
-          "تم حفظ إعدادات الشاشة"
-        );
+  if(error){
 
+    console.error(error);
 
-        closeModal(
-          "screenModal"
-        );
-
-
-        loadAll();
-
-      }
+    showToast(
+      "فشل حفظ إعدادات الشاشة"
     );
+
+    return;
+
+  }
+
+
+  closeModal("screenModal");
+
+  showToast(
+    "تم حفظ إعدادات الشاشة"
+  );
+
+
+  loadAll();
 
 }
 
 
-function applyScreenPreset(
-  value
-){
+function applyScreenPreset(value){
 
-  if(!value)
-    return;
+  if(!value)return;
 
 
-  const parts =
-    value.split("x");
-
-
-  const width =
-    Number(parts[0]);
-
-
-  const height =
-    Number(parts[1]);
+  const [
+    width,
+    height
+  ] =
+    value
+      .split("x")
+      .map(Number);
 
 
   document.getElementById(
@@ -3688,34 +2676,20 @@ function applyScreenPreset(
     height;
 
 
-  let orientation =
-    "landscape";
-
-
-  if(width === height){
-
-    orientation =
-      "square";
-
-  }else if(width < height){
-
-    orientation =
-      "portrait";
-
-  }
-
-
   document.getElementById(
     "screenOrientation"
   ).value =
-    orientation;
+
+    width === height
+      ? "square"
+      : width < height
+        ? "portrait"
+        : "landscape";
 
 }
 
 
-function openScreenUrl(
-  id
-){
+function openScreenUrl(id){
 
   window.open(
     getScreenUrl(id),
@@ -3728,21 +2702,21 @@ function openScreenUrl(
 function openSelectedScreen(){
 
   if(
-    selectedScreenId === null
-  )
-    return;
+    selectedScreenId !== null
+  ){
 
+    openScreenUrl(
+      selectedScreenId
+    );
 
-  openScreenUrl(
-    selectedScreenId
-  );
+  }
 
 }
 
 
-/* =====================================================
+/* =========================
    MEDIA
-===================================================== */
+========================= */
 
 function renderMedia(){
 
@@ -3754,16 +2728,21 @@ function renderMedia(){
 
   if(!media.length){
 
-    table.innerHTML =
-      `
+    table.innerHTML = `
+
       <tr>
+
         <td
           colspan="7"
           class="empty">
+
           لا توجد وسائط حتى الآن
+
         </td>
+
       </tr>
-      `;
+
+    `;
 
     return;
 
@@ -3771,112 +2750,134 @@ function renderMedia(){
 
 
   table.innerHTML =
+
     media.map(
-      item=>{
+      item => `
 
-        const preview =
-          item.type === "image"
+      <tr>
 
-          ?
+        <td>
 
-          `<img
-             src="${escapeHtml(item.file_url)}"
-             alt="">`
+          <div class="media-thumb">
 
-          :
+            ${
+              item.type === "image"
 
-          `<video
-             src="${escapeHtml(item.file_url)}"
-             muted>
-           </video>`;
+              ?
 
+              `
+              <img
+                src="${escapeHtml(item.file_url)}"
+                alt="">
+              `
 
-        return `
+              :
 
-          <tr>
+              `
+              <video
+                src="${escapeHtml(item.file_url)}"
+                muted>
+              </video>
+              `
 
-            <td>
+            }
 
-              <div
-                class="media-thumb">
+          </div>
 
-                ${preview}
-
-              </div>
-
-            </td>
-
-
-            <td>
-              ${escapeHtml(item.name)}
-            </td>
+        </td>
 
 
-            <td>
-              ${item.type === "image"
-                ? "صورة"
-                : "فيديو"}
-            </td>
+        <td>
+          ${escapeHtml(item.name)}
+        </td>
 
 
-            <td>
-              ${
-                item.width && item.height
-                  ? item.width +
-                    " × " +
-                    item.height
-                  : "-"
-              }
-            </td>
+        <td>
+
+          ${
+            item.type === "image"
+              ? "صورة"
+              : "فيديو"
+          }
+
+        </td>
 
 
-            <td>
-              ${
-                item.type === "image"
-                  ? (item.duration || 10) +
-                    " ث"
-                  : "-"
-              }
-            </td>
+        <td>
+
+          ${
+            item.width &&
+            item.height
+
+              ?
+
+              item.width +
+              " × " +
+              item.height
+
+              :
+
+              "-"
+
+          }
+
+        </td>
 
 
-            <td>
+        <td>
 
-              <span
-                class="status ${
-                  item.enabled
-                    ? "on"
-                    : "off"
-                }">
+          ${
+            item.type === "image"
 
-                ${
-                  item.enabled
-                    ? "مفعلة"
-                    : "غير مفعلة"
-                }
+              ?
 
-              </span>
+              (item.duration || 10) +
+              " ث"
 
-            </td>
+              :
+
+              "-"
+
+          }
+
+        </td>
 
 
-            <td>
+        <td>
 
-              <button
-                class="btn btn-small btn-danger"
-                onclick="deleteMedia('${item.id}')">
+          <span
+            class="status ${
+              item.enabled
+                ? "on"
+                : "off"
+            }">
 
-                حذف
+            ${
+              item.enabled
+                ? "مفعلة"
+                : "غير مفعلة"
+            }
 
-              </button>
+          </span>
 
-            </td>
+        </td>
 
-          </tr>
 
-        `;
+        <td>
 
-      }
+          <button
+            class="btn btn-small btn-danger"
+            onclick="deleteMedia('${item.id}')">
+
+            حذف
+
+          </button>
+
+        </td>
+
+      </tr>
+
+      `
     ).join("");
 
 }
@@ -3896,7 +2897,7 @@ function openMediaModal(
 
 
   document.getElementById(
-    "mediaUrl"
+    "mediaFile"
   ).value = "";
 
 
@@ -3911,40 +2912,145 @@ function openMediaModal(
 
 
   document
-    .getElementById(
-      "mediaModal"
-    )
+    .getElementById("mediaModal")
     .classList.add("show");
 
 }
 
 
+/* =========================
+   READ FILE DIMENSIONS
+========================= */
+
+async function readDimensions(
+  file,
+  type
+){
+
+  const objectUrl =
+    URL.createObjectURL(file);
+
+
+  try{
+
+    if(type === "image"){
+
+      const image =
+        new Image();
+
+
+      return await new Promise(
+        (resolve,reject)=>{
+
+          image.onload = () => {
+
+            resolve({
+
+              width:
+                image.naturalWidth,
+
+              height:
+                image.naturalHeight
+
+            });
+
+          };
+
+
+          image.onerror =
+            reject;
+
+
+          image.src =
+            objectUrl;
+
+        }
+      );
+
+    }
+
+
+    const video =
+      document.createElement(
+        "video"
+      );
+
+
+    return await new Promise(
+      (resolve,reject)=>{
+
+        video.onloadedmetadata =
+          () => {
+
+            resolve({
+
+              width:
+                video.videoWidth,
+
+              height:
+                video.videoHeight,
+
+              duration:
+                video.duration
+
+            });
+
+          };
+
+
+        video.onerror =
+          reject;
+
+
+        video.src =
+          objectUrl;
+
+      }
+    );
+
+
+  }finally{
+
+    URL.revokeObjectURL(
+      objectUrl
+    );
+
+  }
+
+}
+
+
+/* =========================
+   UPLOAD MEDIA
+========================= */
+
 async function saveMedia(){
 
-  const name =
+  const fileInput =
+    document.getElementById(
+      "mediaFile"
+    );
+
+
+  const file =
+    fileInput.files[0];
+
+
+  const enteredName =
     document.getElementById(
       "mediaName"
     ).value.trim();
 
 
-  const type =
-    document.getElementById(
-      "mediaType"
-    ).value;
-
-
-  const url =
-    document.getElementById(
-      "mediaUrl"
-    ).value.trim();
-
-
   const duration =
-    Number(
-      document.getElementById(
-        "mediaDuration"
-      ).value
-    ) || 10;
+    Math.max(
+      1,
+      Number(
+        document.getElementById(
+          "mediaDuration"
+        ).value
+      ) || 10
+    );
 
 
   const tagsText =
@@ -3953,10 +3059,10 @@ async function saveMedia(){
     ).value.trim();
 
 
-  if(!name){
+  if(!file){
 
     showToast(
-      "اكتب اسم الوسائط"
+      "اختر صورة أو فيديو أولًا"
     );
 
     return;
@@ -3964,89 +3070,302 @@ async function saveMedia(){
   }
 
 
-  if(!url){
+  const isImage =
+    file.type.startsWith(
+      "image/"
+    );
+
+
+  const isVideo =
+    file.type.startsWith(
+      "video/"
+    );
+
+
+  if(!isImage && !isVideo){
 
     showToast(
-      "أدخل رابط الملف"
+      "نوع الملف غير مدعوم"
     );
 
     return;
 
   }
+
+
+  const type =
+    isImage
+      ? "image"
+      : "video";
+
+
+  const finalName =
+    enteredName ||
+    file.name.replace(
+      /\.[^/.]+$/,
+      ""
+    );
 
 
   const tags =
     tagsText
-      ? tagsText
+
+      ?
+
+        tagsText
           .split(",")
           .map(
             tag =>
               tag.trim()
           )
           .filter(Boolean)
-      : [];
 
+      :
 
-  const {data,error} =
-    await supabaseClient
-      .from("media")
-      .insert({
-
-        name:name,
-
-        type:type,
-
-        file_url:url,
-
-        duration:duration,
-
-        tags:tags,
-
-        enabled:true
-
-      })
-      .select()
-      .single();
-
-
-  if(error){
-
-    console.error(error);
-
-    showToast(
-      "فشل إضافة الوسائط"
-    );
-
-    return;
-
-  }
-
-
-  media.unshift(data);
-
-
-  closeModal(
-    "mediaModal"
-  );
-
-
-  renderMedia();
-
-  updateStats();
+        [];
 
 
   showToast(
-    "تمت إضافة الوسائط"
+    "جاري رفع الملف..."
   );
 
 
-  if(
-    addingToContent &&
-    selectedPlaylistId
-  ){
+  let filePath = null;
 
-    await addMediaToPlaylist(
-      data.id
+
+  try{
+
+    const extension =
+      file.name.includes(".")
+        ?
+
+          file.name
+            .split(".")
+            .pop()
+            .toLowerCase()
+
+        :
+
+          "";
+
+
+    const safeName =
+      finalName
+
+        .replace(
+          /[^a-zA-Z0-9\u0600-\u06FF_-]/g,
+          "-"
+        )
+
+        .replace(
+          /-+/g,
+          "-"
+        )
+
+        .replace(
+          /^-|-$/g,
+          ""
+        );
+
+
+    filePath =
+
+      Date.now() +
+      "-" +
+      Math.random()
+        .toString(36)
+        .substring(2,8) +
+      "-" +
+      (
+        safeName ||
+        "media"
+      ) +
+      (
+        extension
+          ? "." + extension
+          : ""
+      );
+
+
+    /* UPLOAD TO STORAGE */
+
+    const uploadResult =
+      await supabaseClient
+        .storage
+        .from(STORAGE_BUCKET)
+        .upload(
+          filePath,
+          file,
+          {
+
+            cacheControl:
+              "3600",
+
+            upsert:
+              false,
+
+            contentType:
+              file.type
+
+          }
+        );
+
+
+    if(uploadResult.error){
+
+      throw uploadResult.error;
+
+    }
+
+
+    /* PUBLIC URL */
+
+    const publicResult =
+      supabaseClient
+        .storage
+        .from(STORAGE_BUCKET)
+        .getPublicUrl(
+          filePath
+        );
+
+
+    const publicUrl =
+      publicResult
+        .data
+        .publicUrl;
+
+
+    /* DIMENSIONS */
+
+    const dimensions =
+      await readDimensions(
+        file,
+        type
+      );
+
+
+    let finalDuration =
+      null;
+
+
+    if(type === "image"){
+
+      finalDuration =
+        duration;
+
+    }
+
+
+    /* SAVE DATABASE RECORD */
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .from("media")
+        .insert({
+
+          name:
+            finalName,
+
+          type:
+            type,
+
+          file_path:
+            filePath,
+
+          file_url:
+            publicUrl,
+
+          file_size:
+            file.size,
+
+          width:
+            dimensions.width,
+
+          height:
+            dimensions.height,
+
+          duration:
+            finalDuration,
+
+          tags:
+            tags,
+
+          enabled:
+            true
+
+        })
+        .select()
+        .single();
+
+
+    /* IF DATABASE FAILED,
+       DELETE FILE FROM STORAGE */
+
+    if(error){
+
+      await supabaseClient
+        .storage
+        .from(STORAGE_BUCKET)
+        .remove([
+          filePath
+        ]);
+
+
+      throw error;
+
+    }
+
+
+    media.unshift(
+      data
+    );
+
+
+    closeModal(
+      "mediaModal"
+    );
+
+
+    renderMedia();
+
+    updateStats();
+
+
+    showToast(
+      "تم رفع الملف بنجاح"
+    );
+
+
+    /* ADD DIRECTLY TO PLAYLIST */
+
+    if(
+      addingToContent &&
+      selectedPlaylistId
+    ){
+
+      await addMediaToPlaylist(
+        data.id
+      );
+
+    }
+
+
+  }catch(error){
+
+    console.error(
+      error
+    );
+
+
+    showToast(
+      "فشل رفع الملف: " +
+      (
+        error.message ||
+        "خطأ غير معروف"
+      )
     );
 
   }
@@ -4054,18 +3373,31 @@ async function saveMedia(){
 }
 
 
+/* =========================
+   DELETE MEDIA
+========================= */
+
 async function deleteMedia(
   id
 ){
 
-  const used =
-    playlistItems.some(
-      item =>
-        item.media_id === id
+  const item =
+    media.find(
+      x => x.id === id
     );
 
 
-  if(used){
+  if(!item)return;
+
+
+  const isUsed =
+    playlistItems.some(
+      x =>
+        x.media_id === id
+    );
+
+
+  if(isUsed){
 
     showToast(
       "لا يمكن حذف وسائط مستخدمة في محتوى"
@@ -4076,58 +3408,103 @@ async function deleteMedia(
   }
 
 
-  const confirmed =
-    confirm(
+  if(
+    !confirm(
       "هل تريد حذف هذه الوسائط؟"
-    );
-
-
-  if(!confirmed)
-    return;
-
-
-  const {error} =
-    await supabaseClient
-      .from("media")
-      .delete()
-      .eq("id",id);
-
-
-  if(error){
-
-    console.error(error);
-
-    showToast(
-      "فشل حذف الوسائط"
-    );
+    )
+  ){
 
     return;
 
   }
 
 
-  media =
-    media.filter(
-      item =>
-        item.id !== id
+  try{
+
+    /* DELETE DATABASE */
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .from("media")
+        .delete()
+        .eq(
+          "id",
+          id
+        );
+
+
+    if(error){
+
+      throw error;
+
+    }
+
+
+    /* DELETE STORAGE FILE */
+
+    if(item.file_path){
+
+      const {
+        error:
+          storageError
+      } =
+        await supabaseClient
+          .storage
+          .from(STORAGE_BUCKET)
+          .remove([
+            item.file_path
+          ]);
+
+
+      if(storageError){
+
+        console.warn(
+          "Storage delete error:",
+          storageError
+        );
+
+      }
+
+    }
+
+
+    media =
+      media.filter(
+        x => x.id !== id
+      );
+
+
+    renderMedia();
+
+    updateStats();
+
+
+    showToast(
+      "تم حذف الوسائط"
     );
 
 
-  renderMedia();
+  }catch(error){
 
-  updateStats();
+    console.error(
+      error
+    );
 
 
-  showToast(
-    "تم حذف الوسائط"
-  );
+    showToast(
+      "فشل حذف الوسائط"
+    );
+
+  }
 
 }
 
 
-/* =====================================================
-   CONTENT SELECTOR
-===================================================== */
+/* =========================
+   CONTENT
+========================= */
 
 function prepareContentSelector(){
 
@@ -4140,23 +3517,27 @@ function prepareContentSelector(){
   select.innerHTML =
     screens
       .map(
-        screen =>
-          `
-          <option
-            value="${screen.id}">
-            ${escapeHtml(screen.name)}
-          </option>
-          `
+        screen => `
+
+        <option
+          value="${screen.id}">
+
+          ${escapeHtml(
+            screen.name
+          )}
+
+        </option>
+
+        `
       )
       .join("");
 
 
   if(
-    selectedScreenId
-    &&
+    selectedScreenId &&
     screens.some(
-      screen =>
-        Number(screen.id) ===
+      x =>
+        Number(x.id) ===
         Number(selectedScreenId)
     )
   ){
@@ -4174,19 +3555,33 @@ function prepareContentSelector(){
 
 function loadContentEditor(){
 
+  const value =
+    document.getElementById(
+      "contentScreenSelect"
+    ).value;
+
+
+  if(!value){
+
+    document.getElementById(
+      "contentEditor"
+    ).style.display =
+      "none";
+
+    return;
+
+  }
+
+
   selectedScreenId =
-    Number(
-      document.getElementById(
-        "contentScreenSelect"
-      ).value
-    );
+    Number(value);
 
 
   const playlist =
     playlists.find(
-      item =>
-        Number(item.screen_id) ===
-        Number(selectedScreenId)
+      x =>
+        Number(x.screen_id) ===
+        selectedScreenId
     );
 
 
@@ -4212,18 +3607,19 @@ function loadContentEditor(){
     "block";
 
 
+  const screen =
+    screens.find(
+      x =>
+        Number(x.id) ===
+        selectedScreenId
+    );
+
+
   document.getElementById(
     "contentScreenTitle"
   ).textContent =
-    (
-      screens.find(
-        screen =>
-          Number(screen.id) ===
-          Number(selectedScreenId)
-      )?.name
-      ||
-      "المحتوى"
-    );
+    screen?.name ||
+    "المحتوى";
 
 
   document.getElementById(
@@ -4235,7 +3631,8 @@ function loadContentEditor(){
   document.getElementById(
     "defaultDuration"
   ).value =
-    playlist.default_duration || 10;
+    playlist.default_duration ||
+    10;
 
 
   document.getElementById(
@@ -4267,13 +3664,15 @@ function renderContentItems(){
 
   const items =
     playlistItems
+
       .filter(
         item =>
           item.playlist_id ===
           selectedPlaylistId
       )
+
       .sort(
-        (a,b)=>
+        (a,b) =>
           Number(a.position) -
           Number(b.position)
       );
@@ -4281,18 +3680,20 @@ function renderContentItems(){
 
   if(!items.length){
 
-    container.innerHTML =
-      `
+    container.innerHTML = `
+
       <div class="empty">
 
         لا يوجد محتوى حاليًا
 
-        <br><br>
+        <br>
+        <br>
 
         اضغط «إضافة صورة أو فيديو»
 
       </div>
-      `;
+
+    `;
 
     return;
 
@@ -4300,238 +3701,262 @@ function renderContentItems(){
 
 
   container.innerHTML =
-    items
-      .map(
-        (item,index)=>{
 
-          const mediaItem =
-            media.find(
-              m =>
-                m.id ===
-                item.media_id
-            );
+    items.map(
+      (item,index)=>{
 
-
-          if(!mediaItem)
-            return "";
+        const mediaItem =
+          media.find(
+            x =>
+              x.id ===
+              item.media_id
+          );
 
 
-          const preview =
-            mediaItem.type === "image"
-
-            ?
-
-            `<img
-              src="${escapeHtml(mediaItem.file_url)}"
-              alt="">`
-
-            :
-
-            `<video
-              src="${escapeHtml(mediaItem.file_url)}"
-              muted>
-            </video>`;
+        if(!mediaItem)
+          return "";
 
 
-          return `
+        return `
 
-            <div
-              class="content-item"
-              draggable="true"
-              data-item-id="${item.id}"
-              ondragstart="dragStart(event)"
-              ondragover="dragOver(event)"
-              ondrop="dropItem(event)">
-
-
-              <div class="drag">
-                ☷
-              </div>
+        <div
+          class="content-item"
+          draggable="true"
+          data-item-id="${item.id}"
+          ondragstart="dragStart(event)"
+          ondragover="dragOver(event)"
+          ondrop="dropItem(event)">
 
 
-              <div
-                class="media-thumb">
-
-                ${preview}
-
-              </div>
+          <div class="drag">
+            ☷
+          </div>
 
 
-              <div class="item-info">
+          <div class="media-thumb">
 
-                <div class="item-name">
-
-                  ${escapeHtml(
-                    mediaItem.name
-                  )}
-
-                </div>
-
-                <div class="item-type">
-
-                  ${
-                    mediaItem.type === "image"
-                      ? "صورة"
-                      : "فيديو"
-                  }
-
-                  ·
-
-                  ${index + 1}
-
-                </div>
-
-              </div>
-
-
-              ${
-                mediaItem.type === "image"
+            ${
+              mediaItem.type === "image"
 
                 ?
 
                 `
-                <div
-                  class="item-controls">
-
-                  <label
-                    style="
-                      margin:0;
-                      font-size:9px;">
-
-                    ثانية
-
-                  </label>
-
-                  <input
-                    type="number"
-                    min="1"
-                    value="${
-                      item.duration ||
-                      mediaItem.duration ||
-                      10
-                    }"
-                    onchange="
-                      updateItemDuration(
-                        '${item.id}',
-                        this.value
-                      )">
-
-                </div>
+                <img
+                  src="${escapeHtml(
+                    mediaItem.file_url
+                  )}"
+                  alt="">
                 `
 
                 :
 
                 `
-                <select
-                  style="width:85px;"
-                  onchange="
-                    updateVideoMode(
-                      '${item.id}',
-                      this.value
-                    )">
-
-                  <option
-                    value="next"
-                    ${
-                      item.video_mode === "next"
-                        ? "selected"
-                        : ""
-                    }>
-                    التالي
-                  </option>
-
-                  <option
-                    value="loop"
-                    ${
-                      item.video_mode === "loop"
-                        ? "selected"
-                        : ""
-                    }>
-                    تكرار
-                  </option>
-
-                </select>
+                <video
+                  src="${escapeHtml(
+                    mediaItem.file_url
+                  )}"
+                  muted>
+                </video>
                 `
 
+            }
+
+          </div>
+
+
+          <div class="item-info">
+
+            <div class="item-name">
+
+              ${escapeHtml(
+                mediaItem.name
+              )}
+
+            </div>
+
+
+            <div class="item-type">
+
+              ${
+                mediaItem.type === "image"
+                  ? "صورة"
+                  : "فيديو"
               }
 
+              ·
+
+              ${index + 1}
+
+            </div>
+
+          </div>
+
+
+          ${
+            mediaItem.type === "image"
+
+              ?
+
+              `
+
+              <div class="item-controls">
+
+                <label
+                  style="margin:0;font-size:9px">
+
+                  ثانية
+
+                </label>
+
+                <input
+                  type="number"
+                  min="1"
+                  value="${
+                    item.duration ||
+                    mediaItem.duration ||
+                    10
+                  }"
+                  onchange="
+                    updateItemDuration(
+                      '${item.id}',
+                      this.value
+                    )
+                  ">
+
+              </div>
+
+              `
+
+              :
+
+              `
 
               <select
-                style="width:85px;"
+                style="width:85px"
                 onchange="
-                  updateItemTransition(
+                  updateVideoMode(
                     '${item.id}',
                     this.value
-                  )">
+                  )
+                ">
 
                 <option
-                  value="fade"
+                  value="next"
                   ${
-                    item.transition === "fade"
+                    item.video_mode === "next"
                       ? "selected"
                       : ""
                   }>
-                  Fade
+
+                  التالي
+
                 </option>
 
                 <option
-                  value="slide"
+                  value="loop"
                   ${
-                    item.transition === "slide"
+                    item.video_mode === "loop"
                       ? "selected"
                       : ""
                   }>
-                  Slide
-                </option>
 
-                <option
-                  value="zoom"
-                  ${
-                    item.transition === "zoom"
-                      ? "selected"
-                      : ""
-                  }>
-                  Zoom
-                </option>
+                  تكرار
 
-                <option
-                  value="none"
-                  ${
-                    item.transition === "none"
-                      ? "selected"
-                      : ""
-                  }>
-                  بدون
                 </option>
 
               </select>
 
+              `
 
-              <button
-                class="btn btn-small btn-danger"
-                onclick="
-                  deletePlaylistItem(
-                    '${item.id}'
-                  )">
+          }
 
-                حذف
 
-              </button>
+          <select
+            style="width:85px"
+            onchange="
+              updateItemTransition(
+                '${item.id}',
+                this.value
+              )
+            ">
 
-            </div>
+            <option
+              value="fade"
+              ${
+                item.transition === "fade"
+                  ? "selected"
+                  : ""
+              }>
 
-          `;
+              Fade
 
-        }
-      )
-      .join("");
+            </option>
+
+            <option
+              value="slide"
+              ${
+                item.transition === "slide"
+                  ? "selected"
+                  : ""
+              }>
+
+              Slide
+
+            </option>
+
+            <option
+              value="zoom"
+              ${
+                item.transition === "zoom"
+                  ? "selected"
+                  : ""
+              }>
+
+              Zoom
+
+            </option>
+
+            <option
+              value="none"
+              ${
+                item.transition === "none"
+                  ? "selected"
+                  : ""
+              }>
+
+              بدون
+
+            </option>
+
+          </select>
+
+
+          <button
+            class="btn btn-small btn-danger"
+            onclick="
+              deletePlaylistItem(
+                '${item.id}'
+              )
+            ">
+
+            حذف
+
+          </button>
+
+
+        </div>
+
+        `;
+
+      }
+    ).join("");
 
 }
 
 
-/* =====================================================
+/* =========================
    ADD MEDIA TO PLAYLIST
-===================================================== */
+========================= */
 
 async function addMediaToPlaylist(
   mediaId
@@ -4548,35 +3973,41 @@ async function addMediaToPlaylist(
   }
 
 
-  const existing =
+  const items =
     playlistItems.filter(
-      item =>
-        item.playlist_id ===
+      x =>
+        x.playlist_id ===
         selectedPlaylistId
     );
 
 
-  const nextPosition =
-    existing.length
-      ? Math.max(
-          ...existing.map(
-            item =>
-              Number(
-                item.position
-              )
+  const position =
+    items.length
+
+      ?
+
+        Math.max(
+          ...items.map(
+            x =>
+              Number(x.position)
           )
         ) + 1
-      : 0;
+
+      :
+
+        0;
 
 
   const mediaItem =
     media.find(
-      item =>
-        item.id === mediaId
+      x => x.id === mediaId
     );
 
 
-  const {data,error} =
+  const {
+    data,
+    error
+  } =
     await supabaseClient
       .from("playlist_items")
       .insert({
@@ -4588,16 +4019,14 @@ async function addMediaToPlaylist(
           mediaId,
 
         position:
-          nextPosition,
+          position,
 
-        enabled:true,
+        enabled:
+          true,
 
         duration:
           mediaItem?.type === "image"
-            ? (
-                mediaItem.duration ||
-                10
-              )
+            ? mediaItem.duration || 10
             : null,
 
         transition:
@@ -4606,7 +4035,8 @@ async function addMediaToPlaylist(
         video_mode:
           "next",
 
-        muted:true
+        muted:
+          true
 
       })
       .select()
@@ -4626,12 +4056,12 @@ async function addMediaToPlaylist(
   }
 
 
-  playlistItems.push(data);
+  playlistItems.push(
+    data
+  );
 
 
   renderContentItems();
-
-  updateStats();
 
 
   showToast(
@@ -4641,9 +4071,9 @@ async function addMediaToPlaylist(
 }
 
 
-/* =====================================================
-   ITEM UPDATES
-===================================================== */
+/* =========================
+   ITEM SETTINGS
+========================= */
 
 async function updateItemDuration(
   id,
@@ -4657,18 +4087,24 @@ async function updateItemDuration(
     );
 
 
-  const {error} =
+  const {
+    error
+  } =
     await supabaseClient
       .from("playlist_items")
       .update({
 
-        duration:duration,
+        duration:
+          duration,
 
         updated_at:
           new Date().toISOString()
 
       })
-      .eq("id",id);
+      .eq(
+        "id",
+        id
+      );
 
 
   if(error){
@@ -4688,30 +4124,39 @@ async function updateItemDuration(
     );
 
 
-  if(item)
+  if(item){
+
     item.duration =
       duration;
+
+  }
 
 }
 
 
 async function updateVideoMode(
   id,
-  mode
+  value
 ){
 
-  const {error} =
+  const {
+    error
+  } =
     await supabaseClient
       .from("playlist_items")
       .update({
 
-        video_mode:mode,
+        video_mode:
+          value,
 
         updated_at:
           new Date().toISOString()
 
       })
-      .eq("id",id);
+      .eq(
+        "id",
+        id
+      );
 
 
   if(error){
@@ -4720,41 +4165,34 @@ async function updateVideoMode(
       "فشل تعديل الفيديو"
     );
 
-    return;
-
   }
-
-
-  const item =
-    playlistItems.find(
-      x => x.id === id
-    );
-
-
-  if(item)
-    item.video_mode =
-      mode;
 
 }
 
 
 async function updateItemTransition(
   id,
-  transition
+  value
 ){
 
-  const {error} =
+  const {
+    error
+  } =
     await supabaseClient
       .from("playlist_items")
       .update({
 
-        transition:transition,
+        transition:
+          value,
 
         updated_at:
           new Date().toISOString()
 
       })
-      .eq("id",id);
+      .eq(
+        "id",
+        id
+      );
 
 
   if(error){
@@ -4763,37 +4201,29 @@ async function updateItemTransition(
       "فشل تعديل الانتقال"
     );
 
-    return;
-
   }
-
-
-  const item =
-    playlistItems.find(
-      x => x.id === id
-    );
-
-
-  if(item)
-    item.transition =
-      transition;
 
 }
 
 
-/* =====================================================
-   DELETE ITEM
-===================================================== */
+/* =========================
+   DELETE PLAYLIST ITEM
+========================= */
 
 async function deletePlaylistItem(
   id
 ){
 
-  const {error} =
+  const {
+    error
+  } =
     await supabaseClient
       .from("playlist_items")
       .delete()
-      .eq("id",id);
+      .eq(
+        "id",
+        id
+      );
 
 
   if(error){
@@ -4809,12 +4239,12 @@ async function deletePlaylistItem(
 
   playlistItems =
     playlistItems.filter(
-      item =>
-        item.id !== id
+      x => x.id !== id
     );
 
 
   await normalizePositions();
+
 
   renderContentItems();
 
@@ -4826,18 +4256,16 @@ async function deletePlaylistItem(
 }
 
 
-/* =====================================================
+/* =========================
    DRAG & DROP
-===================================================== */
-
-let draggedItemId =
-  null;
-
+========================= */
 
 function dragStart(event){
 
   draggedItemId =
-    event.currentTarget.dataset.itemId;
+    event.currentTarget
+      .dataset
+      .itemId;
 
 }
 
@@ -4855,82 +4283,87 @@ async function dropItem(event){
 
 
   const targetId =
-    event.currentTarget.dataset.itemId;
+    event.currentTarget
+      .dataset
+      .itemId;
 
 
   if(
     !draggedItemId ||
     draggedItemId === targetId
-  )
+  ){
+
     return;
+
+  }
 
 
   const items =
     playlistItems
+
       .filter(
-        item =>
-          item.playlist_id ===
+        x =>
+          x.playlist_id ===
           selectedPlaylistId
       )
+
       .sort(
-        (a,b)=>
+        (a,b) =>
           Number(a.position) -
           Number(b.position)
       );
 
 
-  const fromIndex =
+  const from =
     items.findIndex(
-      item =>
-        item.id ===
+      x =>
+        x.id ===
         draggedItemId
     );
 
 
-  const toIndex =
+  const to =
     items.findIndex(
-      item =>
-        item.id ===
+      x =>
+        x.id ===
         targetId
     );
 
 
-  if(
-    fromIndex < 0 ||
-    toIndex < 0
-  )
+  if(from < 0 || to < 0)
     return;
 
 
   const moved =
     items.splice(
-      fromIndex,
+      from,
       1
     )[0];
 
 
   items.splice(
-    toIndex,
+    to,
     0,
     moved
   );
 
 
   for(
-    let i=0;
-    i<items.length;
-    i++
+    let index = 0;
+    index < items.length;
+    index++
   ){
 
-    items[i].position =
-      i;
+    items[index].position =
+      index;
 
 
     await supabaseClient
       .from("playlist_items")
       .update({
 
-        position:i,
+        position:
+          index,
 
         updated_at:
           new Date().toISOString()
@@ -4938,22 +4371,20 @@ async function dropItem(event){
       })
       .eq(
         "id",
-        items[i].id
+        items[index].id
       );
 
   }
 
 
-  const other =
-    playlistItems.filter(
-      item =>
-        item.playlist_id !==
-        selectedPlaylistId
-    );
-
-
   playlistItems =
-    other.concat(items);
+    playlistItems
+      .filter(
+        x =>
+          x.playlist_id !==
+          selectedPlaylistId
+      )
+      .concat(items);
 
 
   renderContentItems();
@@ -4961,44 +4392,46 @@ async function dropItem(event){
 }
 
 
-/* =====================================================
+/* =========================
    NORMALIZE POSITIONS
-===================================================== */
+========================= */
 
 async function normalizePositions(){
 
   const items =
     playlistItems
+
       .filter(
-        item =>
-          item.playlist_id ===
+        x =>
+          x.playlist_id ===
           selectedPlaylistId
       )
+
       .sort(
-        (a,b)=>
+        (a,b) =>
           Number(a.position) -
           Number(b.position)
       );
 
 
   for(
-    let i=0;
-    i<items.length;
-    i++
+    let index = 0;
+    index < items.length;
+    index++
   ){
 
-    items[i].position =
-      i;
+    items[index].position =
+      index;
 
 
     await supabaseClient
       .from("playlist_items")
       .update({
-        position:i
+        position:index
       })
       .eq(
         "id",
-        items[i].id
+        items[index].id
       );
 
   }
@@ -5006,9 +4439,9 @@ async function normalizePositions(){
 }
 
 
-/* =====================================================
+/* =========================
    PLAYLIST SETTINGS
-===================================================== */
+========================= */
 
 async function savePlaylistSettings(){
 
@@ -5049,7 +4482,9 @@ async function savePlaylistSettings(){
   };
 
 
-  const {error} =
+  const {
+    error
+  } =
     await supabaseClient
       .from("playlists")
       .update(data)
@@ -5067,34 +4502,14 @@ async function savePlaylistSettings(){
       "فشل حفظ إعدادات المحتوى"
     );
 
-    return;
-
-  }
-
-
-  const playlist =
-    playlists.find(
-      item =>
-        item.id ===
-        selectedPlaylistId
-    );
-
-
-  if(playlist){
-
-    Object.assign(
-      playlist,
-      data
-    );
-
   }
 
 }
 
 
-/* =====================================================
+/* =========================
    PUBLISH
-===================================================== */
+========================= */
 
 async function publishCurrentScreen(){
 
@@ -5112,9 +4527,17 @@ async function publishCurrentScreen(){
   }
 
 
-  const {data,error} =
+  const now =
+    new Date().toISOString();
+
+
+  const {
+    error
+  } =
     await supabaseClient
-      .from("screen_publish_state")
+      .from(
+        "screen_publish_state"
+      )
       .upsert({
 
         screen_id:
@@ -5127,14 +4550,12 @@ async function publishCurrentScreen(){
           Date.now(),
 
         published_at:
-          new Date().toISOString(),
+          now,
 
         updated_at:
-          new Date().toISOString()
+          now
 
-      })
-      .select()
-      .single();
+      });
 
 
   if(error){
@@ -5154,13 +4575,14 @@ async function publishCurrentScreen(){
     .from("playlists")
     .update({
 
-      published:true,
+      published:
+        true,
 
       published_at:
-        new Date().toISOString(),
+        now,
 
       updated_at:
-        new Date().toISOString()
+        now
 
     })
     .eq(
@@ -5176,9 +4598,9 @@ async function publishCurrentScreen(){
 }
 
 
-/* =====================================================
-   SCHEDULING
-===================================================== */
+/* =========================
+   SCHEDULES
+========================= */
 
 function renderSchedules(){
 
@@ -5190,16 +4612,21 @@ function renderSchedules(){
 
   if(!schedules.length){
 
-    table.innerHTML =
-      `
+    table.innerHTML = `
+
       <tr>
+
         <td
           colspan="7"
           class="empty">
+
           لا توجد جدولات حتى الآن
+
         </td>
+
       </tr>
-      `;
+
+    `;
 
     return;
 
@@ -5207,100 +4634,118 @@ function renderSchedules(){
 
 
   table.innerHTML =
-    schedules
-      .map(
-        schedule=>{
 
-          const screen =
-            screens.find(
-              item =>
-                Number(item.id) ===
-                Number(schedule.screen_id)
-            );
+    schedules.map(
+      schedule => {
 
-
-          const playlist =
-            playlists.find(
-              item =>
-                item.id ===
-                schedule.playlist_id
-            );
+        const screen =
+          screens.find(
+            x =>
+              Number(x.id) ===
+              Number(
+                schedule.screen_id
+              )
+          );
 
 
-          return `
+        const playlist =
+          playlists.find(
+            x =>
+              x.id ===
+              schedule.playlist_id
+          );
 
-            <tr>
 
-              <td>
-                ${escapeHtml(
-                  screen?.name || "-"
-                )}
-              </td>
+        return `
 
-              <td>
-                ${escapeHtml(
-                  playlist?.name || "-"
-                )}
-              </td>
+        <tr>
 
-              <td>
-                ${schedule.start_date || "-"}
-                ${schedule.start_time || ""}
-              </td>
+          <td>
+            ${escapeHtml(
+              screen?.name || "-"
+            )}
+          </td>
 
-              <td>
-                ${schedule.end_date || "-"}
-                ${schedule.end_time || ""}
-              </td>
+          <td>
+            ${escapeHtml(
+              playlist?.name || "-"
+            )}
+          </td>
 
-              <td>
-                ${schedule.priority}
-              </td>
+          <td>
 
-              <td>
+            ${
+              schedule.start_date ||
+              "-"
+            }
 
-                <span
-                  class="status ${
-                    schedule.enabled
-                      ? "on"
-                      : "off"
-                  }">
+            ${schedule.start_time || ""}
 
-                  ${
-                    schedule.enabled
-                      ? "مفعلة"
-                      : "متوقفة"
-                  }
+          </td>
 
-                </span>
+          <td>
 
-              </td>
+            ${
+              schedule.end_date ||
+              "-"
+            }
 
-              <td>
+            ${schedule.end_time || ""}
 
-                <button
-                  class="btn btn-small btn-danger"
-                  onclick="
-                    deleteSchedule(
-                      '${schedule.id}'
-                    )">
+          </td>
 
-                  حذف
+          <td>
+            ${schedule.priority}
+          </td>
 
-                </button>
+          <td>
 
-              </td>
+            <span
+              class="status ${
+                schedule.enabled
+                  ? "on"
+                  : "off"
+              }">
 
-            </tr>
+              ${
+                schedule.enabled
+                  ? "مفعلة"
+                  : "متوقفة"
+              }
 
-          `;
+            </span>
 
-        }
-      )
-      .join("");
+          </td>
+
+          <td>
+
+            <button
+              class="btn btn-small btn-danger"
+              onclick="
+                deleteSchedule(
+                  '${schedule.id}'
+                )
+              ">
+
+              حذف
+
+            </button>
+
+          </td>
+
+        </tr>
+
+        `;
+
+      }
+    ).join("");
 
 }
 
+
+/* =========================
+   SCHEDULE MODAL
+========================= */
 
 function openScheduleModal(){
 
@@ -5313,26 +4758,27 @@ function openScheduleModal(){
   screenSelect.innerHTML =
     screens
       .map(
-        screen =>
-          `
-          <option
-            value="${screen.id}">
-            ${escapeHtml(screen.name)}
-          </option>
-          `
+        screen => `
+
+        <option
+          value="${screen.id}">
+
+          ${escapeHtml(
+            screen.name
+          )}
+
+        </option>
+
+        `
       )
       .join("");
 
 
+  screenSelect.onchange =
+    renderSchedulePlaylists;
+
+
   renderSchedulePlaylists();
-
-
-  document
-    .getElementById(
-      "scheduleScreen"
-    )
-    .onchange =
-      renderSchedulePlaylists;
 
 
   document
@@ -5360,33 +4806,40 @@ function renderSchedulePlaylists(){
     );
 
 
-  const available =
-    playlists.filter(
-      playlist =>
-        Number(
-          playlist.screen_id
-        ) === screenId
-    );
-
-
   select.innerHTML =
-    available
-      .map(
-        playlist =>
-          `
-          <option
-            value="${playlist.id}">
-            ${escapeHtml(
-              playlist.name
-            )}
-          </option>
-          `
-      )
-      .join("");
 
+    playlists
+
+      .filter(
+        playlist =>
+          Number(
+            playlist.screen_id
+          ) === screenId
+      )
+
+      .map(
+        playlist => `
+
+        <option
+          value="${playlist.id}">
+
+          ${escapeHtml(
+            playlist.name
+          )}
+
+        </option>
+
+        `
+      )
+
+      .join("");
 
 }
 
+
+/* =========================
+   SAVE SCHEDULE
+========================= */
 
 async function saveSchedule(){
 
@@ -5426,22 +4879,26 @@ async function saveSchedule(){
     start_date:
       document.getElementById(
         "scheduleStartDate"
-      ).value || null,
+      ).value ||
+      null,
 
     end_date:
       document.getElementById(
         "scheduleEndDate"
-      ).value || null,
+      ).value ||
+      null,
 
     start_time:
       document.getElementById(
         "scheduleStartTime"
-      ).value || null,
+      ).value ||
+      null,
 
     end_time:
       document.getElementById(
         "scheduleEndTime"
-      ).value || null,
+      ).value ||
+      null,
 
     priority:
       Number(
@@ -5450,12 +4907,15 @@ async function saveSchedule(){
         ).value
       ),
 
-    enabled:true
+    enabled:
+      true
 
   };
 
 
-  const {error} =
+  const {
+    error
+  } =
     await supabaseClient
       .from("schedules")
       .insert(data);
@@ -5489,15 +4949,24 @@ async function saveSchedule(){
 }
 
 
+/* =========================
+   DELETE SCHEDULE
+========================= */
+
 async function deleteSchedule(
   id
 ){
 
-  const {error} =
+  const {
+    error
+  } =
     await supabaseClient
       .from("schedules")
       .delete()
-      .eq("id",id);
+      .eq(
+        "id",
+        id
+      );
 
 
   if(error){
@@ -5513,8 +4982,8 @@ async function deleteSchedule(
 
   schedules =
     schedules.filter(
-      item =>
-        item.id !== id
+      x =>
+        x.id !== id
     );
 
 
@@ -5528,13 +4997,11 @@ async function deleteSchedule(
 }
 
 
-/* =====================================================
-   MODAL
-===================================================== */
+/* =========================
+   MODALS
+========================= */
 
-function closeModal(
-  id
-){
+function closeModal(id){
 
   document
     .getElementById(id)
@@ -5548,146 +5015,171 @@ document
     ".modal-backdrop"
   )
   .forEach(
-    backdrop=>{
+    modal => {
 
-      backdrop.addEventListener(
-        "click",
-        event=>{
+      modal.onclick =
+        event => {
 
           if(
             event.target ===
-            backdrop
+            modal
           ){
 
-            backdrop.classList.remove(
+            modal.classList.remove(
               "show"
             );
 
           }
 
-        }
-      );
+        };
 
     }
   );
 
 
-/* =====================================================
+/* =========================
    REALTIME
-===================================================== */
+========================= */
 
 function setupRealtime(){
 
-  supabaseClient
-    .channel(
-      "innovation-screens-dashboard"
-    )
+  const channel =
+    supabaseClient
+      .channel(
+        "innovation-screens-dashboard"
+      )
 
-    .on(
-      "postgres_changes",
-      {
-        event:"*",
-        schema:"public",
-        table:"screens"
-      },
-      ()=>{
-        loadAll();
-      }
-    )
+      .on(
+        "postgres_changes",
+        {
+          event:"*",
+          schema:"public",
+          table:"screens"
+        },
+        () => loadAll()
+      )
 
-    .on(
-      "postgres_changes",
-      {
-        event:"*",
-        schema:"public",
-        table:"media"
-      },
-      ()=>{
-        loadAll();
-      }
-    )
+      .on(
+        "postgres_changes",
+        {
+          event:"*",
+          schema:"public",
+          table:"media"
+        },
+        () => loadAll()
+      )
 
-    .on(
-      "postgres_changes",
-      {
-        event:"*",
-        schema:"public",
-        table:"playlists"
-      },
-      ()=>{
-        loadAll();
-      }
-    )
+      .on(
+        "postgres_changes",
+        {
+          event:"*",
+          schema:"public",
+          table:"playlists"
+        },
+        () => loadAll()
+      )
 
-    .on(
-      "postgres_changes",
-      {
-        event:"*",
-        schema:"public",
-        table:"playlist_items"
-      },
-      ()=>{
-        loadAll();
-      }
-    )
+      .on(
+        "postgres_changes",
+        {
+          event:"*",
+          schema:"public",
+          table:"playlist_items"
+        },
+        () => loadAll()
+      )
 
-    .on(
-      "postgres_changes",
-      {
-        event:"*",
-        schema:"public",
-        table:"schedules"
-      },
-      ()=>{
-        loadAll();
-      }
-    )
+      .on(
+        "postgres_changes",
+        {
+          event:"*",
+          schema:"public",
+          table:"schedules"
+        },
+        () => loadAll()
+      )
 
-    .on(
-      "postgres_changes",
-      {
-        event:"*",
-        schema:"public",
-        table:"screen_publish_state"
-      },
-      ()=>{
-        loadAll();
-      }
-    )
+      .on(
+        "postgres_changes",
+        {
+          event:"*",
+          schema:"public",
+          table:"screen_publish_state"
+        },
+        () => loadAll()
+      )
 
-    .subscribe(
-      status=>{
+      .subscribe(
+        status => {
 
-        console.log(
-          "Realtime:",
-          status
-        );
+          console.log(
+            "Realtime:",
+            status
+          );
 
-      }
-    );
+        }
+      );
 
 }
 
 
-/* =====================================================
-   INITIALIZE
-===================================================== */
+/* =========================
+   CONNECTION
+========================= */
 
-async function initialize(){
+window.addEventListener(
+  "online",
+  () =>
+    setConnection(
+      true,
+      "متصل بالسحابة"
+    )
+);
 
-  applyLanguage();
+
+window.addEventListener(
+  "offline",
+  () =>
+    setConnection(
+      false,
+      "لا يوجد اتصال بالإنترنت"
+    )
+);
+
+
+/* =========================
+   LANGUAGE
+========================= */
+
+document.getElementById(
+  "settingsLanguage"
+).value =
+  currentLanguage;
+
+
+document.documentElement.dir =
+  currentLanguage === "ar"
+    ? "rtl"
+    : "ltr";
+
+
+document.documentElement.lang =
+  currentLanguage;
+
+
+/* =========================
+   START
+========================= */
+
+(async function(){
 
   await loadAll();
 
   setupRealtime();
 
-}
-
-
-initialize();
+})();
 
 </script>
 
 </body>
-
 </html>
