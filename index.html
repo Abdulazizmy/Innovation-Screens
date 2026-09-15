@@ -213,6 +213,13 @@ html,body{
   font-size:10px
 }
 
+.btn:disabled,
+.btn-primary:disabled,
+.refresh-button:disabled{
+  opacity:.55;
+  cursor:not-allowed
+}
+
 .content{padding:22px}
 
 .page{display:none}
@@ -543,6 +550,21 @@ input[type="file"]{
   justify-content:flex-start;
   gap:7px;
   margin-top:15px
+}
+
+.upload-status{
+  display:none;
+  margin-top:10px;
+  padding:10px;
+  border-radius:8px;
+  background:#f7f7f9;
+  color:#555;
+  font-size:10px;
+  line-height:1.6
+}
+
+.upload-status.show{
+  display:block
 }
 
 .toast{
@@ -1240,13 +1262,21 @@ line-height:1.6">
 
 </div>
 
+<div id="uploadStatus" class="upload-status">
+  جاري تجهيز الملف...
+</div>
+
 <div class="modal-actions">
 
-<button class="btn btn-primary" onclick="saveMedia()">
+<button id="saveMediaButton"
+  class="btn btn-primary"
+  onclick="saveMedia()">
 رفع وإضافة
 </button>
 
-<button class="btn" onclick="closeModal('mediaModal')">
+<button id="cancelMediaButton"
+  class="btn"
+  onclick="closeModal('mediaModal')">
 إلغاء
 </button>
 
@@ -1351,6 +1381,13 @@ const SUPABASE_KEY =
 const STORAGE_BUCKET =
 "signage-media";
 
+/*
+ * الحد الأقصى لحجم الملف:
+ * 500 ميجابايت
+ */
+const MAX_FILE_SIZE =
+  500 * 1024 * 1024;
+
 const supabaseClient =
 window.supabase.createClient(
   SUPABASE_URL,
@@ -1367,6 +1404,8 @@ let selectedScreenId=null;
 let selectedPlaylistId=null;
 let addingToContent=false;
 let draggedItemId=null;
+
+let mediaUploading=false;
 
 let currentLanguage=
 localStorage.getItem("innovationScreensLanguage")||"ar";
@@ -1544,6 +1583,12 @@ async function loadAll(){
     playlistItems=itemsResult.data||[];
     schedules=schedulesResult.data||[];
 
+    /*
+     * التأكد من وجود قائمة محتوى لكل شاشة.
+     * إذا الشاشة ما عندها Playlist، ينشئ لها واحدة تلقائيًا.
+     */
+    await ensureDefaultPlaylists();
+
     renderDashboard();
     renderScreens();
     renderMedia();
@@ -1563,6 +1608,61 @@ async function loadAll(){
       "تعذر تحميل البيانات: "+
       (error.message||"خطأ")
     );
+  }
+}
+
+/* =========================
+   AUTO CREATE PLAYLISTS
+========================= */
+
+async function ensureDefaultPlaylists(){
+
+  const missingScreens=
+    screens.filter(screen=>
+      !playlists.some(
+        playlist=>
+          Number(playlist.screen_id)===
+          Number(screen.id)
+      )
+    );
+
+  if(!missingScreens.length)return;
+
+  for(const screen of missingScreens){
+
+    const data={
+      screen_id:screen.id,
+      name:(screen.name||"الشاشة")+" - المحتوى",
+      repeat_all:true,
+      default_duration:10,
+      default_transition:"fade",
+      fit_mode:"contain",
+      enabled:true,
+      published:false
+    };
+
+    const {data:created,error}=
+
+      await supabaseClient
+        .from("playlists")
+        .insert(data)
+        .select()
+        .single();
+
+    if(error){
+
+      console.error(
+        "فشل إنشاء قائمة محتوى للشاشة:",
+        screen.id,
+        error
+      );
+
+      continue;
+    }
+
+    if(created){
+      playlists.push(created);
+    }
   }
 }
 
@@ -1719,11 +1819,32 @@ async function saveScreen(){
 
   if(selectedScreenId===null)return;
 
+  const width=
+    Number(
+      document.getElementById("screenWidth").value
+    );
+
+  const height=
+    Number(
+      document.getElementById("screenHeight").value
+    );
+
+  if(
+    !Number.isFinite(width)||
+    !Number.isFinite(height)||
+    width<1||
+    height<1
+  ){
+
+    showToast("أدخل عرض وارتفاع صحيحين");
+    return;
+  }
+
   const data={
     name:document.getElementById("screenName").value.trim(),
     location:document.getElementById("screenLocation").value.trim(),
-    width:Number(document.getElementById("screenWidth").value),
-    height:Number(document.getElementById("screenHeight").value),
+    width:width,
+    height:height,
     orientation:document.getElementById("screenOrientation").value,
     enabled:document.getElementById("screenEnabled").value==="true",
     updated_at:new Date().toISOString()
@@ -1816,7 +1937,8 @@ function renderMedia(){
 
               <video
                 src="${escapeHtml(item.file_url)}"
-                muted>
+                muted
+                preload="metadata">
               </video>
 
             `
@@ -1844,7 +1966,9 @@ function renderMedia(){
         ${
           item.type==="image"
             ?(item.duration||10)+" ث"
-            :"-"
+            :item.video_duration
+              ?Math.round(item.video_duration)+" ث"
+              :"-"
         }
       </td>
 
@@ -1873,6 +1997,28 @@ function renderMedia(){
 
 function openMediaModal(addToContent=false){
 
+  /*
+   * إذا فتحنا النافذة من داخل المحتوى،
+   * نتأكد أن الشاشة وقائمة المحتوى موجودة.
+   */
+  if(addToContent){
+
+    if(!selectedScreenId){
+
+      showToast("اختر شاشة أولًا");
+      return;
+    }
+
+    const playlist=
+      playlists.find(
+        x=>Number(x.screen_id)===Number(selectedScreenId)
+      );
+
+    if(playlist){
+      selectedPlaylistId=playlist.id;
+    }
+  }
+
   addingToContent=addToContent;
 
   document.getElementById("mediaName").value="";
@@ -1881,12 +2027,14 @@ function openMediaModal(addToContent=false){
   document.getElementById("mediaTags").value="";
   document.getElementById("mediaType").value="image";
 
+  setUploadBusy(false);
+
   document.getElementById("mediaModal")
     .classList.add("show");
 }
 
 /* =========================
-   AUTO DETECT FILE TYPE
+   FILE TYPE
 ========================= */
 
 document.getElementById("mediaFile")
@@ -1896,15 +2044,94 @@ document.getElementById("mediaFile")
 
     if(!file)return;
 
-    const typeSelect=document.getElementById("mediaType");
+    const typeSelect=
+      document.getElementById("mediaType");
 
     if(file.type.startsWith("image/")){
+
       typeSelect.value="image";
+
     }else if(file.type.startsWith("video/")){
+
       typeSelect.value="video";
+
+    }else{
+
+      typeSelect.value="image";
+
+      showToast("نوع الملف غير مدعوم");
+      this.value="";
+      return;
     }
 
+    /*
+     * إذا اختار المستخدم فيديو، لا نحتاج مدة الصورة.
+     */
+    document.getElementById("mediaDuration").disabled=
+      file.type.startsWith("video/");
   });
+
+/* =========================
+   UPLOAD UI
+========================= */
+
+function setUploadBusy(busy,message="جاري رفع الملف..."){
+
+  mediaUploading=busy;
+
+  const button=
+    document.getElementById("saveMediaButton");
+
+  const cancelButton=
+    document.getElementById("cancelMediaButton");
+
+  const status=
+    document.getElementById("uploadStatus");
+
+  if(busy){
+
+    button.disabled=true;
+    cancelButton.disabled=true;
+
+    button.textContent="جاري الرفع...";
+
+    status.textContent=message;
+    status.classList.add("show");
+
+  }else{
+
+    button.disabled=false;
+    cancelButton.disabled=false;
+
+    button.textContent="رفع وإضافة";
+
+    status.textContent="";
+    status.classList.remove("show");
+  }
+}
+
+/* =========================
+   FILE SIZE
+========================= */
+
+function formatFileSize(bytes){
+
+  if(!Number.isFinite(bytes))return "-";
+
+  if(bytes<1024){
+    return bytes+" B";
+  }
+
+  if(bytes<1024*1024){
+    return (bytes/1024).toFixed(1)+" KB";
+  }
+
+  if(bytes<1024*1024*1024){
+    return (bytes/(1024*1024)).toFixed(1)+" MB";
+  }
+
+  return (bytes/(1024*1024*1024)).toFixed(2)+" GB";
+}
 
 /* =========================
    READ FILE DIMENSIONS
@@ -1912,7 +2139,8 @@ document.getElementById("mediaFile")
 
 async function readDimensions(file,type){
 
-  const objectUrl=URL.createObjectURL(file);
+  const objectUrl=
+    URL.createObjectURL(file);
 
   try{
 
@@ -1924,35 +2152,86 @@ async function readDimensions(file,type){
 
         image.onload=()=>{
 
+          if(
+            !image.naturalWidth||
+            !image.naturalHeight
+          ){
+
+            reject(
+              new Error("تعذر قراءة أبعاد الصورة")
+            );
+
+            return;
+          }
+
           resolve({
+
             width:image.naturalWidth,
             height:image.naturalHeight
+
           });
 
         };
 
-        image.onerror=reject;
+        image.onerror=()=>{
+
+          reject(
+            new Error("تعذر قراءة الصورة")
+          );
+
+        };
+
         image.src=objectUrl;
 
       });
 
     }
 
-    const video=document.createElement("video");
+    const video=
+      document.createElement("video");
+
+    video.preload="metadata";
+    video.muted=true;
+    video.playsInline=true;
 
     return await new Promise((resolve,reject)=>{
 
       video.onloadedmetadata=()=>{
 
+        if(
+          !video.videoWidth||
+          !video.videoHeight
+        ){
+
+          reject(
+            new Error("تعذر قراءة أبعاد الفيديو")
+          );
+
+          return;
+        }
+
         resolve({
+
           width:video.videoWidth,
           height:video.videoHeight,
-          duration:video.duration
+
+          duration:
+            Number.isFinite(video.duration)
+              ?video.duration
+              :null
+
         });
 
       };
 
-      video.onerror=reject;
+      video.onerror=()=>{
+
+        reject(
+          new Error("تعذر قراءة الفيديو")
+        );
+
+      };
+
       video.src=objectUrl;
 
     });
@@ -1970,68 +2249,217 @@ async function readDimensions(file,type){
 
 async function saveMedia(){
 
-  const fileInput=document.getElementById("mediaFile");
-  const file=fileInput.files[0];
+  if(mediaUploading)return;
+
+  const fileInput=
+    document.getElementById("mediaFile");
+
+  const file=
+    fileInput.files[0];
 
   const enteredName=
     document.getElementById("mediaName")
       .value.trim();
 
-  const duration=Math.max(
-    1,
-    Number(
-      document.getElementById("mediaDuration").value
-    )||10
-  );
+  const duration=
+    Math.max(
+      1,
+      Number(
+        document.getElementById("mediaDuration").value
+      )||10
+    );
 
   const tagsText=
     document.getElementById("mediaTags")
       .value.trim();
 
   /*
-   * لا يوجد هنا أي إدخال رابط.
-   * المصدر الوحيد للوسائط هو الملف المختار
-   * من جهاز المستخدم.
+   * المصدر الوحيد للوسائط:
+   * ملف من جهاز المستخدم.
    */
 
   if(!file){
 
-    showToast("اختر صورة أو فيديو من جهازك أولًا");
+    showToast(
+      "اختر صورة أو فيديو من جهازك أولًا"
+    );
+
     return;
   }
 
-  const isImage=file.type.startsWith("image/");
-  const isVideo=file.type.startsWith("video/");
+  /*
+   * التحقق من الحجم.
+   */
+
+  if(file.size>MAX_FILE_SIZE){
+
+    showToast(
+      "حجم الملف أكبر من الحد المسموح: 500MB"
+    );
+
+    return;
+  }
+
+  /*
+   * التحقق من نوع الملف.
+   */
+
+  const isImage=
+    file.type.startsWith("image/");
+
+  const isVideo=
+    file.type.startsWith("video/");
 
   if(!isImage&&!isVideo){
 
     showToast("نوع الملف غير مدعوم");
+
     return;
   }
 
-  const type=isImage?"image":"video";
+  const type=
+    isImage
+      ?"image"
+      :"video";
+
+  /*
+   * إذا كان المستخدم اختار النوع يدويًا بشكل مخالف
+   * لنوع الملف الحقيقي، نعتمد على نوع الملف الحقيقي.
+   */
+
+  document.getElementById("mediaType").value=
+    type;
 
   const finalName=
     enteredName||
     file.name.replace(/\.[^/.]+$/,"");
 
-  const tags=tagsText
-    ?tagsText
-      .split(",")
-      .map(tag=>tag.trim())
-      .filter(Boolean)
-    :[];
+  const tags=
+    tagsText
+      ?tagsText
+        .split(",")
+        .map(tag=>tag.trim())
+        .filter(Boolean)
+      :[];
 
-  showToast("جاري رفع الملف...");
+  /*
+   * إذا أضفنا من داخل المحتوى،
+   * نتأكد من وجود Playlist.
+   */
+
+  if(addingToContent){
+
+    if(!selectedScreenId){
+
+      showToast("اختر شاشة أولًا");
+      return;
+    }
+
+    let playlist=
+      playlists.find(
+        x=>Number(x.screen_id)===
+          Number(selectedScreenId)
+      );
+
+    if(!playlist){
+
+      const screen=
+        screens.find(
+          x=>Number(x.id)===
+            Number(selectedScreenId)
+        );
+
+      const {data,error}=
+        await supabaseClient
+          .from("playlists")
+          .insert({
+
+            screen_id:selectedScreenId,
+
+            name:
+              (screen?.name||"الشاشة")+
+              " - المحتوى",
+
+            repeat_all:true,
+
+            default_duration:10,
+
+            default_transition:"fade",
+
+            fit_mode:"contain",
+
+            enabled:true,
+
+            published:false
+
+          })
+          .select()
+          .single();
+
+      if(error){
+
+        console.error(error);
+
+        showToast(
+          "تعذر إنشاء قائمة المحتوى للشاشة"
+        );
+
+        return;
+      }
+
+      playlist=data;
+      playlists.push(data);
+    }
+
+    selectedPlaylistId=playlist.id;
+  }
+
+  setUploadBusy(
+    true,
+    "جاري تجهيز الملف..."
+  );
 
   let filePath=null;
 
   try{
 
-    const extension=
-      file.name.includes(".")
-        ?file.name.split(".").pop().toLowerCase()
-        :"";
+    /*
+     * قراءة أبعاد الملف قبل رفعه.
+     * هذا يمنع رفع ملف تالف أو غير قابل للقراءة.
+     */
+
+    const dimensions=
+      await readDimensions(
+        file,
+        type
+      );
+
+    setUploadBusy(
+      true,
+      "جاري رفع "+
+      formatFileSize(file.size)+
+      "..."
+    );
+
+    /*
+     * استخراج الامتداد.
+     */
+
+    let extension="";
+
+    if(file.name.includes(".")){
+
+      extension=
+        file.name
+          .split(".")
+          .pop()
+          .toLowerCase();
+
+    }
+
+    /*
+     * تنظيف اسم الملف.
+     */
 
     const safeName=
       finalName
@@ -2040,20 +2468,25 @@ async function saveMedia(){
           "-"
         )
         .replace(/-+/g,"-")
-        .replace(/^-|-$/g,"");
+        .replace(/^-|-$/g,"")
+        .substring(0,80);
+
+    /*
+     * اسم فريد للملف داخل Storage.
+     */
 
     filePath=
       Date.now()+
       "-"+
       Math.random()
         .toString(36)
-        .substring(2,8)+
+        .substring(2,10)+
       "-"+
       (safeName||"media")+
       (extension?"."+extension:"");
 
     /*
-     * رفع الملف الحقيقي إلى Supabase Storage
+     * رفع الملف الحقيقي إلى Supabase Storage.
      */
 
     const uploadResult=
@@ -2061,41 +2494,86 @@ async function saveMedia(){
         .storage
         .from(STORAGE_BUCKET)
         .upload(
+
           filePath,
+
           file,
+
           {
             cacheControl:"3600",
+
             upsert:false,
-            contentType:file.type
+
+            contentType:
+              file.type||
+
+              (
+                type==="image"
+                  ?"image/*"
+                  :"video/*"
+              )
+
           }
+
         );
 
     if(uploadResult.error){
+
       throw uploadResult.error;
     }
 
+    setUploadBusy(
+      true,
+      "تم رفع الملف، جاري حفظ بياناته..."
+    );
+
     /*
      * إنشاء الرابط تلقائيًا.
-     * المستخدم لا يكتبه ولا يحتاج إلى إدخاله.
+     * المستخدم لا يكتبه.
      */
 
     const publicResult=
       supabaseClient
         .storage
         .from(STORAGE_BUCKET)
-        .getPublicUrl(filePath);
+        .getPublicUrl(
+          filePath
+        );
 
     const publicUrl=
-      publicResult.data.publicUrl;
+      publicResult?.data?.publicUrl;
 
-    const dimensions=
-      await readDimensions(file,type);
+    if(!publicUrl){
+
+      throw new Error(
+        "تعذر إنشاء رابط الملف"
+      );
+    }
+
+    /*
+     * مدة الفيديو إذا كانت متوفرة.
+     * الصور تستخدم المدة التي حددها المستخدم.
+     */
 
     let finalDuration=null;
 
+    let videoDuration=null;
+
     if(type==="image"){
+
       finalDuration=duration;
+
+    }else{
+
+      videoDuration=
+        Number.isFinite(dimensions.duration)
+          ?dimensions.duration
+          :null;
     }
+
+    /*
+     * حفظ بيانات الملف في جدول media.
+     */
 
     const {
       data,
@@ -2131,40 +2609,116 @@ async function saveMedia(){
 
     if(error){
 
+      /*
+       * إذا فشل حفظ بيانات الملف،
+       * نحذف الملف الذي رفعناه من Storage.
+       */
+
       await supabaseClient
         .storage
         .from(STORAGE_BUCKET)
-        .remove([filePath]);
+        .remove([
+          filePath
+        ]);
 
       throw error;
     }
 
+    /*
+     * إضافة مدة الفيديو للواجهة فقط.
+     * جدول media الحالي يعتمد duration للصور.
+     */
+    if(
+      data&&
+      type==="video"
+    ){
+
+      data.video_duration=
+        videoDuration;
+    }
+
     media.unshift(data);
 
-    closeModal("mediaModal");
+    /*
+     * إغلاق نافذة الرفع.
+     */
+
+    closeModal(
+      "mediaModal"
+    );
+
+    /*
+     * إعادة عرض مكتبة الوسائط.
+     */
 
     renderMedia();
     updateStats();
 
-    showToast("تم رفع الملف بنجاح");
+    /*
+     * إذا كان المستخدم أضاف الملف من داخل المحتوى،
+     * نضيفه مباشرة إلى Playlist.
+     */
 
     if(
       addingToContent&&
       selectedPlaylistId
     ){
 
-      await addMediaToPlaylist(data.id);
+      await addMediaToPlaylist(
+        data.id
+      );
 
     }
 
+    showToast(
+      "تم رفع الملف وإضافته بنجاح"
+    );
+
   }catch(error){
 
-    console.error(error);
+    console.error(
+      "Media upload error:",
+      error
+    );
+
+    /*
+     * إذا تم رفع الملف إلى Storage
+     * ثم حدث خطأ بعد ذلك، نحاول تنظيفه.
+     */
+
+    if(filePath){
+
+      try{
+
+        await supabaseClient
+          .storage
+          .from(STORAGE_BUCKET)
+          .remove([
+            filePath
+          ]);
+
+      }catch(cleanupError){
+
+        console.warn(
+          "Cleanup error:",
+          cleanupError
+        );
+
+      }
+    }
 
     showToast(
       "فشل رفع الملف: "+
-      (error.message||"خطأ غير معروف")
+      (
+        error?.message||
+        "خطأ غير معروف"
+      )
     );
+
+  }finally{
+
+    setUploadBusy(false);
+
   }
 }
 
@@ -2174,7 +2728,10 @@ async function saveMedia(){
 
 async function deleteMedia(id){
 
-  const item=media.find(x=>x.id===id);
+  const item=
+    media.find(
+      x=>x.id===id
+    );
 
   if(!item)return;
 
@@ -2192,19 +2749,18 @@ async function deleteMedia(id){
     return;
   }
 
-  if(!confirm("هل تريد حذف هذه الوسائط؟")){
+  if(!confirm(
+    "هل تريد حذف هذه الوسائط؟"
+  )){
+
     return;
   }
 
   try{
 
-    const {error}=
-      await supabaseClient
-        .from("media")
-        .delete()
-        .eq("id",id);
-
-    if(error)throw error;
+    /*
+     * نحذف من Storage أولًا.
+     */
 
     if(item.file_path){
 
@@ -2214,27 +2770,57 @@ async function deleteMedia(id){
         await supabaseClient
           .storage
           .from(STORAGE_BUCKET)
-          .remove([item.file_path]);
+          .remove([
+            item.file_path
+          ]);
 
       if(storageError){
-        console.warn(
-          "Storage delete error:",
-          storageError
-        );
+
+        throw storageError;
       }
     }
 
-    media=media.filter(x=>x.id!==id);
+    /*
+     * ثم نحذف سجل قاعدة البيانات.
+     */
+
+    const {error}=
+      await supabaseClient
+        .from("media")
+        .delete()
+        .eq("id",id);
+
+    if(error){
+
+      throw error;
+    }
+
+    media=
+      media.filter(
+        x=>x.id!==id
+      );
 
     renderMedia();
     updateStats();
 
-    showToast("تم حذف الوسائط");
+    showToast(
+      "تم حذف الوسائط"
+    );
 
   }catch(error){
 
-    console.error(error);
-    showToast("فشل حذف الوسائط");
+    console.error(
+      "Delete media error:",
+      error
+    );
+
+    showToast(
+      "فشل حذف الوسائط: "+
+      (
+        error?.message||
+        "خطأ"
+      )
+    );
   }
 }
 
@@ -2261,11 +2847,23 @@ function prepareContentSelector(){
   if(
     selectedScreenId&&
     screens.some(
-      x=>Number(x.id)===Number(selectedScreenId)
+      x=>Number(x.id)===
+        Number(selectedScreenId)
     )
   ){
 
-    select.value=selectedScreenId;
+    select.value=
+      selectedScreenId;
+
+  }else if(screens.length){
+
+    selectedScreenId=
+      Number(
+        screens[0].id
+      );
+
+    select.value=
+      selectedScreenId;
   }
 
   loadContentEditor();
@@ -2287,11 +2885,13 @@ function loadContentEditor(){
     return;
   }
 
-  selectedScreenId=Number(value);
+  selectedScreenId=
+    Number(value);
 
   const playlist=
     playlists.find(
-      x=>Number(x.screen_id)===selectedScreenId
+      x=>Number(x.screen_id)===
+        selectedScreenId
     );
 
   if(!playlist){
@@ -2303,7 +2903,8 @@ function loadContentEditor(){
     return;
   }
 
-  selectedPlaylistId=playlist.id;
+  selectedPlaylistId=
+    playlist.id;
 
   document.getElementById(
     "contentEditor"
@@ -2311,13 +2912,15 @@ function loadContentEditor(){
 
   const screen=
     screens.find(
-      x=>Number(x.id)===selectedScreenId
+      x=>Number(x.id)===
+        selectedScreenId
     );
 
   document.getElementById(
     "contentScreenTitle"
   ).textContent=
-    screen?.name||"المحتوى";
+    screen?.name||
+    "المحتوى";
 
   document.getElementById(
     "repeatAll"
@@ -2327,17 +2930,20 @@ function loadContentEditor(){
   document.getElementById(
     "defaultDuration"
   ).value=
-    playlist.default_duration||10;
+    playlist.default_duration||
+    10;
 
   document.getElementById(
     "defaultTransition"
   ).value=
-    playlist.default_transition||"fade";
+    playlist.default_transition||
+    "fade";
 
   document.getElementById(
     "fitMode"
   ).value=
-    playlist.fit_mode||"contain";
+    playlist.fit_mode||
+    "contain";
 
   renderContentItems();
 }
@@ -2345,15 +2951,21 @@ function loadContentEditor(){
 function renderContentItems(){
 
   const container=
-    document.getElementById("contentItems");
+    document.getElementById(
+      "contentItems"
+    );
 
   const items=
     playlistItems
       .filter(
-        item=>item.playlist_id===selectedPlaylistId
+        item=>
+          item.playlist_id===
+          selectedPlaylistId
       )
       .sort(
-        (a,b)=>Number(a.position)-Number(b.position)
+        (a,b)=>
+          Number(a.position)-
+          Number(b.position)
       );
 
   if(!items.length){
@@ -2373,178 +2985,206 @@ function renderContentItems(){
   }
 
   container.innerHTML=
-    items.map((item,index)=>{
+    items.map(
+      (item,index)=>{
 
-      const mediaItem=
-        media.find(
-          x=>x.id===item.media_id
-        );
+        const mediaItem=
+          media.find(
+            x=>x.id===
+              item.media_id
+          );
 
-      if(!mediaItem)return "";
+        if(!mediaItem)return "";
 
-      return `
+        return `
 
-      <div
-        class="content-item"
-        draggable="true"
-        data-item-id="${item.id}"
-        ondragstart="dragStart(event)"
-        ondragover="dragOver(event)"
-        ondrop="dropItem(event)">
+        <div
+          class="content-item"
+          draggable="true"
+          data-item-id="${item.id}"
+          ondragstart="dragStart(event)"
+          ondragover="dragOver(event)"
+          ondrop="dropItem(event)">
 
-        <div class="drag">☷</div>
+          <div class="drag">☷</div>
 
-        <div class="media-thumb">
+          <div class="media-thumb">
+
+            ${
+              mediaItem.type==="image"
+
+              ?`
+                <img
+                  src="${escapeHtml(mediaItem.file_url)}"
+                  alt="">
+              `
+
+              :`
+                <video
+                  src="${escapeHtml(mediaItem.file_url)}"
+                  muted
+                  preload="metadata">
+                </video>
+              `
+            }
+
+          </div>
+
+          <div class="item-info">
+
+            <div class="item-name">
+              ${escapeHtml(mediaItem.name)}
+            </div>
+
+            <div class="item-type">
+
+              ${
+                mediaItem.type==="image"
+                  ?"صورة"
+                  :"فيديو"
+              }
+
+              ·
+
+              ${index+1}
+
+            </div>
+
+          </div>
 
           ${
             mediaItem.type==="image"
 
             ?`
-              <img
-                src="${escapeHtml(mediaItem.file_url)}"
-                alt="">
+
+              <div class="item-controls">
+
+                <label style="margin:0;font-size:9px">
+                  ثانية
+                </label>
+
+                <input
+                  type="number"
+                  min="1"
+                  value="${
+                    item.duration||
+                    mediaItem.duration||
+                    10
+                  }"
+                  onchange="
+                    updateItemDuration(
+                      '${item.id}',
+                      this.value
+                    )
+                  ">
+
+              </div>
+
             `
 
             :`
-              <video
-                src="${escapeHtml(mediaItem.file_url)}"
-                muted>
-              </video>
-            `
-          }
 
-        </div>
-
-        <div class="item-info">
-
-          <div class="item-name">
-            ${escapeHtml(mediaItem.name)}
-          </div>
-
-          <div class="item-type">
-
-            ${
-              mediaItem.type==="image"
-                ?"صورة"
-                :"فيديو"
-            }
-
-            ·
-
-            ${index+1}
-
-          </div>
-
-        </div>
-
-        ${
-          mediaItem.type==="image"
-
-          ?`
-
-            <div class="item-controls">
-
-              <label style="margin:0;font-size:9px">
-                ثانية
-              </label>
-
-              <input
-                type="number"
-                min="1"
-                value="${
-                  item.duration||
-                  mediaItem.duration||
-                  10
-                }"
+              <select
+                style="width:85px"
                 onchange="
-                  updateItemDuration(
+                  updateVideoMode(
                     '${item.id}',
                     this.value
                   )
                 ">
 
-            </div>
+                <option
+                  value="next"
+                  ${
+                    item.video_mode==="next"
+                      ?"selected"
+                      :""
+                  }>
+                  التالي
+                </option>
 
-          `
+                <option
+                  value="loop"
+                  ${
+                    item.video_mode==="loop"
+                      ?"selected"
+                      :""
+                  }>
+                  تكرار
+                </option>
 
-          :`
+              </select>
 
-            <select
-              style="width:85px"
-              onchange="
-                updateVideoMode(
-                  '${item.id}',
-                  this.value
-                )
-              ">
+            `
+          }
 
-              <option
-                value="next"
-                ${item.video_mode==="next"?"selected":""}>
-                التالي
-              </option>
+          <select
+            style="width:85px"
+            onchange="
+              updateItemTransition(
+                '${item.id}',
+                this.value
+              )
+            ">
 
-              <option
-                value="loop"
-                ${item.video_mode==="loop"?"selected":""}>
-                تكرار
-              </option>
+            <option
+              value="fade"
+              ${
+                item.transition==="fade"
+                  ?"selected"
+                  :""
+              }>
+              Fade
+            </option>
 
-            </select>
+            <option
+              value="slide"
+              ${
+                item.transition==="slide"
+                  ?"selected"
+                  :""
+              }>
+              Slide
+            </option>
 
-          `
-        }
+            <option
+              value="zoom"
+              ${
+                item.transition==="zoom"
+                  ?"selected"
+                  :""
+              }>
+              Zoom
+            </option>
 
-        <select
-          style="width:85px"
-          onchange="
-            updateItemTransition(
-              '${item.id}',
-              this.value
-            )
-          ">
+            <option
+              value="none"
+              ${
+                item.transition==="none"
+                  ?"selected"
+                  :""
+              }>
+              بدون
+            </option>
 
-          <option
-            value="fade"
-            ${item.transition==="fade"?"selected":""}>
-            Fade
-          </option>
+          </select>
 
-          <option
-            value="slide"
-            ${item.transition==="slide"?"selected":""}>
-            Slide
-          </option>
+          <button
+            class="btn btn-small btn-danger"
+            onclick="
+              deletePlaylistItem(
+                '${item.id}'
+              )
+            ">
+            حذف
+          </button>
 
-          <option
-            value="zoom"
-            ${item.transition==="zoom"?"selected":""}>
-            Zoom
-          </option>
+        </div>
 
-          <option
-            value="none"
-            ${item.transition==="none"?"selected":""}>
-            بدون
-          </option>
+        `;
 
-        </select>
-
-        <button
-          class="btn btn-small btn-danger"
-          onclick="
-            deletePlaylistItem(
-              '${item.id}'
-            )
-          ">
-          حذف
-        </button>
-
-      </div>
-
-      `;
-
-    }).join("");
+      }
+    ).join("");
 }
 
 /* =========================
@@ -2555,13 +3195,18 @@ async function addMediaToPlaylist(mediaId){
 
   if(!selectedPlaylistId){
 
-    showToast("اختر شاشة أولًا");
+    showToast(
+      "اختر شاشة أولًا"
+    );
+
     return;
   }
 
   const items=
     playlistItems.filter(
-      x=>x.playlist_id===selectedPlaylistId
+      x=>
+        x.playlist_id===
+        selectedPlaylistId
     );
 
   const position=
@@ -2574,7 +3219,9 @@ async function addMediaToPlaylist(mediaId){
       :0;
 
   const mediaItem=
-    media.find(x=>x.id===mediaId);
+    media.find(
+      x=>x.id===mediaId
+    );
 
   const {
     data,
@@ -2584,19 +3231,31 @@ async function addMediaToPlaylist(mediaId){
       .from("playlist_items")
       .insert({
 
-        playlist_id:selectedPlaylistId,
-        media_id:mediaId,
-        position:position,
-        enabled:true,
+        playlist_id:
+          selectedPlaylistId,
+
+        media_id:
+          mediaId,
+
+        position:
+          position,
+
+        enabled:
+          true,
 
         duration:
           mediaItem?.type==="image"
             ?mediaItem.duration||10
             :null,
 
-        transition:"fade",
-        video_mode:"next",
-        muted:true
+        transition:
+          "fade",
+
+        video_mode:
+          "next",
+
+        muted:
+          true
 
       })
       .select()
@@ -2606,7 +3265,10 @@ async function addMediaToPlaylist(mediaId){
 
     console.error(error);
 
-    showToast("فشل إضافة المحتوى");
+    showToast(
+      "فشل إضافة المحتوى"
+    );
+
     return;
   }
 
@@ -2614,7 +3276,9 @@ async function addMediaToPlaylist(mediaId){
 
   renderContentItems();
 
-  showToast("تمت إضافة المحتوى");
+  showToast(
+    "تمت إضافة المحتوى"
+  );
 }
 
 /* =========================
@@ -2633,21 +3297,34 @@ async function updateItemDuration(id,value){
     await supabaseClient
       .from("playlist_items")
       .update({
-        duration:duration,
-        updated_at:new Date().toISOString()
+
+        duration:
+          duration,
+
+        updated_at:
+          new Date().toISOString()
+
       })
       .eq("id",id);
 
   if(error){
 
-    showToast("فشل تعديل المدة");
+    showToast(
+      "فشل تعديل المدة"
+    );
+
     return;
   }
 
   const item=
-    playlistItems.find(x=>x.id===id);
+    playlistItems.find(
+      x=>x.id===id
+    );
 
-  if(item)item.duration=duration;
+  if(item){
+    item.duration=
+      duration;
+  }
 }
 
 async function updateVideoMode(id,value){
@@ -2656,13 +3333,21 @@ async function updateVideoMode(id,value){
     await supabaseClient
       .from("playlist_items")
       .update({
-        video_mode:value,
-        updated_at:new Date().toISOString()
+
+        video_mode:
+          value,
+
+        updated_at:
+          new Date().toISOString()
+
       })
       .eq("id",id);
 
   if(error){
-    showToast("فشل تعديل الفيديو");
+
+    showToast(
+      "فشل تعديل الفيديو"
+    );
   }
 }
 
@@ -2672,13 +3357,21 @@ async function updateItemTransition(id,value){
     await supabaseClient
       .from("playlist_items")
       .update({
-        transition:value,
-        updated_at:new Date().toISOString()
+
+        transition:
+          value,
+
+        updated_at:
+          new Date().toISOString()
+
       })
       .eq("id",id);
 
   if(error){
-    showToast("فشل تعديل الانتقال");
+
+    showToast(
+      "فشل تعديل الانتقال"
+    );
   }
 }
 
@@ -2696,7 +3389,10 @@ async function deletePlaylistItem(id){
 
   if(error){
 
-    showToast("فشل حذف المحتوى");
+    showToast(
+      "فشل حذف المحتوى"
+    );
+
     return;
   }
 
@@ -2709,7 +3405,9 @@ async function deletePlaylistItem(id){
 
   renderContentItems();
 
-  showToast("تم حذف المحتوى");
+  showToast(
+    "تم حذف المحتوى"
+  );
 }
 
 /* =========================
@@ -2723,6 +3421,7 @@ function dragStart(event){
 }
 
 function dragOver(event){
+
   event.preventDefault();
 }
 
@@ -2737,16 +3436,21 @@ async function dropItem(event){
     !draggedItemId||
     draggedItemId===targetId
   ){
+
     return;
   }
 
   const items=
     playlistItems
       .filter(
-        x=>x.playlist_id===selectedPlaylistId
+        x=>
+          x.playlist_id===
+          selectedPlaylistId
       )
       .sort(
-        (a,b)=>Number(a.position)-Number(b.position)
+        (a,b)=>
+          Number(a.position)-
+          Number(b.position)
       );
 
   const from=
@@ -2762,29 +3466,62 @@ async function dropItem(event){
   if(from<0||to<0)return;
 
   const moved=
-    items.splice(from,1)[0];
+    items.splice(
+      from,
+      1
+    )[0];
 
-  items.splice(to,0,moved);
+  items.splice(
+    to,
+    0,
+    moved
+  );
 
-  for(let index=0;index<items.length;index++){
+  for(
+    let index=0;
+    index<items.length;
+    index++
+  ){
 
-    items[index].position=index;
+    items[index].position=
+      index;
 
-    await supabaseClient
-      .from("playlist_items")
-      .update({
-        position:index,
-        updated_at:new Date().toISOString()
-      })
-      .eq("id",items[index].id);
+    const {error}=
+      await supabaseClient
+        .from("playlist_items")
+        .update({
+
+          position:
+            index,
+
+          updated_at:
+            new Date().toISOString()
+
+        })
+        .eq(
+          "id",
+          items[index].id
+        );
+
+    if(error){
+
+      console.error(
+        "Position update error:",
+        error
+      );
+    }
   }
 
   playlistItems=
     playlistItems
       .filter(
-        x=>x.playlist_id!==selectedPlaylistId
+        x=>
+          x.playlist_id!==
+          selectedPlaylistId
       )
       .concat(items);
+
+  draggedItemId=null;
 
   renderContentItems();
 }
@@ -2798,10 +3535,14 @@ async function normalizePositions(){
   const items=
     playlistItems
       .filter(
-        x=>x.playlist_id===selectedPlaylistId
+        x=>
+          x.playlist_id===
+          selectedPlaylistId
       )
       .sort(
-        (a,b)=>Number(a.position)-Number(b.position)
+        (a,b)=>
+          Number(a.position)-
+          Number(b.position)
       );
 
   for(
@@ -2810,14 +3551,24 @@ async function normalizePositions(){
     index++
   ){
 
-    items[index].position=index;
+    items[index].position=
+      index;
 
     await supabaseClient
       .from("playlist_items")
       .update({
-        position:index
+
+        position:
+          index,
+
+        updated_at:
+          new Date().toISOString()
+
       })
-      .eq("id",items[index].id);
+      .eq(
+        "id",
+        items[index].id
+      );
   }
 }
 
@@ -2832,37 +3583,66 @@ async function savePlaylistSettings(){
   const data={
 
     repeat_all:
-      document.getElementById("repeatAll").checked,
+      document.getElementById(
+        "repeatAll"
+      ).checked,
 
     default_duration:
       Math.max(
         1,
         Number(
-          document.getElementById("defaultDuration").value
+          document.getElementById(
+            "defaultDuration"
+          ).value
         )||10
       ),
 
     default_transition:
-      document.getElementById("defaultTransition").value,
+      document.getElementById(
+        "defaultTransition"
+      ).value,
 
     fit_mode:
-      document.getElementById("fitMode").value,
+      document.getElementById(
+        "fitMode"
+      ).value,
 
     updated_at:
       new Date().toISOString()
+
   };
 
   const {error}=
     await supabaseClient
       .from("playlists")
       .update(data)
-      .eq("id",selectedPlaylistId);
+      .eq(
+        "id",
+        selectedPlaylistId
+      );
 
   if(error){
 
     console.error(error);
 
-    showToast("فشل حفظ إعدادات المحتوى");
+    showToast(
+      "فشل حفظ إعدادات المحتوى"
+    );
+
+    return;
+  }
+
+  const playlist=
+    playlists.find(
+      x=>x.id===selectedPlaylistId
+    );
+
+  if(playlist){
+
+    Object.assign(
+      playlist,
+      data
+    );
   }
 }
 
@@ -2877,28 +3657,37 @@ async function publishCurrentScreen(){
     !selectedPlaylistId
   ){
 
-    showToast("اختر شاشة أولًا");
+    showToast(
+      "اختر شاشة أولًا"
+    );
+
     return;
   }
 
   const now=
     new Date().toISOString();
 
-  const {error}=
+  const {
+    error
+  }=
     await supabaseClient
       .from("screen_publish_state")
       .upsert({
 
-        screen_id:selectedScreenId,
+        screen_id:
+          selectedScreenId,
 
         published_playlist_id:
           selectedPlaylistId,
 
-        version:Date.now(),
+        version:
+          Date.now(),
 
-        published_at:now,
+        published_at:
+          now,
 
-        updated_at:now
+        updated_at:
+          now
 
       });
 
@@ -2906,20 +3695,51 @@ async function publishCurrentScreen(){
 
     console.error(error);
 
-    showToast("فشل نشر المحتوى");
+    showToast(
+      "فشل نشر المحتوى"
+    );
+
     return;
   }
 
-  await supabaseClient
-    .from("playlists")
-    .update({
-      published:true,
-      published_at:now,
-      updated_at:now
-    })
-    .eq("id",selectedPlaylistId);
+  const {
+    error:playlistError
+  }=
+    await supabaseClient
+      .from("playlists")
+      .update({
 
-  showToast("🚀 تم نشر المحتوى على الشاشة");
+        published:
+          true,
+
+        published_at:
+          now,
+
+        updated_at:
+          now
+
+      })
+      .eq(
+        "id",
+        selectedPlaylistId
+      );
+
+  if(playlistError){
+
+    console.error(
+      playlistError
+    );
+
+    showToast(
+      "تم النشر لكن تعذر تحديث حالة القائمة"
+    );
+
+    return;
+  }
+
+  showToast(
+    "🚀 تم نشر المحتوى على الشاشة"
+  );
 }
 
 /* =========================
@@ -2929,7 +3749,9 @@ async function publishCurrentScreen(){
 function renderSchedules(){
 
   const table=
-    document.getElementById("scheduleTable");
+    document.getElementById(
+      "scheduleTable"
+    );
 
   if(!schedules.length){
 
@@ -2944,77 +3766,91 @@ function renderSchedules(){
   }
 
   table.innerHTML=
-    schedules.map(schedule=>{
+    schedules.map(
+      schedule=>{
 
-      const screen=
-        screens.find(
-          x=>Number(x.id)===Number(schedule.screen_id)
-        );
+        const screen=
+          screens.find(
+            x=>
+              Number(x.id)===
+              Number(schedule.screen_id)
+          );
 
-      const playlist=
-        playlists.find(
-          x=>x.id===schedule.playlist_id
-        );
+        const playlist=
+          playlists.find(
+            x=>
+              x.id===
+              schedule.playlist_id
+          );
 
-      return `
+        return `
 
-      <tr>
+        <tr>
 
-        <td>
-          ${escapeHtml(screen?.name||"-")}
-        </td>
+          <td>
+            ${escapeHtml(
+              screen?.name||"-"
+            )}
+          </td>
 
-        <td>
-          ${escapeHtml(playlist?.name||"-")}
-        </td>
+          <td>
+            ${escapeHtml(
+              playlist?.name||"-"
+            )}
+          </td>
 
-        <td>
-          ${schedule.start_date||"-"}
-          ${schedule.start_time||""}
-        </td>
+          <td>
+            ${schedule.start_date||"-"}
+            ${schedule.start_time||""}
+          </td>
 
-        <td>
-          ${schedule.end_date||"-"}
-          ${schedule.end_time||""}
-        </td>
+          <td>
+            ${schedule.end_date||"-"}
+            ${schedule.end_time||""}
+          </td>
 
-        <td>${schedule.priority}</td>
+          <td>
+            ${schedule.priority}
+          </td>
 
-        <td>
+          <td>
 
-          <span class="status ${
-            schedule.enabled?"on":"off"
-          }">
-
-            ${
+            <span class="status ${
               schedule.enabled
-                ?"مفعلة"
-                :"متوقفة"
-            }
+                ?"on"
+                :"off"
+            }">
 
-          </span>
+              ${
+                schedule.enabled
+                  ?"مفعلة"
+                  :"متوقفة"
+              }
 
-        </td>
+            </span>
 
-        <td>
+          </td>
 
-          <button
-            class="btn btn-small btn-danger"
-            onclick="
-              deleteSchedule(
-                '${schedule.id}'
-              )
-            ">
-            حذف
-          </button>
+          <td>
 
-        </td>
+            <button
+              class="btn btn-small btn-danger"
+              onclick="
+                deleteSchedule(
+                  '${schedule.id}'
+                )
+              ">
+              حذف
+            </button>
 
-      </tr>
+          </td>
 
-      `;
+        </tr>
 
-    }).join("");
+        `;
+
+      }
+    ).join("");
 }
 
 /* =========================
@@ -3024,47 +3860,60 @@ function renderSchedules(){
 function openScheduleModal(){
 
   const screenSelect=
-    document.getElementById("scheduleScreen");
+    document.getElementById(
+      "scheduleScreen"
+    );
 
   screenSelect.innerHTML=
-    screens.map(screen=>`
+    screens.map(
+      screen=>`
 
-      <option value="${screen.id}">
-        ${escapeHtml(screen.name)}
-      </option>
+        <option value="${screen.id}">
+          ${escapeHtml(screen.name)}
+        </option>
 
-    `).join("");
+      `
+    ).join("");
 
   screenSelect.onchange=
     renderSchedulePlaylists;
 
   renderSchedulePlaylists();
 
-  document.getElementById("scheduleModal")
-    .classList.add("show");
+  document.getElementById(
+    "scheduleModal"
+  ).classList.add("show");
 }
 
 function renderSchedulePlaylists(){
 
   const screenId=
     Number(
-      document.getElementById("scheduleScreen").value
+      document.getElementById(
+        "scheduleScreen"
+      ).value
     );
 
   const select=
-    document.getElementById("schedulePlaylist");
+    document.getElementById(
+      "schedulePlaylist"
+    );
 
   select.innerHTML=
     playlists
       .filter(
         playlist=>
-          Number(playlist.screen_id)===screenId
+          Number(
+            playlist.screen_id
+          )===screenId
       )
       .map(
         playlist=>`
 
           <option value="${playlist.id}">
-            ${escapeHtml(playlist.name)}
+            ${escapeHtml(
+              playlist.name
+            )}
           </option>
 
         `
@@ -3080,46 +3929,81 @@ async function saveSchedule(){
 
   const screenId=
     Number(
-      document.getElementById("scheduleScreen").value
+      document.getElementById(
+        "scheduleScreen"
+      ).value
     );
 
   const playlistId=
-    document.getElementById("schedulePlaylist").value;
+    document.getElementById(
+      "schedulePlaylist"
+    ).value;
 
   if(!playlistId){
 
-    showToast("لا يوجد محتوى لهذه الشاشة");
+    showToast(
+      "لا يوجد محتوى لهذه الشاشة"
+    );
+
+    return;
+  }
+
+  const startDate=
+    document.getElementById(
+      "scheduleStartDate"
+    ).value||null;
+
+  const endDate=
+    document.getElementById(
+      "scheduleEndDate"
+    ).value||null;
+
+  if(
+    startDate&&
+    endDate&&
+    endDate<startDate
+  ){
+
+    showToast(
+      "تاريخ النهاية يجب أن يكون بعد البداية"
+    );
+
     return;
   }
 
   const data={
 
-    screen_id:screenId,
+    screen_id:
+      screenId,
 
-    playlist_id:playlistId,
+    playlist_id:
+      playlistId,
 
     start_date:
-      document.getElementById("scheduleStartDate").value||
-      null,
+      startDate,
 
     end_date:
-      document.getElementById("scheduleEndDate").value||
-      null,
+      endDate,
 
     start_time:
-      document.getElementById("scheduleStartTime").value||
-      null,
+      document.getElementById(
+        "scheduleStartTime"
+      ).value||null,
 
     end_time:
-      document.getElementById("scheduleEndTime").value||
-      null,
+      document.getElementById(
+        "scheduleEndTime"
+      ).value||null,
 
     priority:
       Number(
-        document.getElementById("schedulePriority").value
+        document.getElementById(
+          "schedulePriority"
+        ).value
       ),
 
-    enabled:true
+    enabled:
+      true
   };
 
   const {error}=
@@ -3131,15 +4015,22 @@ async function saveSchedule(){
 
     console.error(error);
 
-    showToast("فشل حفظ الجدولة");
+    showToast(
+      "فشل حفظ الجدولة"
+    );
+
     return;
   }
 
-  closeModal("scheduleModal");
+  closeModal(
+    "scheduleModal"
+  );
 
   await loadAll();
 
-  showToast("تم حفظ الجدولة");
+  showToast(
+    "تم حفظ الجدولة"
+  );
 }
 
 /* =========================
@@ -3152,11 +4043,17 @@ async function deleteSchedule(id){
     await supabaseClient
       .from("schedules")
       .delete()
-      .eq("id",id);
+      .eq(
+        "id",
+        id
+      );
 
   if(error){
 
-    showToast("فشل حذف الجدولة");
+    showToast(
+      "فشل حذف الجدولة"
+    );
+
     return;
   }
 
@@ -3167,7 +4064,9 @@ async function deleteSchedule(id){
 
   renderSchedules();
 
-  showToast("تم حذف الجدولة");
+  showToast(
+    "تم حذف الجدولة"
+  );
 }
 
 /* =========================
@@ -3175,6 +4074,18 @@ async function deleteSchedule(id){
 ========================= */
 
 function closeModal(id){
+
+  /*
+   * لا نسمح بإغلاق نافذة الرفع
+   * أثناء رفع الملف.
+   */
+  if(
+    id==="mediaModal"&&
+    mediaUploading
+  ){
+
+    return;
+  }
 
   document.getElementById(id)
     .classList.remove("show");
@@ -3185,11 +4096,20 @@ document.querySelectorAll(".modal-backdrop")
 
     modal.onclick=event=>{
 
-      if(event.target===modal){
+      if(
+        event.target===modal&&
+        !(
+          modal.id==="mediaModal"&&
+          mediaUploading
+        )
+      ){
 
-        modal.classList.remove("show");
+        modal.classList.remove(
+          "show"
+        );
 
       }
+
     };
 
   });
@@ -3201,7 +4121,9 @@ document.querySelectorAll(".modal-backdrop")
 function setupRealtime(){
 
   supabaseClient
-    .channel("innovation-screens-dashboard")
+    .channel(
+      "innovation-screens-dashboard"
+    )
 
     .on(
       "postgres_changes",
@@ -3263,11 +4185,14 @@ function setupRealtime(){
       ()=>loadAll()
     )
 
-    .subscribe(status=>{
-
-      console.log("Realtime:",status);
-
-    });
+    .subscribe(
+      status=>{
+        console.log(
+          "Realtime:",
+          status
+        );
+      }
+    );
 }
 
 /* =========================
@@ -3277,22 +4202,26 @@ function setupRealtime(){
 window.addEventListener(
   "online",
   ()=>{
+
     setConnection(
       true,
       "متصل بالسحابة"
     );
 
     loadAll();
+
   }
 );
 
 window.addEventListener(
   "offline",
   ()=>{
+
     setConnection(
       false,
       "لا يوجد اتصال بالإنترنت"
     );
+
   }
 );
 
@@ -3300,7 +4229,9 @@ window.addEventListener(
    LANGUAGE
 ========================= */
 
-document.getElementById("settingsLanguage").value=
+document.getElementById(
+  "settingsLanguage"
+).value=
   currentLanguage;
 
 document.documentElement.dir=
@@ -3310,6 +4241,13 @@ document.documentElement.dir=
 
 document.documentElement.lang=
   currentLanguage;
+
+document.getElementById(
+  "languageButton"
+).textContent=
+  currentLanguage==="ar"
+    ?"English"
+    :"العربية";
 
 /* =========================
    START
@@ -3322,7 +4260,6 @@ document.documentElement.lang=
   setupRealtime();
 
 })();
-
 </script>
 
 </body>
