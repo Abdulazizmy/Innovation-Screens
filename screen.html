@@ -30,6 +30,12 @@ body{
   font-family:Arial,Tahoma,sans-serif;
 }
 
+body{
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
+}
+
 #stage{
   position:fixed;
   inset:0;
@@ -98,14 +104,7 @@ body{
   padding:30px;
 }
 
-#countdown{
-  display:none !important;
-}
-
-#info{
-  display:none !important;
-}
-
+#info,
 #offline{
   display:none !important;
 }
@@ -137,16 +136,12 @@ body{
     هذه الشاشة تحت الصيانة
   </div>
 
-  <div id="countdown"></div>
-
 </div>
 
 
 <div id="info"></div>
 
-<div id="offline">
-  الاتصال غير متاح — تشغيل آخر محتوى محفوظ
-</div>
+<div id="offline"></div>
 
 
 <script>
@@ -232,12 +227,6 @@ const maintenance =
   );
 
 
-const countdown =
-  document.getElementById(
-    "countdown"
-  );
-
-
 const info =
   document.getElementById(
     "info"
@@ -263,8 +252,6 @@ let currentItems = [];
 let currentIndex = 0;
 
 let timer = null;
-
-let countdownTimer = null;
 
 let paused = false;
 
@@ -321,7 +308,7 @@ function safeJsonParse(
 function updateConnectionStatus(){
 
   /*
-    لا نعرض أي حالة اتصال على الشاشة.
+    لا يتم عرض حالة الاتصال على الشاشة.
   */
 
 }
@@ -363,11 +350,14 @@ function saveLocalCache(){
 
     const data = {
 
-      screen:screen,
+      screen:
+        screen,
 
-      content:content,
+      content:
+        content,
 
-      savedAt:Date.now()
+      savedAt:
+        Date.now()
 
     };
 
@@ -529,8 +519,6 @@ async function loadPublishedContent(){
 
     content = null;
 
-    saveLocalCache();
-
     return;
 
   }
@@ -564,8 +552,6 @@ async function loadPublishedContent(){
   ){
 
     content = null;
-
-    saveLocalCache();
 
     return;
 
@@ -737,9 +723,7 @@ async function loadPublishedContent(){
    SUPABASE SYNC
 ===================================================== */
 
-async function syncFromSupabase(
-  showMessages = false
-){
+async function syncFromSupabase(){
 
   if(syncing)
     return;
@@ -917,25 +901,17 @@ function getActiveItems(){
 
 
 /* =====================================================
-   CLEAR TIMERS
+   CLEAR TIMER
 ===================================================== */
 
-function clearTimers(){
+function clearTimer(){
 
   clearTimeout(
     timer
   );
 
 
-  clearInterval(
-    countdownTimer
-  );
-
-
   timer =
-    null;
-
-  countdownTimer =
     null;
 
 }
@@ -947,11 +923,7 @@ function clearTimers(){
 
 function resetMedia(){
 
-  clearTimers();
-
-
-  countdown.style.display =
-    "none";
+  clearTimer();
 
 
   image.style.opacity =
@@ -1054,80 +1026,6 @@ function applyTransition(
     },
     80
   );
-
-}
-
-
-/* =====================================================
-   COUNTDOWN
-===================================================== */
-
-function startCountdown(
-  seconds
-){
-
-  clearInterval(
-    countdownTimer
-  );
-
-
-  /*
-    العداد يعمل داخليًا فقط
-    بدون ظهوره على الشاشة.
-  */
-
-  countdown.style.display =
-    "none";
-
-
-  const duration =
-    Math.max(
-      1,
-      Number(seconds) || 10
-    );
-
-
-  const endTime =
-    Date.now()
-    +
-    duration * 1000;
-
-
-  function update(){
-
-    const remaining =
-      Math.max(
-        0,
-        Math.ceil(
-          (
-            endTime -
-            Date.now()
-          ) / 1000
-        )
-      );
-
-
-    if(
-      remaining <= 0
-    ){
-
-      clearInterval(
-        countdownTimer
-      );
-
-    }
-
-  }
-
-
-  update();
-
-
-  countdownTimer =
-    setInterval(
-      update,
-      200
-    );
 
 }
 
@@ -1428,11 +1326,6 @@ async function playImage(
     );
 
 
-  startCountdown(
-    duration
-  );
-
-
   timer =
     setTimeout(
       ()=>{
@@ -1542,10 +1435,6 @@ async function playVideo(
   );
 
 
-  countdown.style.display =
-    "none";
-
-
   video.onended =
     ()=>{
 
@@ -1563,7 +1452,7 @@ async function playVideo(
   video.onerror =
     ()=>{
 
-    };
+  };
 
 
   video.play()
@@ -1582,7 +1471,7 @@ async function playVideo(
 
 function playCurrent(){
 
-  clearTimers();
+  clearTimer();
 
 
   currentItems =
@@ -1952,24 +1841,6 @@ setInterval(
 
 
 /* =====================================================
-   INFO
-===================================================== */
-
-function showInfo(
-  message
-){
-
-  /*
-    معطلة عمدًا.
-    الشاشة لا تعرض أي رسائل أثناء التشغيل.
-  */
-
-  return;
-
-}
-
-
-/* =====================================================
    FULLSCREEN
 ===================================================== */
 
@@ -2013,7 +1884,7 @@ document.addEventListener(
 
       if(paused){
 
-        clearTimers();
+        clearTimer();
 
         video.pause();
 
