@@ -53,6 +53,9 @@ body{
   transition:
     opacity .55s ease,
     transform .55s ease;
+  user-select:none;
+  -webkit-user-select:none;
+  pointer-events:none;
 }
 
 #image.cover,
@@ -96,49 +99,15 @@ body{
 }
 
 #countdown{
-  position:absolute;
-  right:15px;
-  bottom:15px;
-  z-index:10;
-  display:none;
-  padding:8px 12px;
-  background:rgba(0,0,0,.75);
-  color:#fff;
-  border-radius:7px;
-  font-size:14px;
+  display:none !important;
 }
 
 #info{
-  position:fixed;
-  top:8px;
-  right:8px;
-  z-index:50;
-  max-width:90%;
-  padding:6px 8px;
-  border-radius:6px;
-  background:rgba(0,0,0,.7);
-  color:#fff;
-  font-size:10px;
-  opacity:0;
-  transition:.25s;
-  pointer-events:none;
-}
-
-#info.show{
-  opacity:1;
+  display:none !important;
 }
 
 #offline{
-  position:fixed;
-  left:8px;
-  bottom:8px;
-  z-index:50;
-  display:none;
-  padding:5px 8px;
-  border-radius:5px;
-  background:rgba(130,20,20,.8);
-  color:#fff;
-  font-size:9px;
+  display:none !important;
 }
 
 </style>
@@ -351,19 +320,9 @@ function safeJsonParse(
 
 function updateConnectionStatus(){
 
-  if(
-    navigator.onLine
-  ){
-
-    offline.style.display =
-      "none";
-
-  }else{
-
-    offline.style.display =
-      "block";
-
-  }
+  /*
+    لا نعرض أي حالة اتصال على الشاشة.
+  */
 
 }
 
@@ -373,10 +332,6 @@ window.addEventListener(
   async ()=>{
 
     updateConnectionStatus();
-
-    showInfo(
-      "تم استعادة الاتصال"
-    );
 
     await syncFromSupabase();
 
@@ -389,10 +344,6 @@ window.addEventListener(
   ()=>{
 
     updateConnectionStatus();
-
-    showInfo(
-      "تشغيل آخر محتوى محفوظ"
-    );
 
   }
 );
@@ -838,15 +789,6 @@ async function syncFromSupabase(
 
       playCurrent();
 
-
-      if(showMessages){
-
-        showInfo(
-          "تم تحديث محتوى الشاشة"
-        );
-
-      }
-
     }
 
 
@@ -1129,6 +1071,15 @@ function startCountdown(
   );
 
 
+  /*
+    العداد يعمل داخليًا فقط
+    بدون ظهوره على الشاشة.
+  */
+
+  countdown.style.display =
+    "none";
+
+
   const duration =
     Math.max(
       1,
@@ -1140,10 +1091,6 @@ function startCountdown(
     Date.now()
     +
     duration * 1000;
-
-
-  countdown.style.display =
-    "block";
 
 
   function update(){
@@ -1160,11 +1107,6 @@ function startCountdown(
       );
 
 
-    countdown.textContent =
-      remaining +
-      " ث";
-
-
     if(
       remaining <= 0
     ){
@@ -1172,10 +1114,6 @@ function startCountdown(
       clearInterval(
         countdownTimer
       );
-
-
-      countdown.style.display =
-        "none";
 
     }
 
@@ -1625,26 +1563,12 @@ async function playVideo(
   video.onerror =
     ()=>{
 
-      if(
-        !navigator.onLine
-      ){
-
-        showInfo(
-          "تعذر تشغيل الفيديو المحفوظ"
-        );
-
-      }
-
     };
 
 
   video.play()
     .catch(
       ()=>{
-
-        showInfo(
-          "اضغط على الشاشة لتفعيل الفيديو"
-        );
 
       }
     );
@@ -1951,9 +1875,7 @@ function setupRealtime(){
           SCREEN_ID
       },
       ()=>{
-        syncFromSupabase(
-          true
-        );
+        syncFromSupabase();
       }
     )
     .on(
@@ -1967,9 +1889,7 @@ function setupRealtime(){
           SCREEN_ID
       },
       ()=>{
-        syncFromSupabase(
-          true
-        );
+        syncFromSupabase();
       }
     )
     .on(
@@ -1980,9 +1900,7 @@ function setupRealtime(){
         table:"playlists"
       },
       ()=>{
-        syncFromSupabase(
-          true
-        );
+        syncFromSupabase();
       }
     )
     .on(
@@ -1993,9 +1911,7 @@ function setupRealtime(){
         table:"playlist_items"
       },
       ()=>{
-        syncFromSupabase(
-          true
-        );
+        syncFromSupabase();
       }
     )
     .on(
@@ -2006,9 +1922,7 @@ function setupRealtime(){
         table:"media"
       },
       ()=>{
-        syncFromSupabase(
-          true
-        );
+        syncFromSupabase();
       }
     )
     .subscribe(
@@ -2045,31 +1959,12 @@ function showInfo(
   message
 ){
 
-  info.textContent =
-    message;
+  /*
+    معطلة عمدًا.
+    الشاشة لا تعرض أي رسائل أثناء التشغيل.
+  */
 
-
-  info.classList.add(
-    "show"
-  );
-
-
-  clearTimeout(
-    window.infoTimer
-  );
-
-
-  window.infoTimer =
-    setTimeout(
-      ()=>{
-
-        info.classList.remove(
-          "show"
-        );
-
-      },
-      2500
-    );
+  return;
 
 }
 
@@ -2122,19 +2017,9 @@ document.addEventListener(
 
         video.pause();
 
-
-        showInfo(
-          "متوقف مؤقتًا"
-        );
-
       }else{
 
         playCurrent();
-
-
-        showInfo(
-          "تم استئناف التشغيل"
-        );
 
       }
 
@@ -2222,9 +2107,8 @@ async function initialize(){
 
 
   /*
-    أول شيء:
-    نحاول تشغيل آخر نسخة محفوظة
-    حتى لو الشاشة بدون إنترنت.
+    تشغيل آخر نسخة محفوظة
+    مباشرة عند فتح الشاشة.
   */
 
   const cached =
@@ -2252,8 +2136,7 @@ async function initialize(){
 
 
   /*
-    إذا كان الإنترنت متوفر:
-    نسحب النسخة الأحدث من Supabase.
+    جلب أحدث محتوى من Supabase.
   */
 
   if(
@@ -2293,24 +2176,6 @@ async function initialize(){
   */
 
   preloadMedia();
-
-
-  /*
-    رسالة تعريف بسيطة
-  */
-
-  if(screen){
-
-    showInfo(
-      (
-        screen.name ||
-        "Screen"
-      ) +
-      " · ID " +
-      SCREEN_ID
-    );
-
-  }
 
 }
 
