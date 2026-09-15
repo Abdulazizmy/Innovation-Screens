@@ -1,0 +1,1308 @@
+```html
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+<title>Screen</title>
+
+<style>
+
+*{
+  box-sizing:border-box;
+}
+
+html,
+body{
+  width:100%;
+  height:100%;
+  margin:0;
+  padding:0;
+  overflow:hidden;
+  background:#000;
+  font-family:Arial,Tahoma,sans-serif;
+}
+
+#stage{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  background:#000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+
+#image{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  opacity:0;
+  transition:
+    opacity .55s ease,
+    transform .55s ease;
+}
+
+#video{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  opacity:0;
+  transition:
+    opacity .55s ease,
+    transform .55s ease;
+}
+
+#image.cover,
+#video.cover{
+  object-fit:cover;
+}
+
+#image.background,
+#video.background{
+  object-fit:contain;
+}
+
+#overlay{
+  position:absolute;
+  inset:0;
+  z-index:20;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:8%;
+  text-align:center;
+  background:rgba(0,0,0,.88);
+  color:#fff;
+  font-size:clamp(25px,5vw,75px);
+  font-weight:700;
+  line-height:1.5;
+}
+
+#maintenance{
+  position:absolute;
+  inset:0;
+  z-index:30;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:#111;
+  color:#fff;
+  text-align:center;
+  font-size:clamp(22px,4vw,60px);
+}
+
+#countdown{
+  position:absolute;
+  right:15px;
+  bottom:15px;
+  z-index:10;
+  display:none;
+  padding:8px 12px;
+  background:rgba(0,0,0,.75);
+  color:#fff;
+  border-radius:7px;
+  font-size:14px;
+}
+
+#info{
+  position:fixed;
+  top:8px;
+  right:8px;
+  z-index:50;
+  max-width:90%;
+  padding:6px 8px;
+  border-radius:6px;
+  background:rgba(0,0,0,.7);
+  color:#fff;
+  font-size:10px;
+  opacity:0;
+  transition:.25s;
+  pointer-events:none;
+}
+
+#info.show{
+  opacity:1;
+}
+
+#offline{
+  position:fixed;
+  left:8px;
+  bottom:8px;
+  z-index:50;
+  display:none;
+  padding:5px 8px;
+  border-radius:5px;
+  background:rgba(130,20,20,.8);
+  color:#fff;
+  font-size:9px;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div id="stage">
+
+  <img
+    id="image"
+    alt="">
+
+  <video
+    id="video"
+    playsinline
+    autoplay
+    muted>
+  </video>
+
+  <div id="overlay"></div>
+
+  <div id="maintenance">
+    هذه الشاشة تحت الصيانة
+  </div>
+
+  <div id="countdown"></div>
+
+</div>
+
+
+<div id="info"></div>
+
+<div id="offline">
+  الاتصال غير متاح — تشغيل آخر محتوى محفوظ
+</div>
+
+
+<script>
+
+/* =====================================================
+   SETTINGS
+===================================================== */
+
+const STORAGE_KEY =
+  "innovationSignageV2";
+
+
+const params =
+  new URLSearchParams(
+    window.location.search
+  );
+
+
+const SCREEN_ID =
+  Number(
+    params.get("id") || 1
+  );
+
+
+/* =====================================================
+   ELEMENTS
+===================================================== */
+
+const image =
+  document.getElementById(
+    "image"
+  );
+
+
+const video =
+  document.getElementById(
+    "video"
+  );
+
+
+const overlay =
+  document.getElementById(
+    "overlay"
+  );
+
+
+const maintenance =
+  document.getElementById(
+    "maintenance"
+  );
+
+
+const countdown =
+  document.getElementById(
+    "countdown"
+  );
+
+
+const info =
+  document.getElementById(
+    "info"
+  );
+
+
+const offline =
+  document.getElementById(
+    "offline"
+  );
+
+
+/* =====================================================
+   STATE
+===================================================== */
+
+let database = null;
+
+let screen = null;
+
+let content = null;
+
+let currentIndex = 0;
+
+let timer = null;
+
+let countdownTimer = null;
+
+let paused = false;
+
+let lastState = "";
+
+let lastBroadcastState = "";
+
+let currentItems = [];
+
+
+/* =====================================================
+   DATABASE
+===================================================== */
+
+function loadDatabase(){
+
+  try{
+
+    database =
+      JSON.parse(
+        localStorage.getItem(
+          STORAGE_KEY
+        ) || "{}"
+      );
+
+  }catch(error){
+
+    database = {};
+
+  }
+
+
+  screen =
+    (database.screens || [])
+      .find(
+        item =>
+          Number(item.id) === SCREEN_ID
+      );
+
+
+  content =
+    database.contents
+      ? database.contents[SCREEN_ID]
+      : null;
+
+}
+
+
+/* =====================================================
+   STATE HASH
+===================================================== */
+
+function getStateHash(){
+
+  return JSON.stringify({
+
+    screen:screen,
+
+    content:content,
+
+    broadcast:
+      database.broadcast || null
+
+  });
+
+}
+
+
+/* =====================================================
+   ACTIVE CONTENT
+===================================================== */
+
+function getActiveItems(){
+
+  if(!content)
+    return [];
+
+
+  return (
+    content.items || []
+  )
+  .filter(
+    item =>
+      item.enabled &&
+      item.url
+  );
+
+}
+
+
+/* =====================================================
+   CLEAR TIMERS
+===================================================== */
+
+function clearTimers(){
+
+  clearTimeout(timer);
+
+  clearInterval(
+    countdownTimer
+  );
+
+}
+
+
+/* =====================================================
+   RESET MEDIA
+===================================================== */
+
+function resetMedia(){
+
+  clearTimers();
+
+  countdown.style.display =
+    "none";
+
+
+  image.style.opacity =
+    "0";
+
+  video.style.opacity =
+    "0";
+
+
+  video.pause();
+
+}
+
+
+/* =====================================================
+   TRANSITION
+===================================================== */
+
+function applyTransition(
+  transition
+){
+
+  image.style.transform =
+    "translateX(0) scale(1)";
+
+  video.style.transform =
+    "translateX(0) scale(1)";
+
+
+  image.style.opacity =
+    "0";
+
+  video.style.opacity =
+    "0";
+
+
+  if(
+    transition === "slide"
+  ){
+
+    image.style.transform =
+      "translateX(35px)";
+
+    video.style.transform =
+      "translateX(35px)";
+
+  }
+
+
+  if(
+    transition === "zoom"
+  ){
+
+    image.style.transform =
+      "scale(1.06)";
+
+    video.style.transform =
+      "scale(1.06)";
+
+  }
+
+
+  setTimeout(
+    ()=>{
+
+      image.style.opacity =
+        "1";
+
+      video.style.opacity =
+        "1";
+
+      image.style.transform =
+        "translateX(0) scale(1)";
+
+      video.style.transform =
+        "translateX(0) scale(1)";
+
+    },
+    80
+  );
+
+}
+
+
+/* =====================================================
+   COUNTDOWN
+===================================================== */
+
+function startCountdown(
+  seconds
+){
+
+  clearInterval(
+    countdownTimer
+  );
+
+
+  const duration =
+    Math.max(
+      1,
+      Number(seconds) || 10
+    );
+
+
+  const endTime =
+    Date.now()
+    +
+    duration * 1000;
+
+
+  countdown.style.display =
+    "block";
+
+
+  function update(){
+
+    const remaining =
+      Math.max(
+        0,
+        Math.ceil(
+          (
+            endTime
+            -
+            Date.now()
+          ) / 1000
+        )
+      );
+
+
+    countdown.textContent =
+      remaining
+      +
+      " ث";
+
+
+    if(remaining<=0){
+
+      clearInterval(
+        countdownTimer
+      );
+
+      countdown.style.display =
+        "none";
+
+    }
+
+  }
+
+
+  update();
+
+
+  countdownTimer =
+    setInterval(
+      update,
+      200
+    );
+
+}
+
+
+/* =====================================================
+   PLAY IMAGE
+===================================================== */
+
+function playImage(
+  item
+){
+
+  video.pause();
+
+  video.removeAttribute(
+    "src"
+  );
+
+
+  video.style.display =
+    "none";
+
+  image.style.display =
+    "block";
+
+
+  image.className =
+    "";
+
+
+  if(
+    content.fitMode === "cover"
+  ){
+
+    image.classList.add(
+      "cover"
+    );
+
+  }
+
+
+  if(
+    content.fitMode ===
+    "background"
+  ){
+
+    image.classList.add(
+      "background"
+    );
+
+  }
+
+
+  image.src =
+    item.url;
+
+
+  applyTransition(
+    item.transition
+    ||
+    content.defaultTransition
+    ||
+    "fade"
+  );
+
+
+  const duration =
+    Math.max(
+      1,
+      Number(
+        item.duration
+        ||
+        content.defaultDuration
+        ||
+        10
+      )
+    );
+
+
+  startCountdown(
+    duration
+  );
+
+
+  timer =
+    setTimeout(
+      ()=>{
+        nextItem();
+      },
+      duration * 1000
+    );
+
+}
+
+
+/* =====================================================
+   PLAY VIDEO
+===================================================== */
+
+function playVideo(
+  item
+){
+
+  image.style.display =
+    "none";
+
+  video.style.display =
+    "block";
+
+
+  video.className =
+    "";
+
+
+  if(
+    content.fitMode === "cover"
+  ){
+
+    video.classList.add(
+      "cover"
+    );
+
+  }
+
+
+  if(
+    content.fitMode ===
+    "background"
+  ){
+
+    video.classList.add(
+      "background"
+    );
+
+  }
+
+
+  video.pause();
+
+
+  video.src =
+    item.url;
+
+
+  video.currentTime =
+    0;
+
+
+  video.muted =
+    item.muted !== false;
+
+
+  video.loop =
+    item.mode === "loop";
+
+
+  applyTransition(
+    item.transition
+    ||
+    content.defaultTransition
+    ||
+    "fade"
+  );
+
+
+  countdown.style.display =
+    "none";
+
+
+  video.onended =
+    ()=>{
+
+      if(
+        !video.loop
+      ){
+
+        nextItem();
+
+      }
+
+    };
+
+
+  video.play()
+    .catch(
+      ()=>{
+        showInfo(
+          "اضغط على الشاشة لتفعيل الفيديو"
+        );
+      }
+    );
+
+}
+
+
+/* =====================================================
+   PLAY CURRENT
+===================================================== */
+
+function playCurrent(){
+
+  clearTimers();
+
+  currentItems =
+    getActiveItems();
+
+
+  if(!currentItems.length){
+
+    resetMedia();
+
+    image.style.display =
+      "none";
+
+    video.style.display =
+      "none";
+
+    return;
+
+  }
+
+
+  if(
+    currentIndex >=
+    currentItems.length
+  ){
+
+    currentIndex=0;
+
+  }
+
+
+  const item =
+    currentItems[
+      currentIndex
+    ];
+
+
+  if(
+    item.type === "video"
+  ){
+
+    playVideo(item);
+
+  }else{
+
+    playImage(item);
+
+  }
+
+}
+
+
+/* =====================================================
+   NEXT
+===================================================== */
+
+function nextItem(){
+
+  if(paused)
+    return;
+
+
+  currentItems =
+    getActiveItems();
+
+
+  if(!currentItems.length)
+    return;
+
+
+  currentIndex++;
+
+
+  if(
+    currentIndex >=
+    currentItems.length
+  ){
+
+    if(
+      content.repeatAll !== false
+    ){
+
+      currentIndex=0;
+
+    }else{
+
+      currentIndex =
+        currentItems.length-1;
+
+      return;
+
+    }
+
+  }
+
+
+  playCurrent();
+
+}
+
+
+/* =====================================================
+   PREVIOUS
+===================================================== */
+
+function previousItem(){
+
+  currentItems =
+    getActiveItems();
+
+
+  if(!currentItems.length)
+    return;
+
+
+  currentIndex--;
+
+  if(
+    currentIndex < 0
+  ){
+
+    currentIndex =
+      currentItems.length-1;
+
+  }
+
+
+  playCurrent();
+
+}
+
+
+/* =====================================================
+   BROADCAST
+===================================================== */
+
+function updateBroadcast(){
+
+  const broadcast =
+    database.broadcast;
+
+
+  if(
+    broadcast &&
+    broadcast.active &&
+    Array.isArray(
+      broadcast.screenIds
+    ) &&
+    broadcast.screenIds.includes(
+      SCREEN_ID
+    )
+  ){
+
+    const state =
+      JSON.stringify(
+        broadcast
+      );
+
+
+    if(
+      state !==
+      lastBroadcastState
+    ){
+
+      lastBroadcastState =
+        state;
+
+      overlay.textContent =
+        broadcast.text
+        ||
+        "تنبيه عاجل";
+
+      overlay.style.display =
+        "flex";
+
+    }
+
+  }else{
+
+    if(
+      overlay.style.display !==
+      "none"
+    ){
+
+      overlay.style.display =
+        "none";
+
+    }
+
+    lastBroadcastState =
+      "";
+
+  }
+
+}
+
+
+/* =====================================================
+   SCREEN STATUS
+===================================================== */
+
+function checkScreen(){
+
+  if(!screen){
+
+    maintenance.style.display =
+      "flex";
+
+    maintenance.textContent =
+      "الشاشة غير موجودة";
+
+    return false;
+
+  }
+
+
+  if(
+    screen.enabled === false
+  ){
+
+    maintenance.style.display =
+      "flex";
+
+    maintenance.textContent =
+      "هذه الشاشة غير مفعلة";
+
+    return false;
+
+  }
+
+
+  maintenance.style.display =
+    "none";
+
+
+  return true;
+
+}
+
+
+/* =====================================================
+   MAIN START
+===================================================== */
+
+function startPlayer(){
+
+  loadDatabase();
+
+
+  if(
+    !checkScreen()
+  ){
+
+    return;
+
+  }
+
+
+  updateBroadcast();
+
+
+  const newState =
+    getStateHash();
+
+
+  if(
+    newState !==
+    lastState
+  ){
+
+    lastState =
+      newState;
+
+
+    currentIndex =
+      0;
+
+
+    playCurrent();
+
+  }
+
+}
+
+
+/* =====================================================
+   INFO
+===================================================== */
+
+function showInfo(
+  message
+){
+
+  info.textContent =
+    message;
+
+  info.classList.add(
+    "show"
+  );
+
+
+  clearTimeout(
+    window.infoTimer
+  );
+
+
+  window.infoTimer =
+    setTimeout(
+      ()=>{
+        info.classList.remove(
+          "show"
+        );
+      },
+      2500
+    );
+
+}
+
+
+/* =====================================================
+   FULLSCREEN
+===================================================== */
+
+function goFullscreen(){
+
+  if(
+    document.documentElement
+      .requestFullscreen
+  ){
+
+    document.documentElement
+      .requestFullscreen()
+      .catch(
+        ()=>{}
+      );
+
+  }
+
+}
+
+
+/* =====================================================
+   KEYBOARD CONTROLS
+===================================================== */
+
+document.addEventListener(
+  "keydown",
+  event=>{
+
+    if(
+      event.key === " "
+    ){
+
+      event.preventDefault();
+
+      paused =
+        !paused;
+
+
+      if(paused){
+
+        clearTimers();
+
+        video.pause();
+
+        showInfo(
+          "متوقف مؤقتًا"
+        );
+
+      }else{
+
+        playCurrent();
+
+        showInfo(
+          "تم استئناف التشغيل"
+        );
+
+      }
+
+    }
+
+
+    if(
+      event.key ===
+      "ArrowRight"
+    ){
+
+      nextItem();
+
+    }
+
+
+    if(
+      event.key ===
+      "ArrowLeft"
+    ){
+
+      previousItem();
+
+    }
+
+
+    if(
+      event.key ===
+      "f"
+      ||
+      event.key ===
+      "F"
+    ){
+
+      goFullscreen();
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   DOUBLE CLICK
+===================================================== */
+
+document.body.addEventListener(
+  "dblclick",
+  ()=>{
+    goFullscreen();
+  }
+);
+
+
+/* =====================================================
+   CLICK TO ENABLE VIDEO
+===================================================== */
+
+document.body.addEventListener(
+  "click",
+  ()=>{
+
+    if(
+      video.paused &&
+      video.src
+    ){
+
+      video.play()
+        .catch(
+          ()=>{}
+        );
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   CONNECTION INDICATOR
+===================================================== */
+
+window.addEventListener(
+  "offline",
+  ()=>{
+    offline.style.display =
+      "block";
+  }
+);
+
+
+window.addEventListener(
+  "online",
+  ()=>{
+    offline.style.display =
+      "none";
+  }
+);
+
+
+/* =====================================================
+   AUTO REFRESH
+===================================================== */
+
+setInterval(
+  ()=>{
+
+    try{
+
+      loadDatabase();
+
+      if(
+        !checkScreen()
+      )
+        return;
+
+
+      updateBroadcast();
+
+
+      const newState =
+        getStateHash();
+
+
+      if(
+        newState !==
+        lastState
+      ){
+
+        lastState =
+          newState;
+
+
+        currentIndex =
+          0;
+
+
+        playCurrent();
+
+      }
+
+    }catch(error){
+
+      console.error(error);
+
+    }
+
+  },
+  2000
+);
+
+
+/* =====================================================
+   INITIALIZE
+===================================================== */
+
+window.addEventListener(
+  "load",
+  ()=>{
+
+    loadDatabase();
+
+    startPlayer();
+
+
+    showInfo(
+      (
+        screen?.name
+        ||
+        "Screen"
+      )
+      +
+      " · ID "
+      +
+      SCREEN_ID
+    );
+
+  }
+);
+
+</script>
+
+</body>
+</html>
+```

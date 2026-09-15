@@ -1,0 +1,4113 @@
+```html
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مركز التحكم بالشاشات</title>
+
+<style>
+:root{
+  --primary:#2A206A;
+  --primary-light:#3b2d91;
+  --bg:#0d0e14;
+  --panel:#161821;
+  --panel-2:#1d1f29;
+  --border:#292c38;
+  --text:#f5f5f7;
+  --muted:#999dac;
+  --success:#35c98b;
+  --warning:#f2b94b;
+  --danger:#e95e68;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,Tahoma,sans-serif;
+}
+
+button,
+input,
+select,
+textarea{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+.app{
+  min-height:100vh;
+  display:flex;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar{
+  width:240px;
+  position:fixed;
+  top:0;
+  right:0;
+  bottom:0;
+  padding:18px;
+  background:#12131a;
+  border-left:1px solid var(--border);
+  z-index:10;
+}
+
+.ltr .sidebar{
+  right:auto;
+  left:0;
+  border-left:0;
+  border-right:1px solid var(--border);
+}
+
+.logo{
+  font-size:17px;
+  font-weight:800;
+  margin-bottom:5px;
+}
+
+.logo-sub{
+  color:var(--muted);
+  font-size:10px;
+  margin-bottom:24px;
+}
+
+.nav{
+  display:grid;
+  gap:5px;
+}
+
+.nav button{
+  width:100%;
+  border:0;
+  background:transparent;
+  color:#bfc1cc;
+  padding:11px 12px;
+  border-radius:8px;
+  text-align:right;
+  transition:.15s;
+}
+
+.ltr .nav button{
+  text-align:left;
+}
+
+.nav button:hover{
+  background:var(--panel-2);
+  color:#fff;
+}
+
+.nav button.active{
+  background:var(--primary);
+  color:#fff;
+}
+
+.lang-btn{
+  width:100%;
+  margin-top:18px;
+  padding:9px;
+  background:var(--panel-2);
+  color:#fff;
+  border:1px solid var(--border);
+  border-radius:8px;
+}
+
+/* =========================
+   MAIN
+========================= */
+
+.main{
+  width:calc(100% - 240px);
+  margin-right:240px;
+  padding:20px;
+}
+
+.ltr .main{
+  margin-right:0;
+  margin-left:240px;
+}
+
+.page{
+  display:none;
+}
+
+.page.active{
+  display:block;
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:15px;
+  margin-bottom:18px;
+}
+
+.topbar h1{
+  margin:0;
+  font-size:22px;
+}
+
+.subtitle{
+  color:var(--muted);
+  font-size:12px;
+  margin-top:5px;
+}
+
+.actions{
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+}
+
+.btn{
+  padding:8px 11px;
+  border-radius:7px;
+  border:1px solid var(--border);
+  background:var(--panel-2);
+  color:#fff;
+}
+
+.btn:hover{
+  background:#252834;
+}
+
+.btn.primary{
+  background:var(--primary);
+  border-color:var(--primary);
+}
+
+.btn.primary:hover{
+  background:var(--primary-light);
+}
+
+.btn.danger{
+  color:#ff9ca3;
+  background:#3b2025;
+}
+
+.btn.small{
+  padding:5px 8px;
+  font-size:11px;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:11px;
+  padding:13px;
+}
+
+.card-title{
+  font-size:14px;
+  font-weight:700;
+  margin-bottom:9px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:10px;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.stat-title{
+  color:var(--muted);
+  font-size:11px;
+}
+
+.stat-number{
+  font-size:25px;
+  font-weight:800;
+  margin-top:6px;
+}
+
+.muted{
+  color:var(--muted);
+}
+
+.tiny{
+  font-size:10px;
+}
+
+.row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  padding:4px 7px;
+  border-radius:20px;
+  font-size:10px;
+  background:#292c37;
+}
+
+.badge.online{
+  background:#15372d;
+  color:#70e3b2;
+}
+
+.badge.offline{
+  background:#3c2025;
+  color:#ff969d;
+}
+
+/* =========================
+   SCREEN CARDS
+========================= */
+
+.screen-card{
+  min-height:155px;
+}
+
+.screen-preview{
+  height:60px;
+  margin:9px 0;
+  border-radius:7px;
+  background:#090a0e;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#666;
+  font-size:10px;
+}
+
+.screen-preview img,
+.screen-preview video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* =========================
+   FORM
+========================= */
+
+.form-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+}
+
+.form-grid.two{
+  grid-template-columns:repeat(2,1fr);
+}
+
+.form-grid.three{
+  grid-template-columns:repeat(3,1fr);
+}
+
+label{
+  display:grid;
+  gap:5px;
+  color:#bfc1cc;
+  font-size:11px;
+}
+
+input,
+select,
+textarea{
+  width:100%;
+  background:#0f1016;
+  color:#fff;
+  border:1px solid var(--border);
+  border-radius:7px;
+  padding:8px;
+  outline:none;
+}
+
+textarea{
+  min-height:90px;
+  resize:vertical;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+  border-color:var(--primary-light);
+}
+
+.toggle{
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+
+.toggle input{
+  width:auto;
+}
+
+/* =========================
+   TOOLBAR
+========================= */
+
+.toolbar{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  flex-wrap:wrap;
+  margin-bottom:10px;
+}
+
+.toolbar input{
+  max-width:260px;
+}
+
+/* =========================
+   CONTENT EDITOR
+========================= */
+
+.content-editor{
+  display:grid;
+  grid-template-columns:270px 1fr;
+  gap:12px;
+}
+
+.preview-box{
+  min-height:390px;
+  background:#07080c;
+  border:1px solid var(--border);
+  border-radius:9px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  position:relative;
+  color:#666;
+  font-size:11px;
+}
+
+.preview-box img,
+.preview-box video{
+  width:100%;
+  height:100%;
+  max-height:390px;
+  object-fit:contain;
+}
+
+.content-item{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:9px;
+  padding:9px;
+  margin-bottom:7px;
+}
+
+.content-item.dragging{
+  opacity:.4;
+}
+
+.item-header{
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+
+.drag{
+  color:#777;
+  cursor:grab;
+}
+
+.item-controls{
+  display:grid;
+  grid-template-columns:1fr 110px 120px auto auto;
+  gap:7px;
+  margin-top:8px;
+  align-items:end;
+}
+
+.add-content{
+  border:1px dashed #414453;
+  border-radius:9px;
+  padding:13px;
+  text-align:center;
+  color:#aaa;
+}
+
+.add-content button{
+  background:transparent;
+  border:0;
+  color:#fff;
+}
+
+/* =========================
+   MEDIA TABLE
+========================= */
+
+.media-wrapper{
+  overflow:auto;
+}
+
+.media-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:11px;
+}
+
+.media-table th,
+.media-table td{
+  border-bottom:1px solid var(--border);
+  padding:8px;
+  text-align:right;
+  white-space:nowrap;
+}
+
+.ltr .media-table th,
+.ltr .media-table td{
+  text-align:left;
+}
+
+.media-thumb{
+  width:65px;
+  height:42px;
+  border-radius:6px;
+  background:#08090d;
+  overflow:hidden;
+}
+
+.media-thumb img,
+.media-thumb video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:#000b;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:15px;
+  z-index:50;
+}
+
+.modal.show{
+  display:flex;
+}
+
+.modal-box{
+  width:min(620px,100%);
+  max-height:90vh;
+  overflow:auto;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:15px;
+}
+
+hr{
+  border:0;
+  border-top:1px solid var(--border);
+  margin:13px 0;
+}
+
+/* =========================
+   EMPTY
+========================= */
+
+.empty{
+  text-align:center;
+  color:var(--muted);
+  padding:30px;
+}
+
+/* =========================
+   TOAST
+========================= */
+
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:18px;
+  transform:translateX(-50%);
+  background:#252834;
+  color:#fff;
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:9px 13px;
+  display:none;
+  z-index:100;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:900px){
+
+  .sidebar{
+    width:205px;
+  }
+
+  .main{
+    width:calc(100% - 205px);
+    margin-right:205px;
+  }
+
+  .ltr .main{
+    margin-left:205px;
+  }
+
+  .stats{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .form-grid,
+  .form-grid.three{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .content-editor{
+    grid-template-columns:1fr;
+  }
+}
+
+@media(max-width:600px){
+
+  .app{
+    display:block;
+  }
+
+  .sidebar{
+    position:static;
+    width:100%;
+    border:0;
+  }
+
+  .main,
+  .ltr .main{
+    width:100%;
+    margin:0;
+    padding:12px;
+  }
+
+  .nav{
+    grid-template-columns:repeat(3,1fr);
+  }
+
+  .form-grid,
+  .form-grid.two,
+  .form-grid.three{
+    grid-template-columns:1fr;
+  }
+
+  .stats{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .item-controls{
+    grid-template-columns:1fr 1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app" id="app">
+
+<!-- =========================
+     SIDEBAR
+========================= -->
+
+<aside class="sidebar">
+
+  <div class="logo" id="logoText">
+    مركز التحكم بالشاشات
+  </div>
+
+  <div class="logo-sub" id="logoSub">
+    Innovation Hub Digital Signage
+  </div>
+
+  <div class="nav">
+
+    <button class="active" data-page="dashboard">
+      لوحة التحكم
+    </button>
+
+    <button data-page="screens">
+      الشاشات
+    </button>
+
+    <button data-page="media">
+      مكتبة الوسائط
+    </button>
+
+    <button data-page="content">
+      المحتوى
+    </button>
+
+    <button data-page="schedule">
+      الجدولة
+    </button>
+
+    <button data-page="settings">
+      الإعدادات
+    </button>
+
+  </div>
+
+  <button class="lang-btn" id="languageButton">
+    English
+  </button>
+
+</aside>
+
+
+<!-- =========================
+     MAIN
+========================= -->
+
+<main class="main">
+
+
+<!-- =========================
+     DASHBOARD
+========================= -->
+
+<section class="page active" id="dashboard">
+
+  <div class="topbar">
+
+    <div>
+      <h1>لوحة التحكم</h1>
+
+      <div class="subtitle">
+        إدارة الشاشات والمحتوى من مكان واحد
+      </div>
+    </div>
+
+    <div class="actions">
+
+      <button class="btn primary" onclick="openBroadcastModal()">
+        بث عاجل
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <div class="stats" id="dashboardStats"></div>
+
+
+  <div class="card">
+
+    <div class="row">
+
+      <div class="card-title">
+        الشاشات
+      </div>
+
+      <button
+        class="btn small"
+        onclick="showPage('screens')">
+        إدارة
+      </button>
+
+    </div>
+
+    <div class="grid" id="dashboardScreens"></div>
+
+  </div>
+
+</section>
+
+
+<!-- =========================
+     SCREENS
+========================= -->
+
+<section class="page" id="screens">
+
+  <div class="topbar">
+
+    <div>
+      <h1>الشاشات</h1>
+
+      <div class="subtitle">
+        لكل شاشة إعداداتها ورابطها المستقل
+      </div>
+    </div>
+
+    <button
+      class="btn primary"
+      onclick="addScreen()">
+      + إضافة شاشة
+    </button>
+
+  </div>
+
+  <div class="grid" id="screensGrid"></div>
+
+</section>
+
+
+<!-- =========================
+     MEDIA
+========================= -->
+
+<section class="page" id="media">
+
+  <div class="topbar">
+
+    <div>
+      <h1>مكتبة الوسائط</h1>
+
+      <div class="subtitle">
+        إدارة الصور والفيديوهات
+      </div>
+    </div>
+
+    <div class="actions">
+
+      <button
+        class="btn primary"
+        onclick="document.getElementById('mediaInput').click()">
+        + إضافة صورة أو فيديو
+      </button>
+
+      <input
+        type="file"
+        id="mediaInput"
+        accept="image/*,video/*"
+        multiple
+        hidden>
+
+    </div>
+
+  </div>
+
+
+  <div class="toolbar">
+
+    <input
+      id="mediaSearch"
+      placeholder="بحث باسم الملف..."
+      oninput="renderMedia()">
+
+    <select
+      id="mediaFilter"
+      onchange="renderMedia()">
+
+      <option value="all">
+        الكل
+      </option>
+
+      <option value="image">
+        صور
+      </option>
+
+      <option value="video">
+        فيديو
+      </option>
+
+    </select>
+
+  </div>
+
+
+  <div class="card media-wrapper">
+
+    <table class="media-table">
+
+      <thead>
+
+        <tr>
+          <th>المعاينة</th>
+          <th>الملف</th>
+          <th>النوع</th>
+          <th>الحجم</th>
+          <th>الأبعاد</th>
+          <th>الإجراء</th>
+        </tr>
+
+      </thead>
+
+      <tbody id="mediaBody"></tbody>
+
+    </table>
+
+  </div>
+
+</section>
+
+
+<!-- =========================
+     CONTENT
+========================= -->
+
+<section class="page" id="content">
+
+  <div class="topbar">
+
+    <div>
+
+      <h1>المحتوى</h1>
+
+      <div class="subtitle">
+        أضف الصور والفيديوهات ورتبها بالطريقة التي تريدها
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="toolbar">
+
+    <select
+      id="contentScreen"
+      onchange="renderContent()">
+    </select>
+
+    <button
+      class="btn"
+      onclick="copyContent()">
+      نسخ محتوى الشاشة
+    </button>
+
+    <button
+      class="btn primary"
+      onclick="publishContent()">
+      🚀 نشر على الشاشات
+    </button>
+
+  </div>
+
+
+  <div class="content-editor">
+
+    <div class="card">
+
+      <div class="card-title">
+        معاينة الشاشة
+      </div>
+
+      <div
+        class="preview-box"
+        id="contentPreview">
+
+        لا يوجد محتوى
+
+      </div>
+
+    </div>
+
+
+    <div>
+
+      <div
+        class="card"
+        style="margin-bottom:8px">
+
+        <div class="row">
+
+          <strong>
+            إعدادات التشغيل
+          </strong>
+
+          <label class="toggle">
+
+            <input
+              type="checkbox"
+              id="repeatAll"
+              onchange="saveContentSettings()">
+
+            تكرار المحتوى بالكامل
+
+          </label>
+
+        </div>
+
+
+        <div
+          class="form-grid three"
+          style="margin-top:10px">
+
+          <label>
+
+            المدة الافتراضية بالثواني
+
+            <input
+              type="number"
+              min="1"
+              id="defaultDuration"
+              value="10"
+              onchange="saveContentSettings()">
+
+          </label>
+
+
+          <label>
+
+            الانتقال الافتراضي
+
+            <select
+              id="defaultTransition"
+              onchange="saveContentSettings()">
+
+              <option value="fade">
+                تلاشي
+              </option>
+
+              <option value="slide">
+                انزلاق
+              </option>
+
+              <option value="zoom">
+                تكبير
+              </option>
+
+              <option value="none">
+                بدون
+              </option>
+
+            </select>
+
+          </label>
+
+
+          <label>
+
+            عند اختلاف المقاس
+
+            <select
+              id="fitMode"
+              onchange="saveContentSettings()">
+
+              <option value="contain">
+                احتواء
+              </option>
+
+              <option value="cover">
+                ملء
+              </option>
+
+              <option value="background">
+                خلفية
+              </option>
+
+            </select>
+
+          </label>
+
+        </div>
+
+      </div>
+
+
+      <div id="contentItems"></div>
+
+
+      <div class="add-content">
+
+        <button onclick="addContentFromLibrary()">
+          + إضافة صورة أو فيديو
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =========================
+     SCHEDULE
+========================= -->
+
+<section class="page" id="schedule">
+
+  <div class="topbar">
+
+    <div>
+
+      <h1>الجدولة</h1>
+
+      <div class="subtitle">
+        تحديد أوقات عرض المحتوى
+      </div>
+
+    </div>
+
+    <button
+      class="btn primary"
+      onclick="addSchedule()">
+      + إضافة جدولة
+    </button>
+
+  </div>
+
+
+  <div class="card">
+
+    <div id="scheduleList"></div>
+
+  </div>
+
+</section>
+
+
+<!-- =========================
+     SETTINGS
+========================= -->
+
+<section class="page" id="settings">
+
+  <div class="topbar">
+
+    <div>
+
+      <h1>الإعدادات</h1>
+
+      <div class="subtitle">
+        إعدادات النظام والنسخ الاحتياطي
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="grid">
+
+
+    <div class="card">
+
+      <div class="card-title">
+        النسخ الاحتياطي
+      </div>
+
+      <p class="tiny muted">
+        حفظ نسخة من إعدادات الشاشات والمحتوى والجدولة.
+      </p>
+
+      <button
+        class="btn"
+        onclick="exportData()">
+        نسخ احتياطي
+      </button>
+
+      <button
+        class="btn"
+        onclick="document.getElementById('restoreInput').click()">
+        استعادة
+      </button>
+
+      <input
+        type="file"
+        id="restoreInput"
+        accept=".json"
+        hidden>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-title">
+        حالة النشر
+      </div>
+
+      <p
+        id="publishState"
+        class="tiny muted">
+      </p>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-title">
+        بث عاجل
+      </div>
+
+      <p class="tiny muted">
+        يمكن إرسال رسالة عاجلة للشاشات المحددة، وعند إنهائها تعود الشاشات للمحتوى السابق.
+      </p>
+
+      <button
+        class="btn"
+        onclick="openBroadcastModal()">
+        إدارة البث العاجل
+      </button>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-title">
+        البيانات المحلية
+      </div>
+
+      <p class="tiny muted">
+        هذه النسخة الحالية تحفظ البيانات داخل المتصفح. الربط السحابي والمزامنة بين الأجهزة ستكون في المرحلة التالية.
+      </p>
+
+      <button
+        class="btn danger"
+        onclick="clearLocalData()">
+        مسح البيانات التجريبية
+      </button>
+
+    </div>
+
+  </div>
+
+</section>
+
+</main>
+
+</div>
+
+
+<!-- =========================
+     MODAL
+========================= -->
+
+<div
+  class="modal"
+  id="modal">
+
+  <div
+    class="modal-box"
+    id="modalBox">
+  </div>
+
+</div>
+
+
+<div
+  class="toast"
+  id="toast">
+</div>
+
+
+<script>
+
+/* =====================================================
+   CONFIG
+===================================================== */
+
+const STORAGE_KEY = "innovationSignageV2";
+
+
+const AVAILABLE_SIZES = [
+
+  ["358×1600","عمودي"],
+
+  ["1080×1920","عمودي"],
+
+  ["1200×1920","عمودي"],
+
+  ["1080×1080","مربع"],
+
+  ["1280×720","أفقي"],
+
+  ["1920×1080","أفقي"],
+
+  ["2560×1440","أفقي"],
+
+  ["3840×2160","أفقي 4K"],
+
+  ["4096×2160","أفقي 4K Cinema"],
+
+  ["2160×3840","عمودي 4K"],
+
+  ["3840×3840","مربع 4K"]
+
+];
+
+
+const DEFAULT_SCREENS = [
+
+  {
+    id:1,
+    name:"الشاشة الرئيسية",
+    location:"المدخل",
+    size:"358×1600",
+    orientation:"عمودي",
+    enabled:true,
+    status:"online"
+  },
+
+  {
+    id:2,
+    name:"الشاشة 02",
+    location:"المسرح",
+    size:"1920×1080",
+    orientation:"أفقي",
+    enabled:true,
+    status:"online"
+  },
+
+  {
+    id:3,
+    name:"الشاشة 03",
+    location:"الممر",
+    size:"1080×1920",
+    orientation:"عمودي",
+    enabled:true,
+    status:"online"
+  },
+
+  {
+    id:4,
+    name:"الشاشة 04",
+    location:"منطقة الانتظار",
+    size:"1920×1080",
+    orientation:"أفقي",
+    enabled:true,
+    status:"online"
+  },
+
+  {
+    id:5,
+    name:"الشاشة 05",
+    location:"منطقة العرض",
+    size:"1920×1080",
+    orientation:"أفقي",
+    enabled:true,
+    status:"online"
+  },
+
+  {
+    id:6,
+    name:"الشاشة 06",
+    location:"المختبر",
+    size:"1080×1920",
+    orientation:"عمودي",
+    enabled:true,
+    status:"online"
+  },
+
+  {
+    id:7,
+    name:"الشاشة 07",
+    location:"المجتمعات",
+    size:"1920×1080",
+    orientation:"أفقي",
+    enabled:true,
+    status:"online"
+  },
+
+  {
+    id:8,
+    name:"الشاشة 08",
+    location:"الاستقبال",
+    size:"1920×1080",
+    orientation:"أفقي",
+    enabled:true,
+    status:"online"
+  }
+
+];
+
+
+/* =====================================================
+   DATABASE
+===================================================== */
+
+let db =
+  JSON.parse(localStorage.getItem(STORAGE_KEY) || "null")
+  ||
+  {
+    screens:DEFAULT_SCREENS,
+
+    media:[],
+
+    contents:{},
+
+    schedules:[],
+
+    publishedAt:null,
+
+    broadcast:null,
+
+    language:"ar"
+  };
+
+
+function saveDB(){
+
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(db)
+  );
+
+}
+
+
+/* =====================================================
+   HELPERS
+===================================================== */
+
+function esc(value){
+
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+function toast(message){
+
+  const element =
+    document.getElementById("toast");
+
+  element.textContent = message;
+
+  element.style.display = "block";
+
+  clearTimeout(window.toastTimer);
+
+  window.toastTimer =
+    setTimeout(
+      ()=>{
+        element.style.display = "none";
+      },
+      1800
+    );
+
+}
+
+
+function formatBytes(bytes){
+
+  if(!bytes)
+    return "—";
+
+  const units =
+    ["B","KB","MB","GB"];
+
+  let i=0;
+
+  let value=bytes;
+
+  while(
+    value>=1024 &&
+    i<units.length-1
+  ){
+
+    value/=1024;
+    i++;
+
+  }
+
+  return value.toFixed(i ? 1 : 0)
+    +" "
+    +units[i];
+
+}
+
+
+function screenUrl(id){
+
+  return location.href
+    .replace(/index\.html.*$/,"")
+    +"screen.html?id="
+    +id;
+
+}
+
+
+function copyText(text){
+
+  if(navigator.clipboard){
+
+    navigator.clipboard.writeText(text);
+
+  }
+
+  toast("تم النسخ");
+
+}
+
+
+/* =====================================================
+   PAGE NAVIGATION
+===================================================== */
+
+function showPage(page){
+
+  document
+    .querySelectorAll(".page")
+    .forEach(
+      element=>{
+        element.classList.remove("active");
+      }
+    );
+
+
+  const target =
+    document.getElementById(page);
+
+  if(target)
+    target.classList.add("active");
+
+
+  document
+    .querySelectorAll(".nav button")
+    .forEach(button=>{
+
+      button.classList.toggle(
+        "active",
+        button.dataset.page===page
+      );
+
+    });
+
+
+  if(page==="dashboard")
+    renderDashboard();
+
+  if(page==="screens")
+    renderScreens();
+
+  if(page==="media")
+    renderMedia();
+
+  if(page==="content"){
+
+    fillContentScreens();
+
+    renderContent();
+
+  }
+
+  if(page==="schedule")
+    renderSchedules();
+
+  if(page==="settings")
+    renderSettings();
+
+}
+
+
+document
+  .querySelectorAll(".nav button")
+  .forEach(button=>{
+
+    button.addEventListener(
+      "click",
+      ()=>{
+        showPage(button.dataset.page);
+      }
+    );
+
+  });
+
+
+/* =====================================================
+   CONTENT DEFAULT
+===================================================== */
+
+function getScreenContent(id){
+
+  if(!db.contents[id]){
+
+    db.contents[id]={
+
+      repeatAll:true,
+
+      defaultDuration:10,
+
+      defaultTransition:"fade",
+
+      fitMode:"contain",
+
+      items:[],
+
+      draft:true
+
+    };
+
+    saveDB();
+
+  }
+
+  return db.contents[id];
+
+}
+
+
+/* =====================================================
+   DASHBOARD
+===================================================== */
+
+function renderDashboard(){
+
+  const total =
+    db.screens.length;
+
+  const online =
+    db.screens.filter(
+      screen=>
+        screen.enabled &&
+        screen.status==="online"
+    ).length;
+
+  const offline =
+    total-online;
+
+  const media =
+    db.media.length;
+
+
+  document.getElementById(
+    "dashboardStats"
+  ).innerHTML = `
+
+    <div class="card">
+
+      <div class="stat-title">
+        الشاشات
+      </div>
+
+      <div class="stat-number">
+        ${total}
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="stat-title">
+        متصلة
+      </div>
+
+      <div class="stat-number">
+        ${online}
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="stat-title">
+        غير متصلة
+      </div>
+
+      <div class="stat-number">
+        ${offline}
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="stat-title">
+        الوسائط
+      </div>
+
+      <div class="stat-number">
+        ${media}
+      </div>
+
+    </div>
+
+  `;
+
+
+  document.getElementById(
+    "dashboardScreens"
+  ).innerHTML =
+    db.screens
+      .map(renderScreenCard)
+      .join("");
+
+}
+
+
+function renderScreenCard(screen){
+
+  const content =
+    getScreenContent(screen.id);
+
+  const first =
+    content.items.find(
+      item=>item.enabled
+    );
+
+
+  return `
+
+    <div class="card screen-card">
+
+      <div class="row">
+
+        <h3 style="margin:0;font-size:14px">
+          ${esc(screen.name)}
+        </h3>
+
+        <span class="badge ${
+          screen.status==="online"
+          ? "online"
+          : "offline"
+        }">
+
+          ${
+            screen.status==="online"
+            ? "متصلة"
+            : "غير متصلة"
+          }
+
+        </span>
+
+      </div>
+
+
+      <div class="tiny muted">
+
+        ${esc(screen.location)}
+        ·
+        ${esc(screen.size)}
+        ·
+        ${esc(screen.orientation)}
+
+      </div>
+
+
+      <div class="screen-preview">
+
+        ${
+          first?.url
+
+          ?
+
+          first.type==="video"
+
+          ?
+
+          `<video
+             src="${first.url}"
+             muted
+             autoplay>
+           </video>`
+
+          :
+
+          `<img
+             src="${first.url}"
+             alt="">`
+
+          :
+
+          "لا يوجد محتوى"
+
+        }
+
+      </div>
+
+
+      <div class="row">
+
+        <button
+          class="btn small"
+          onclick="editScreen(${screen.id})">
+          إعدادات
+        </button>
+
+        <button
+          class="btn small"
+          onclick="editContent(${screen.id})">
+          المحتوى
+        </button>
+
+        <button
+          class="btn small"
+          onclick="openScreen(${screen.id})">
+          فتح
+        </button>
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+/* =====================================================
+   SCREENS
+===================================================== */
+
+function renderScreens(){
+
+  document.getElementById(
+    "screensGrid"
+  ).innerHTML =
+    db.screens
+      .map(renderScreenCard)
+      .join("");
+
+}
+
+
+function addScreen(){
+
+  const id =
+    Math.max(
+      0,
+      ...db.screens.map(
+        screen=>screen.id
+      )
+    ) + 1;
+
+
+  db.screens.push({
+
+    id,
+
+    name:
+      "الشاشة "
+      +
+      String(id).padStart(2,"0"),
+
+    location:"موقع جديد",
+
+    size:"1920×1080",
+
+    orientation:"أفقي",
+
+    enabled:true,
+
+    status:"online"
+
+  });
+
+
+  saveDB();
+
+  renderScreens();
+
+  renderDashboard();
+
+  editScreen(id);
+
+}
+
+
+function sizeOptions(selected){
+
+  return AVAILABLE_SIZES
+    .map(
+      size=>`
+
+        <option
+          value="${size[0]}"
+          ${size[0]===selected ? "selected" : ""}>
+
+          ${size[0]}
+          —
+          ${size[1]}
+
+        </option>
+
+      `
+    )
+    .join("");
+
+}
+
+
+function editScreen(id){
+
+  const screen =
+    db.screens.find(
+      item=>item.id===id
+    );
+
+  if(!screen)
+    return;
+
+
+  openModal(`
+
+    <div class="topbar">
+
+      <div>
+        <h3 style="margin:0">
+          إعدادات الشاشة
+        </h3>
+      </div>
+
+      <button
+        class="btn small"
+        onclick="closeModal()">
+        ×
+      </button>
+
+    </div>
+
+
+    <div class="form-grid two">
+
+      <label>
+
+        اسم الشاشة
+
+        <input
+          id="screenName"
+          value="${esc(screen.name)}">
+
+      </label>
+
+
+      <label>
+
+        الموقع
+
+        <input
+          id="screenLocation"
+          value="${esc(screen.location)}">
+
+      </label>
+
+
+      <label>
+
+        المقاس
+
+        <select id="screenSize">
+
+          ${sizeOptions(screen.size)}
+
+        </select>
+
+      </label>
+
+
+      <label>
+
+        الاتجاه
+
+        <select id="screenOrientation">
+
+          <option
+            value="عمودي"
+            ${screen.orientation==="عمودي"?"selected":""}>
+            عمودي
+          </option>
+
+          <option
+            value="أفقي"
+            ${screen.orientation==="أفقي"?"selected":""}>
+            أفقي
+          </option>
+
+          <option
+            value="مربع"
+            ${screen.orientation==="مربع"?"selected":""}>
+            مربع
+          </option>
+
+          <option
+            value="عمودي 4K"
+            ${screen.orientation==="عمودي 4K"?"selected":""}>
+            عمودي 4K
+          </option>
+
+          <option
+            value="أفقي 4K"
+            ${screen.orientation==="أفقي 4K"?"selected":""}>
+            أفقي 4K
+          </option>
+
+        </select>
+
+      </label>
+
+    </div>
+
+
+    <label
+      class="toggle"
+      style="margin-top:10px">
+
+      <input
+        id="screenEnabled"
+        type="checkbox"
+        ${screen.enabled ? "checked" : ""}>
+
+      تفعيل الشاشة
+
+    </label>
+
+
+    <hr>
+
+
+    <div class="tiny muted">
+      الرابط المستقل للشاشة
+    </div>
+
+
+    <div
+      style="
+        background:#0d0e14;
+        padding:10px;
+        border-radius:7px;
+        margin-top:5px;
+        word-break:break-all;
+        font-size:11px">
+
+      ${esc(screenUrl(id))}
+
+    </div>
+
+
+    <div
+      class="actions"
+      style="margin-top:10px">
+
+      <button
+        class="btn"
+        onclick="copyText('${screenUrl(id)}')">
+        نسخ الرابط
+      </button>
+
+      <button
+        class="btn"
+        onclick="openScreen(${id})">
+        فتح الشاشة
+      </button>
+
+      <button
+        class="btn primary"
+        onclick="saveScreen(${id})">
+        حفظ
+      </button>
+
+      <button
+        class="btn danger"
+        onclick="deleteScreen(${id})">
+        حذف
+      </button>
+
+    </div>
+
+  `);
+
+}
+
+
+function saveScreen(id){
+
+  const screen =
+    db.screens.find(
+      item=>item.id===id
+    );
+
+
+  screen.name =
+    document.getElementById(
+      "screenName"
+    ).value;
+
+  screen.location =
+    document.getElementById(
+      "screenLocation"
+    ).value;
+
+  screen.size =
+    document.getElementById(
+      "screenSize"
+    ).value;
+
+  screen.orientation =
+    document.getElementById(
+      "screenOrientation"
+    ).value;
+
+  screen.enabled =
+    document.getElementById(
+      "screenEnabled"
+    ).checked;
+
+
+  saveDB();
+
+  closeModal();
+
+  renderScreens();
+
+  renderDashboard();
+
+  toast("تم حفظ إعدادات الشاشة");
+
+}
+
+
+function deleteScreen(id){
+
+  if(db.screens.length<=1){
+
+    toast("يجب أن تبقى شاشة واحدة");
+
+    return;
+
+  }
+
+
+  if(
+    !confirm(
+      "هل تريد حذف هذه الشاشة؟"
+    )
+  )
+    return;
+
+
+  db.screens =
+    db.screens.filter(
+      screen=>screen.id!==id
+    );
+
+
+  delete db.contents[id];
+
+
+  saveDB();
+
+  closeModal();
+
+  renderScreens();
+
+  renderDashboard();
+
+}
+
+
+function openScreen(id){
+
+  window.open(
+    screenUrl(id),
+    "_blank"
+  );
+
+}
+
+
+/* =====================================================
+   CONTENT
+===================================================== */
+
+function fillContentScreens(){
+
+  const select =
+    document.getElementById(
+      "contentScreen"
+    );
+
+
+  const old =
+    select.value;
+
+
+  select.innerHTML =
+    db.screens
+      .map(
+        screen=>`
+
+          <option value="${screen.id}">
+
+            ${esc(screen.name)}
+            —
+            ${esc(screen.location)}
+
+          </option>
+
+        `
+      )
+      .join("");
+
+
+  if(
+    db.screens.some(
+      screen=>String(screen.id)===old
+    )
+  ){
+
+    select.value=old;
+
+  }
+
+}
+
+
+function editContent(id){
+
+  document.getElementById(
+    "contentScreen"
+  ).value=id;
+
+  showPage("content");
+
+}
+
+
+function renderContent(){
+
+  const select =
+    document.getElementById(
+      "contentScreen"
+    );
+
+
+  const id =
+    Number(
+      select.value
+    )
+    ||
+    db.screens[0]?.id;
+
+
+  if(!id)
+    return;
+
+
+  const content =
+    getScreenContent(id);
+
+
+  document.getElementById(
+    "repeatAll"
+  ).checked =
+    content.repeatAll;
+
+
+  document.getElementById(
+    "defaultDuration"
+  ).value =
+    content.defaultDuration;
+
+
+  document.getElementById(
+    "defaultTransition"
+  ).value =
+    content.defaultTransition;
+
+
+  document.getElementById(
+    "fitMode"
+  ).value =
+    content.fitMode;
+
+
+  const items =
+    document.getElementById(
+      "contentItems"
+    );
+
+
+  if(!content.items.length){
+
+    items.innerHTML =
+      `<div class="empty">
+        لا يوجد محتوى. أضف صورة أو فيديو.
+      </div>`;
+
+  }else{
+
+    items.innerHTML =
+      content.items
+        .map(
+          (item,index)=>
+            contentItemHTML(
+              item,
+              index
+            )
+        )
+        .join("");
+
+  }
+
+
+  renderContentPreview(content);
+
+}
+
+
+function contentItemHTML(item,index){
+
+  return `
+
+    <div
+      class="content-item"
+      draggable="true"
+      data-index="${index}"
+      ondragstart="dragStart(event)"
+      ondragover="event.preventDefault()"
+      ondrop="dropItem(event)">
+
+
+      <div class="item-header">
+
+        <span class="drag">
+          ☷
+        </span>
+
+        <strong>
+          ${esc(
+            item.name
+            ||
+            ("محتوى "+(index+1))
+          )}
+        </strong>
+
+        <span class="badge">
+
+          ${
+            item.type==="video"
+            ? "فيديو"
+            : "صورة"
+          }
+
+        </span>
+
+        <span
+          class="tiny muted"
+          style="margin-right:auto">
+
+          ${
+            item.enabled
+            ? ""
+            : "مخفي"
+          }
+
+        </span>
+
+      </div>
+
+
+      <div class="item-controls">
+
+        <label>
+
+          مدة العرض بالثواني
+
+          <input
+            type="number"
+            min="1"
+            value="${item.duration || 10}"
+            onchange="updateItem(
+              ${index},
+              'duration',
+              this.value
+            )">
+
+        </label>
+
+
+        <label>
+
+          الانتقال
+
+          <select
+            onchange="updateItem(
+              ${index},
+              'transition',
+              this.value
+            )">
+
+            <option
+              value="fade"
+              ${item.transition==="fade"?"selected":""}>
+              تلاشي
+            </option>
+
+            <option
+              value="slide"
+              ${item.transition==="slide"?"selected":""}>
+              انزلاق
+            </option>
+
+            <option
+              value="zoom"
+              ${item.transition==="zoom"?"selected":""}>
+              تكبير
+            </option>
+
+            <option
+              value="none"
+              ${item.transition==="none"?"selected":""}>
+              بدون
+            </option>
+
+          </select>
+
+        </label>
+
+
+        <label>
+
+          ${
+            item.type==="video"
+            ? "تشغيل الفيديو"
+            : "تكرار العنصر"
+          }
+
+          <select
+            onchange="updateItem(
+              ${index},
+              'mode',
+              this.value
+            )">
+
+            ${
+              item.type==="video"
+
+              ?
+
+              `
+
+              <option
+                value="end"
+                ${item.mode!=="loop"?"selected":""}>
+                ثم التالي
+              </option>
+
+              <option
+                value="loop"
+                ${item.mode==="loop"?"selected":""}>
+                تكرار
+              </option>
+
+              `
+
+              :
+
+              `
+
+              <option
+                value="once"
+                ${item.mode!=="loop"?"selected":""}>
+                مرة واحدة
+              </option>
+
+              <option
+                value="loop"
+                ${item.mode==="loop"?"selected":""}>
+                تكرار
+              </option>
+
+              `
+
+            }
+
+          </select>
+
+        </label>
+
+
+        <button
+          class="btn small"
+          onclick="toggleItem(${index})">
+
+          ${
+            item.enabled
+            ? "إخفاء"
+            : "إظهار"
+          }
+
+        </button>
+
+
+        <button
+          class="btn small danger"
+          onclick="deleteContentItem(${index})">
+
+          حذف
+
+        </button>
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+function updateItem(index,key,value){
+
+  const id =
+    Number(
+      document.getElementById(
+        "contentScreen"
+      ).value
+    );
+
+
+  const content =
+    getScreenContent(id);
+
+
+  if(key==="duration"){
+
+    content.items[index][key] =
+      Math.max(
+        1,
+        Number(value)||10
+      );
+
+  }else{
+
+    content.items[index][key] =
+      value;
+
+  }
+
+
+  content.draft=true;
+
+  saveDB();
+
+  renderContentPreview(content);
+
+}
+
+
+function toggleItem(index){
+
+  const id =
+    Number(
+      document.getElementById(
+        "contentScreen"
+      ).value
+    );
+
+
+  const content =
+    getScreenContent(id);
+
+
+  content.items[index].enabled =
+    !content.items[index].enabled;
+
+
+  content.draft=true;
+
+  saveDB();
+
+  renderContent();
+
+}
+
+
+function deleteContentItem(index){
+
+  const id =
+    Number(
+      document.getElementById(
+        "contentScreen"
+      ).value
+    );
+
+
+  const content =
+    getScreenContent(id);
+
+
+  content.items.splice(
+    index,
+    1
+  );
+
+
+  content.draft=true;
+
+  saveDB();
+
+  renderContent();
+
+}
+
+
+function saveContentSettings(){
+
+  const id =
+    Number(
+      document.getElementById(
+        "contentScreen"
+      ).value
+    );
+
+
+  const content =
+    getScreenContent(id);
+
+
+  content.repeatAll =
+    document.getElementById(
+      "repeatAll"
+    ).checked;
+
+
+  content.defaultDuration =
+    Number(
+      document.getElementById(
+        "defaultDuration"
+      ).value
+    )
+    ||10;
+
+
+  content.defaultTransition =
+    document.getElementById(
+      "defaultTransition"
+    ).value;
+
+
+  content.fitMode =
+    document.getElementById(
+      "fitMode"
+    ).value;
+
+
+  content.draft=true;
+
+  saveDB();
+
+  renderContent();
+
+}
+
+
+function addContentFromLibrary(){
+
+  if(!db.media.length){
+
+    document.getElementById(
+      "mediaInput"
+    ).click();
+
+    return;
+
+  }
+
+
+  openModal(`
+
+    <div class="topbar">
+
+      <h3 style="margin:0">
+        اختر من مكتبة الوسائط
+      </h3>
+
+      <button
+        class="btn small"
+        onclick="closeModal()">
+        ×
+      </button>
+
+    </div>
+
+
+    <div class="grid">
+
+      ${
+
+        db.media
+          .map(
+            media=>`
+
+              <div class="card">
+
+                <div class="screen-preview">
+
+                  ${
+                    media.type==="video"
+
+                    ?
+
+                    `<video
+                       src="${media.url}"
+                       muted>
+                     </video>`
+
+                    :
+
+                    `<img
+                       src="${media.url}"
+                       alt="">`
+
+                  }
+
+                </div>
+
+                <div class="tiny">
+                  ${esc(media.name)}
+                </div>
+
+                <button
+                  class="btn small"
+                  style="margin-top:7px"
+                  onclick="addMediaToContent(${media.id})">
+
+                  إضافة
+
+                </button>
+
+              </div>
+
+            `
+          )
+          .join("")
+
+      }
+
+    </div>
+
+  `);
+
+}
+
+
+function addMediaToContent(mediaId){
+
+  const screenId =
+    Number(
+      document.getElementById(
+        "contentScreen"
+      ).value
+    );
+
+
+  const content =
+    getScreenContent(screenId);
+
+
+  const media =
+    db.media.find(
+      item=>item.id===mediaId
+    );
+
+
+  if(!media)
+    return;
+
+
+  content.items.push({
+
+    id:Date.now(),
+
+    mediaId:media.id,
+
+    name:media.name,
+
+    type:media.type,
+
+    url:media.url,
+
+    duration:
+      content.defaultDuration,
+
+    transition:
+      content.defaultTransition,
+
+    mode:
+      media.type==="video"
+      ? "end"
+      : "once",
+
+    enabled:true
+
+  });
+
+
+  content.draft=true;
+
+  saveDB();
+
+  closeModal();
+
+  renderContent();
+
+}
+
+
+function renderContentPreview(content){
+
+  const preview =
+    document.getElementById(
+      "contentPreview"
+    );
+
+
+  const item =
+    content.items.find(
+      item=>item.enabled
+    );
+
+
+  if(!item){
+
+    preview.innerHTML =
+      "لا يوجد محتوى";
+
+    return;
+
+  }
+
+
+  if(item.type==="video"){
+
+    preview.innerHTML = `
+
+      <video
+        src="${item.url}"
+        muted
+        controls>
+      </video>
+
+    `;
+
+  }else{
+
+    preview.innerHTML = `
+
+      <img
+        src="${item.url}"
+        style="
+          object-fit:
+          ${
+            content.fitMode==="cover"
+            ? "cover"
+            : "contain"
+          };
+        ">
+
+    `;
+
+  }
+
+}
+
+
+/* =====================================================
+   DRAG & DROP
+===================================================== */
+
+let draggedIndex=null;
+
+
+function dragStart(event){
+
+  draggedIndex =
+    Number(
+      event.currentTarget.dataset.index
+    );
+
+  event.dataTransfer.effectAllowed =
+    "move";
+
+}
+
+
+function dropItem(event){
+
+  const targetIndex =
+    Number(
+      event.currentTarget.dataset.index
+    );
+
+
+  const screenId =
+    Number(
+      document.getElementById(
+        "contentScreen"
+      ).value
+    );
+
+
+  const content =
+    getScreenContent(screenId);
+
+
+  if(
+    draggedIndex===null ||
+    draggedIndex===targetIndex
+  )
+    return;
+
+
+  const moved =
+    content.items.splice(
+      draggedIndex,
+      1
+    )[0];
+
+
+  content.items.splice(
+    targetIndex,
+    0,
+    moved
+  );
+
+
+  content.draft=true;
+
+  saveDB();
+
+  renderContent();
+
+  draggedIndex=null;
+
+}
+
+
+/* =====================================================
+   PUBLISH
+===================================================== */
+
+function publishContent(){
+
+  const screenId =
+    Number(
+      document.getElementById(
+        "contentScreen"
+      ).value
+    );
+
+
+  const content =
+    getScreenContent(screenId);
+
+
+  content.draft=false;
+
+  content.publishedAt =
+    new Date().toISOString();
+
+
+  db.publishedAt =
+    content.publishedAt;
+
+
+  saveDB();
+
+  renderSettings();
+
+  toast(
+    "🚀 تم نشر المحتوى على الشاشة"
+  );
+
+}
+
+
+/* =====================================================
+   COPY CONTENT
+===================================================== */
+
+function copyContent(){
+
+  const fromId =
+    Number(
+      document.getElementById(
+        "contentScreen"
+      ).value
+    );
+
+
+  const targets =
+    db.screens.filter(
+      screen=>screen.id!==fromId
+    );
+
+
+  if(!targets.length){
+
+    toast("لا توجد شاشة أخرى");
+
+    return;
+
+  }
+
+
+  openModal(`
+
+    <div class="topbar">
+
+      <h3 style="margin:0">
+        نسخ المحتوى إلى شاشة
+      </h3>
+
+      <button
+        class="btn small"
+        onclick="closeModal()">
+        ×
+      </button>
+
+    </div>
+
+
+    <select id="copyTarget">
+
+      ${
+        targets
+          .map(
+            screen=>`
+
+              <option
+                value="${screen.id}">
+
+                ${esc(screen.name)}
+
+              </option>
+
+            `
+          )
+          .join("")
+      }
+
+    </select>
+
+
+    <button
+      class="btn primary"
+      style="margin-top:10px"
+      onclick="doCopyContent(${fromId})">
+
+      نسخ
+
+    </button>
+
+  `);
+
+}
+
+
+function doCopyContent(fromId){
+
+  const toId =
+    Number(
+      document.getElementById(
+        "copyTarget"
+      ).value
+    );
+
+
+  db.contents[toId] =
+    JSON.parse(
+      JSON.stringify(
+        getScreenContent(fromId)
+      )
+    );
+
+
+  db.contents[toId].draft=true;
+
+  saveDB();
+
+  closeModal();
+
+  toast("تم نسخ المحتوى");
+
+}
+
+
+/* =====================================================
+   MEDIA LIBRARY
+===================================================== */
+
+document.getElementById(
+  "mediaInput"
+).addEventListener(
+  "change",
+  event=>{
+
+    handleMediaFiles(
+      event.target.files
+    );
+
+  }
+);
+
+
+function handleMediaFiles(files){
+
+  [
+    ...files
+  ].forEach(
+    file=>{
+
+      const reader =
+        new FileReader();
+
+
+      reader.onload =
+        event=>{
+
+          const type =
+            file.type.startsWith("video")
+            ? "video"
+            : "image";
+
+
+          db.media.push({
+
+            id:
+              Date.now()
+              +
+              Math.random(),
+
+            name:file.name,
+
+            type,
+
+            url:event.target.result,
+
+            size:file.size,
+
+            dimensions:"—",
+
+            created:
+              new Date().toISOString()
+
+          });
+
+
+          saveDB();
+
+          renderMedia();
+
+          renderDashboard();
+
+        };
+
+
+      reader.readAsDataURL(file);
+
+    }
+  );
+
+
+  toast(
+    "تمت إضافة الملفات"
+  );
+
+}
+
+
+function renderMedia(){
+
+  const body =
+    document.getElementById(
+      "mediaBody"
+    );
+
+
+  const search =
+    (
+      document.getElementById(
+        "mediaSearch"
+      )?.value
+      ||
+      ""
+    ).toLowerCase();
+
+
+  const filter =
+    document.getElementById(
+      "mediaFilter"
+    )?.value
+    ||
+    "all";
+
+
+  const media =
+    db.media.filter(
+      item=>
+
+        (
+          filter==="all"
+          ||
+          item.type===filter
+        )
+
+        &&
+
+        item.name
+          .toLowerCase()
+          .includes(search)
+
+    );
+
+
+  if(!media.length){
+
+    body.innerHTML = `
+
+      <tr>
+
+        <td
+          colspan="6"
+          class="empty">
+
+          المكتبة فارغة
+
+        </td>
+
+      </tr>
+
+    `;
+
+    return;
+
+  }
+
+
+  body.innerHTML =
+    media
+      .map(
+        item=>`
+
+          <tr>
+
+            <td>
+
+              <div class="media-thumb">
+
+                ${
+                  item.type==="video"
+
+                  ?
+
+                  `<video
+                     src="${item.url}"
+                     muted>
+                   </video>`
+
+                  :
+
+                  `<img
+                     src="${item.url}"
+                     alt="">`
+
+                }
+
+              </div>
+
+            </td>
+
+
+            <td>
+              ${esc(item.name)}
+            </td>
+
+
+            <td>
+              ${
+                item.type==="video"
+                ? "فيديو"
+                : "صورة"
+              }
+            </td>
+
+
+            <td>
+              ${formatBytes(item.size)}
+            </td>
+
+
+            <td>
+              ${item.dimensions || "—"}
+            </td>
+
+
+            <td>
+
+              <button
+                class="btn small danger"
+                onclick="deleteMedia(${item.id})">
+
+                حذف
+
+              </button>
+
+            </td>
+
+          </tr>
+
+        `
+      )
+      .join("");
+
+}
+
+
+function deleteMedia(id){
+
+  db.media =
+    db.media.filter(
+      media=>media.id!==id
+    );
+
+
+  Object.values(
+    db.contents
+  ).forEach(
+    content=>{
+
+      content.items =
+        content.items.filter(
+          item=>item.mediaId!==id
+        );
+
+    }
+  );
+
+
+  saveDB();
+
+  renderMedia();
+
+  renderContent();
+
+  renderDashboard();
+
+  toast("تم حذف الوسائط");
+
+}
+
+
+/* =====================================================
+   SCHEDULE
+===================================================== */
+
+function addSchedule(){
+
+  db.schedules.push({
+
+    id:Date.now(),
+
+    screenId:
+      db.screens[0]?.id,
+
+    title:"جدولة جديدة",
+
+    startDate:"",
+
+    endDate:"",
+
+    days:"كل الأيام",
+
+    startTime:"08:00",
+
+    endTime:"17:00",
+
+    priority:"normal",
+
+    enabled:true
+
+  });
+
+
+  saveDB();
+
+  renderSchedules();
+
+}
+
+
+function renderSchedules(){
+
+  const list =
+    document.getElementById(
+      "scheduleList"
+    );
+
+
+  if(!db.schedules.length){
+
+    list.innerHTML =
+      `<div class="empty">
+        لا توجد جداول حتى الآن.
+      </div>`;
+
+    return;
+
+  }
+
+
+  list.innerHTML =
+    db.schedules
+      .map(
+        (schedule,index)=>
+          scheduleHTML(
+            schedule,
+            index
+          )
+      )
+      .join("");
+
+}
+
+
+function scheduleHTML(schedule,index){
+
+  return `
+
+    <div class="content-item">
+
+      <div class="form-grid three">
+
+        <label>
+
+          اسم الجدولة
+
+          <input
+            value="${esc(schedule.title)}"
+            onchange="
+              updateSchedule(
+                ${index},
+                'title',
+                this.value
+              )">
+
+        </label>
+
+
+        <label>
+
+          الشاشة
+
+          <select
+            onchange="
+              updateSchedule(
+                ${index},
+                'screenId',
+                this.value
+              )">
+
+            ${
+              db.screens
+                .map(
+                  screen=>`
+
+                    <option
+                      value="${screen.id}"
+                      ${
+                        Number(schedule.screenId)
+                        ===screen.id
+                        ?"selected"
+                        :""
+                      }>
+
+                      ${esc(screen.name)}
+
+                    </option>
+
+                  `
+                )
+                .join("")
+            }
+
+          </select>
+
+        </label>
+
+
+        <label>
+
+          الأولوية
+
+          <select
+            onchange="
+              updateSchedule(
+                ${index},
+                'priority',
+                this.value
+              )">
+
+            <option
+              value="normal"
+              ${
+                schedule.priority==="normal"
+                ?"selected"
+                :""
+              }>
+              عادي
+            </option>
+
+            <option
+              value="high"
+              ${
+                schedule.priority==="high"
+                ?"selected"
+                :""
+              }>
+              مرتفع
+            </option>
+
+            <option
+              value="urgent"
+              ${
+                schedule.priority==="urgent"
+                ?"selected"
+                :""
+              }>
+              عاجل
+            </option>
+
+          </select>
+
+        </label>
+
+
+        <label>
+
+          من تاريخ
+
+          <input
+            type="date"
+            value="${schedule.startDate}"
+            onchange="
+              updateSchedule(
+                ${index},
+                'startDate',
+                this.value
+              )">
+
+        </label>
+
+
+        <label>
+
+          إلى تاريخ
+
+          <input
+            type="date"
+            value="${schedule.endDate}"
+            onchange="
+              updateSchedule(
+                ${index},
+                'endDate',
+                this.value
+              )">
+
+        </label>
+
+
+        <label>
+
+          الأيام
+
+          <input
+            value="${esc(schedule.days)}"
+            onchange="
+              updateSchedule(
+                ${index},
+                'days',
+                this.value
+              )">
+
+        </label>
+
+
+        <label>
+
+          من وقت
+
+          <input
+            type="time"
+            value="${schedule.startTime}"
+            onchange="
+              updateSchedule(
+                ${index},
+                'startTime',
+                this.value
+              )">
+
+        </label>
+
+
+        <label>
+
+          إلى وقت
+
+          <input
+            type="time"
+            value="${schedule.endTime}"
+            onchange="
+              updateSchedule(
+                ${index},
+                'endTime',
+                this.value
+              )">
+
+        </label>
+
+
+        <label class="toggle">
+
+          <input
+            type="checkbox"
+            ${
+              schedule.enabled
+              ?"checked"
+              :""
+            }
+            onchange="
+              updateSchedule(
+                ${index},
+                'enabled',
+                this.checked
+              )">
+
+          مفعلة
+
+        </label>
+
+      </div>
+
+
+      <button
+        class="btn small danger"
+        style="margin-top:8px"
+        onclick="deleteSchedule(${index})">
+
+        حذف الجدولة
+
+      </button>
+
+    </div>
+
+  `;
+
+}
+
+
+function updateSchedule(
+  index,
+  key,
+  value
+){
+
+  db.schedules[index][key]=value;
+
+  saveDB();
+
+}
+
+
+function deleteSchedule(index){
+
+  db.schedules.splice(
+    index,
+    1
+  );
+
+  saveDB();
+
+  renderSchedules();
+
+}
+
+
+/* =====================================================
+   EMERGENCY BROADCAST
+===================================================== */
+
+function openBroadcastModal(){
+
+  openModal(`
+
+    <div class="topbar">
+
+      <div>
+
+        <h3 style="margin:0">
+          بث عاجل
+        </h3>
+
+      </div>
+
+      <button
+        class="btn small"
+        onclick="closeModal()">
+        ×
+      </button>
+
+    </div>
+
+
+    <div class="form-grid two">
+
+      <label>
+
+        الرسالة
+
+        <textarea
+          id="broadcastText"
+          placeholder="اكتب الرسالة العاجلة هنا...">${
+            db.broadcast?.text || ""
+          }</textarea>
+
+      </label>
+
+
+      <label>
+
+        الشاشات
+
+        <select
+          id="broadcastScreens"
+          multiple
+          style="height:120px">
+
+          ${
+            db.screens
+              .map(
+                screen=>`
+
+                  <option
+                    value="${screen.id}"
+                    ${
+                      db.broadcast?.screenIds
+                      ?.includes(screen.id)
+                      ||
+                      !db.broadcast
+                      ?"selected"
+                      :""
+                    }>
+
+                    ${esc(screen.name)}
+
+                  </option>
+
+                `
+              )
+              .join("")
+          }
+
+        </select>
+
+      </label>
+
+    </div>
+
+
+    <div class="actions"
+      style="margin-top:10px">
+
+      <button
+        class="btn primary"
+        onclick="startBroadcast()">
+
+        بث الآن
+
+      </button>
+
+
+      <button
+        class="btn"
+        onclick="endBroadcast()">
+
+        إنهاء البث
+
+      </button>
+
+    </div>
+
+  `);
+
+}
+
+
+function startBroadcast(){
+
+  const selected =
+    [
+      ...document
+        .getElementById(
+          "broadcastScreens"
+        )
+        .selectedOptions
+    ]
+    .map(
+      option=>Number(option.value)
+    );
+
+
+  db.broadcast={
+
+    text:
+      document.getElementById(
+        "broadcastText"
+      ).value,
+
+    screenIds:selected,
+
+    startedAt:
+      new Date().toISOString(),
+
+    active:true
+
+  };
+
+
+  saveDB();
+
+  closeModal();
+
+  toast("تم تفعيل البث العاجل");
+
+}
+
+
+function endBroadcast(){
+
+  if(db.broadcast){
+
+    db.broadcast.active=false;
+
+    db.broadcast.endedAt =
+      new Date().toISOString();
+
+  }
+
+
+  saveDB();
+
+  closeModal();
+
+  toast("تم إنهاء البث");
+
+}
+
+
+/* =====================================================
+   SETTINGS
+===================================================== */
+
+function renderSettings(){
+
+  const state =
+    document.getElementById(
+      "publishState"
+    );
+
+
+  if(db.publishedAt){
+
+    state.textContent =
+      "آخر نشر: "
+      +
+      new Date(
+        db.publishedAt
+      ).toLocaleString("ar-SA");
+
+  }else{
+
+    state.textContent =
+      "لم يتم نشر محتوى حتى الآن.";
+
+  }
+
+}
+
+
+function exportData(){
+
+  const blob =
+    new Blob(
+      [
+        JSON.stringify(
+          db,
+          null,
+          2
+        )
+      ],
+      {
+        type:"application/json"
+      }
+    );
+
+
+  const url =
+    URL.createObjectURL(blob);
+
+
+  const a =
+    document.createElement("a");
+
+
+  a.href=url;
+
+  a.download =
+    "innovation-signage-backup.json";
+
+  a.click();
+
+
+  URL.revokeObjectURL(url);
+
+}
+
+
+document
+  .getElementById(
+    "restoreInput"
+  )
+  .addEventListener(
+    "change",
+    event=>{
+
+      const file =
+        event.target.files[0];
+
+      if(!file)
+        return;
+
+
+      const reader =
+        new FileReader();
+
+
+      reader.onload=()=>{
+
+        try{
+
+          db =
+            JSON.parse(
+              reader.result
+            );
+
+          saveDB();
+
+          location.reload();
+
+        }catch{
+
+          toast(
+            "ملف النسخة الاحتياطية غير صالح"
+          );
+
+        }
+
+      };
+
+
+      reader.readAsText(file);
+
+    }
+  );
+
+
+function clearLocalData(){
+
+  if(
+    !confirm(
+      "سيتم حذف جميع البيانات المحلية. هل أنت متأكد؟"
+    )
+  )
+    return;
+
+
+  localStorage.removeItem(
+    STORAGE_KEY
+  );
+
+
+  location.reload();
+
+}
+
+
+/* =====================================================
+   MODAL
+===================================================== */
+
+function openModal(html){
+
+  document.getElementById(
+    "modalBox"
+  ).innerHTML=html;
+
+
+  document.getElementById(
+    "modal"
+  ).classList.add("show");
+
+}
+
+
+function closeModal(){
+
+  document.getElementById(
+    "modal"
+  ).classList.remove("show");
+
+}
+
+
+document
+  .getElementById("modal")
+  .addEventListener(
+    "click",
+    event=>{
+
+      if(
+        event.target.id==="modal"
+      ){
+
+        closeModal();
+
+      }
+
+    }
+  );
+
+
+/* =====================================================
+   LANGUAGE
+===================================================== */
+
+document
+  .getElementById(
+    "languageButton"
+  )
+  .addEventListener(
+    "click",
+    toggleLanguage
+  );
+
+
+function toggleLanguage(){
+
+  db.language =
+    db.language==="ar"
+    ? "en"
+    : "ar";
+
+
+  saveDB();
+
+  applyLanguage();
+
+}
+
+
+function applyLanguage(){
+
+  const english =
+    db.language==="en";
+
+
+  document
+    .getElementById("app")
+    .classList.toggle(
+      "ltr",
+      english
+    );
+
+
+  document.documentElement.dir =
+    english
+    ? "ltr"
+    : "rtl";
+
+
+  document.documentElement.lang =
+    english
+    ? "en"
+    : "ar";
+
+
+  document.getElementById(
+    "languageButton"
+  ).textContent =
+    english
+    ? "العربية"
+    : "English";
+
+
+  document.getElementById(
+    "logoText"
+  ).textContent =
+    english
+    ? "Screen Control Center"
+    : "مركز التحكم بالشاشات";
+
+}
+
+
+/* =====================================================
+   INITIALIZE
+===================================================== */
+
+function init(){
+
+  applyLanguage();
+
+  renderDashboard();
+
+  fillContentScreens();
+
+  renderContent();
+
+  renderMedia();
+
+  renderSchedules();
+
+  renderSettings();
+
+}
+
+
+init();
+
+</script>
+
+</body>
+</html>
+```
