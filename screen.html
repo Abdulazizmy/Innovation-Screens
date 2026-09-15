@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
@@ -11,6 +10,8 @@
   content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
 <title>Screen</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 
@@ -41,18 +42,7 @@ body{
   overflow:hidden;
 }
 
-#image{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:contain;
-  opacity:0;
-  transition:
-    opacity .55s ease,
-    transform .55s ease;
-}
-
+#image,
 #video{
   position:absolute;
   inset:0;
@@ -102,6 +92,7 @@ body{
   color:#fff;
   text-align:center;
   font-size:clamp(22px,4vw,60px);
+  padding:30px;
 }
 
 #countdown{
@@ -192,12 +183,36 @@ body{
 <script>
 
 /* =====================================================
-   SETTINGS
+   SUPABASE
 ===================================================== */
 
-const STORAGE_KEY =
-  "innovationSignageV2";
+const SUPABASE_URL =
+  "https://gkdqttzjwgyfyjbrcbdp.supabase.co";
 
+const SUPABASE_KEY =
+  "sb_publishable_QRPg8bjUXtSxRtwBmCguug_cq8ZjbVv";
+
+const STORAGE_BUCKET =
+  "signage-media";
+
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY,
+    {
+      auth:{
+        persistSession:false,
+        autoRefreshToken:false,
+        detectSessionInUrl:false
+      }
+    }
+  );
+
+
+/* =====================================================
+   SCREEN ID
+===================================================== */
 
 const params =
   new URLSearchParams(
@@ -209,6 +224,15 @@ const SCREEN_ID =
   Number(
     params.get("id") || 1
   );
+
+
+/* =====================================================
+   LOCAL CACHE
+===================================================== */
+
+const CACHE_KEY =
+  "innovationSignageScreenCache_v3_" +
+  SCREEN_ID;
 
 
 /* =====================================================
@@ -261,11 +285,11 @@ const offline =
    STATE
 ===================================================== */
 
-let database = null;
-
 let screen = null;
 
 let content = null;
+
+let currentItems = [];
 
 let currentIndex = 0;
 
@@ -275,65 +299,214 @@ let countdownTimer = null;
 
 let paused = false;
 
-let lastState = "";
+let lastContentHash = "";
 
-let lastBroadcastState = "";
+let realtimeChannel = null;
 
-let currentItems = [];
+let syncing = false;
+
+let heartbeatTimer = null;
+
+let mediaObjectUrls = new Map();
 
 
 /* =====================================================
-   DATABASE
+   HELPERS
 ===================================================== */
 
-function loadDatabase(){
+function sleep(ms){
+
+  return new Promise(
+    resolve =>
+      setTimeout(
+        resolve,
+        ms
+      )
+  );
+
+}
+
+
+function safeJsonParse(
+  value,
+  fallback = null
+){
 
   try{
 
-    database =
-      JSON.parse(
-        localStorage.getItem(
-          STORAGE_KEY
-        ) || "{}"
-      );
+    return JSON.parse(value);
 
   }catch(error){
 
-    database = {};
+    return fallback;
 
   }
-
-
-  screen =
-    (database.screens || [])
-      .find(
-        item =>
-          Number(item.id) === SCREEN_ID
-      );
-
-
-  content =
-    database.contents
-      ? database.contents[SCREEN_ID]
-      : null;
 
 }
 
 
 /* =====================================================
-   STATE HASH
+   OFFLINE STATUS
 ===================================================== */
 
-function getStateHash(){
+function updateConnectionStatus(){
+
+  if(
+    navigator.onLine
+  ){
+
+    offline.style.display =
+      "none";
+
+  }else{
+
+    offline.style.display =
+      "block";
+
+  }
+
+}
+
+
+window.addEventListener(
+  "online",
+  async ()=>{
+
+    updateConnectionStatus();
+
+    showInfo(
+      "تم استعادة الاتصال"
+    );
+
+    await syncFromSupabase();
+
+  }
+);
+
+
+window.addEventListener(
+  "offline",
+  ()=>{
+
+    updateConnectionStatus();
+
+    showInfo(
+      "تشغيل آخر محتوى محفوظ"
+    );
+
+  }
+);
+
+
+/* =====================================================
+   LOCAL CACHE
+===================================================== */
+
+function saveLocalCache(){
+
+  try{
+
+    if(!content)
+      return;
+
+
+    const data = {
+
+      screen:screen,
+
+      content:content,
+
+      savedAt:Date.now()
+
+    };
+
+
+    localStorage.setItem(
+      CACHE_KEY,
+      JSON.stringify(data)
+    );
+
+  }catch(error){
+
+    console.warn(
+      "Cache save failed",
+      error
+    );
+
+  }
+
+}
+
+
+function loadLocalCache(){
+
+  try{
+
+    const raw =
+      localStorage.getItem(
+        CACHE_KEY
+      );
+
+
+    if(!raw)
+      return false;
+
+
+    const data =
+      safeJsonParse(
+        raw
+      );
+
+
+    if(
+      !data ||
+      !data.content
+    ){
+
+      return false;
+
+    }
+
+
+    screen =
+      data.screen || null;
+
+    content =
+      data.content || null;
+
+
+    return true;
+
+  }catch(error){
+
+    console.warn(
+      "Cache load failed",
+      error
+    );
+
+    return false;
+
+  }
+
+}
+
+
+/* =====================================================
+   HASH
+===================================================== */
+
+function getContentHash(){
 
   return JSON.stringify({
 
-    screen:screen,
+    screenId:
+      SCREEN_ID,
 
-    content:content,
+    screen:
+      screen,
 
-    broadcast:
-      database.broadcast || null
+    content:
+      content
 
   });
 
@@ -341,7 +514,446 @@ function getStateHash(){
 
 
 /* =====================================================
-   ACTIVE CONTENT
+   GET SCREEN
+===================================================== */
+
+async function loadScreen(){
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("screens")
+      .select("*")
+      .eq(
+        "id",
+        SCREEN_ID
+      )
+      .maybeSingle();
+
+
+  if(error)
+    throw error;
+
+
+  screen =
+    data || null;
+
+}
+
+
+/* =====================================================
+   GET PUBLISHED PLAYLIST
+===================================================== */
+
+async function loadPublishedContent(){
+
+  const {
+    data:publishState,
+    error:publishError
+  } =
+    await supabaseClient
+      .from(
+        "screen_publish_state"
+      )
+      .select(
+        "screen_id,published_playlist_id,version,published_at"
+      )
+      .eq(
+        "screen_id",
+        SCREEN_ID
+      )
+      .maybeSingle();
+
+
+  if(publishError)
+    throw publishError;
+
+
+  if(
+    !publishState ||
+    !publishState.published_playlist_id
+  ){
+
+    content = null;
+
+    saveLocalCache();
+
+    return;
+
+  }
+
+
+  const playlistId =
+    publishState.published_playlist_id;
+
+
+  const {
+    data:playlist,
+    error:playlistError
+  } =
+    await supabaseClient
+      .from("playlists")
+      .select("*")
+      .eq(
+        "id",
+        playlistId
+      )
+      .maybeSingle();
+
+
+  if(playlistError)
+    throw playlistError;
+
+
+  if(
+    !playlist ||
+    playlist.enabled === false
+  ){
+
+    content = null;
+
+    saveLocalCache();
+
+    return;
+
+  }
+
+
+  const {
+    data:items,
+    error:itemsError
+  } =
+    await supabaseClient
+      .from("playlist_items")
+      .select(`
+        id,
+        playlist_id,
+        media_id,
+        position,
+        enabled,
+        duration,
+        transition,
+        video_mode,
+        muted,
+        created_at,
+        updated_at,
+        media:media_id (
+          id,
+          name,
+          type,
+          file_path,
+          file_url,
+          file_size,
+          width,
+          height,
+          duration,
+          tags,
+          enabled,
+          created_at,
+          updated_at
+        )
+      `)
+      .eq(
+        "playlist_id",
+        playlistId
+      )
+      .order(
+        "position",
+        {
+          ascending:true
+        }
+      );
+
+
+  if(itemsError)
+    throw itemsError;
+
+
+  const normalizedItems =
+    (items || [])
+      .filter(
+        item =>
+          item.enabled !== false &&
+          item.media &&
+          item.media.enabled !== false &&
+          item.media.file_url
+      )
+      .map(
+        item => ({
+
+          id:
+            item.id,
+
+          mediaId:
+            item.media_id,
+
+          type:
+            item.media.type,
+
+          name:
+            item.media.name,
+
+          url:
+            item.media.file_url,
+
+          filePath:
+            item.media.file_path,
+
+          duration:
+            Number(
+              item.duration
+              ||
+              item.media.duration
+              ||
+              playlist.default_duration
+              ||
+              10
+            ),
+
+          transition:
+            item.transition
+            ||
+            playlist.default_transition
+            ||
+            "fade",
+
+          mode:
+            item.video_mode
+            ||
+            "next",
+
+          muted:
+            item.muted !== false,
+
+          width:
+            item.media.width,
+
+          height:
+            item.media.height
+
+        })
+      );
+
+
+  content = {
+
+    playlistId:
+      playlist.id,
+
+    name:
+      playlist.name,
+
+    repeatAll:
+      playlist.repeat_all !== false,
+
+    defaultDuration:
+      Number(
+        playlist.default_duration
+        ||
+        10
+      ),
+
+    defaultTransition:
+      playlist.default_transition
+      ||
+      "fade",
+
+    fitMode:
+      playlist.fit_mode
+      ||
+      "contain",
+
+    publishedAt:
+      publishState.published_at,
+
+    version:
+      publishState.version,
+
+    items:
+      normalizedItems
+
+  };
+
+
+  saveLocalCache();
+
+}
+
+
+/* =====================================================
+   SUPABASE SYNC
+===================================================== */
+
+async function syncFromSupabase(
+  showMessages = false
+){
+
+  if(syncing)
+    return;
+
+
+  if(!navigator.onLine)
+    return;
+
+
+  syncing = true;
+
+
+  try{
+
+    await loadScreen();
+
+    await loadPublishedContent();
+
+
+    if(
+      !checkScreen()
+    ){
+
+      syncing = false;
+
+      return;
+
+    }
+
+
+    const newHash =
+      getContentHash();
+
+
+    if(
+      newHash !==
+      lastContentHash
+    ){
+
+      lastContentHash =
+        newHash;
+
+
+      currentIndex =
+        0;
+
+
+      playCurrent();
+
+
+      if(showMessages){
+
+        showInfo(
+          "تم تحديث محتوى الشاشة"
+        );
+
+      }
+
+    }
+
+
+    await sendHeartbeat();
+
+
+  }catch(error){
+
+    console.error(
+      "Supabase sync error:",
+      error
+    );
+
+
+    if(
+      !content
+    ){
+
+      if(
+        loadLocalCache()
+      ){
+
+        lastContentHash =
+          getContentHash();
+
+
+        currentIndex =
+          0;
+
+
+        playCurrent();
+
+      }
+
+    }
+
+    updateConnectionStatus();
+
+  }finally{
+
+    syncing = false;
+
+  }
+
+}
+
+
+/* =====================================================
+   SCREEN STATUS
+===================================================== */
+
+function checkScreen(){
+
+  if(!screen){
+
+    maintenance.style.display =
+      "flex";
+
+    maintenance.textContent =
+      "الشاشة غير موجودة";
+
+    return false;
+
+  }
+
+
+  if(
+    screen.enabled === false
+  ){
+
+    maintenance.style.display =
+      "flex";
+
+    maintenance.textContent =
+      "هذه الشاشة غير مفعلة";
+
+    return false;
+
+  }
+
+
+  if(
+    screen.maintenance_mode === true
+  ){
+
+    maintenance.style.display =
+      "flex";
+
+    maintenance.textContent =
+      "هذه الشاشة تحت الصيانة";
+
+    return false;
+
+  }
+
+
+  maintenance.style.display =
+    "none";
+
+
+  return true;
+
+}
+
+
+/* =====================================================
+   ACTIVE ITEMS
 ===================================================== */
 
 function getActiveItems(){
@@ -355,7 +967,7 @@ function getActiveItems(){
   )
   .filter(
     item =>
-      item.enabled &&
+      item &&
       item.url
   );
 
@@ -368,11 +980,21 @@ function getActiveItems(){
 
 function clearTimers(){
 
-  clearTimeout(timer);
+  clearTimeout(
+    timer
+  );
+
 
   clearInterval(
     countdownTimer
   );
+
+
+  timer =
+    null;
+
+  countdownTimer =
+    null;
 
 }
 
@@ -384,6 +1006,7 @@ function clearTimers(){
 function resetMedia(){
 
   clearTimers();
+
 
   countdown.style.display =
     "none";
@@ -421,6 +1044,28 @@ function applyTransition(
 
   video.style.opacity =
     "0";
+
+
+  if(
+    transition === "none"
+  ){
+
+    setTimeout(
+      ()=>{
+
+        image.style.opacity =
+          "1";
+
+        video.style.opacity =
+          "1";
+
+      },
+      20
+    );
+
+    return;
+
+  }
 
 
   if(
@@ -508,8 +1153,7 @@ function startCountdown(
         0,
         Math.ceil(
           (
-            endTime
-            -
+            endTime -
             Date.now()
           ) / 1000
         )
@@ -517,16 +1161,18 @@ function startCountdown(
 
 
     countdown.textContent =
-      remaining
-      +
+      remaining +
       " ث";
 
 
-    if(remaining<=0){
+    if(
+      remaining <= 0
+    ){
 
       clearInterval(
         countdownTimer
       );
+
 
       countdown.style.display =
         "none";
@@ -549,10 +1195,211 @@ function startCountdown(
 
 
 /* =====================================================
+   MEDIA CACHE
+===================================================== */
+
+async function cacheMedia(
+  item
+){
+
+  if(
+    !item ||
+    !item.url
+  )
+    return;
+
+
+  if(
+    !("caches" in window)
+  )
+    return;
+
+
+  try{
+
+    const cache =
+      await caches.open(
+        "innovation-signage-media-v1"
+      );
+
+
+    const existing =
+      await cache.match(
+        item.url
+      );
+
+
+    if(existing)
+      return;
+
+
+    const response =
+      await fetch(
+        item.url,
+        {
+          mode:"cors",
+          cache:"no-store"
+        }
+      );
+
+
+    if(
+      response.ok
+    ){
+
+      await cache.put(
+        item.url,
+        response.clone()
+      );
+
+    }
+
+  }catch(error){
+
+    console.warn(
+      "Media cache failed:",
+      item.url,
+      error
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   PRELOAD MEDIA
+===================================================== */
+
+async function preloadMedia(){
+
+  const items =
+    getActiveItems();
+
+
+  if(!items.length)
+    return;
+
+
+  if(
+    !navigator.onLine
+  )
+    return;
+
+
+  for(
+    const item of items
+  ){
+
+    cacheMedia(item);
+
+  }
+
+}
+
+
+/* =====================================================
+   GET OFFLINE MEDIA URL
+===================================================== */
+
+async function getOfflineMediaUrl(
+  url
+){
+
+  if(
+    !("caches" in window)
+  )
+    return null;
+
+
+  try{
+
+    const cache =
+      await caches.open(
+        "innovation-signage-media-v1"
+      );
+
+
+    const response =
+      await cache.match(
+        url
+      );
+
+
+    if(!response)
+      return null;
+
+
+    const blob =
+      await response.blob();
+
+
+    const objectUrl =
+      URL.createObjectURL(
+        blob
+      );
+
+
+    mediaObjectUrls.set(
+      objectUrl,
+      true
+    );
+
+
+    return objectUrl;
+
+  }catch(error){
+
+    console.warn(
+      "Offline media error:",
+      error
+    );
+
+    return null;
+
+  }
+
+}
+
+
+/* =====================================================
+   RESOLVE MEDIA URL
+===================================================== */
+
+async function resolveMediaUrl(
+  item
+){
+
+  if(
+    navigator.onLine
+  ){
+
+    cacheMedia(item);
+
+    return item.url;
+
+  }
+
+
+  const cachedUrl =
+    await getOfflineMediaUrl(
+      item.url
+    );
+
+
+  return (
+    cachedUrl ||
+    item.url
+  );
+
+}
+
+
+/* =====================================================
    PLAY IMAGE
 ===================================================== */
 
-function playImage(
+async function playImage(
   item
 ){
 
@@ -561,6 +1408,9 @@ function playImage(
   video.removeAttribute(
     "src"
   );
+
+
+  video.load();
 
 
   video.style.display =
@@ -575,7 +1425,8 @@ function playImage(
 
 
   if(
-    content.fitMode === "cover"
+    content.fitMode ===
+    "cover"
   ){
 
     image.classList.add(
@@ -597,8 +1448,24 @@ function playImage(
   }
 
 
+  const mediaUrl =
+    await resolveMediaUrl(
+      item
+    );
+
+
+  if(
+    currentItems[currentIndex] !==
+    item
+  ){
+
+    return;
+
+  }
+
+
   image.src =
-    item.url;
+    mediaUrl;
 
 
   applyTransition(
@@ -631,7 +1498,9 @@ function playImage(
   timer =
     setTimeout(
       ()=>{
+
         nextItem();
+
       },
       duration * 1000
     );
@@ -643,12 +1512,13 @@ function playImage(
    PLAY VIDEO
 ===================================================== */
 
-function playVideo(
+async function playVideo(
   item
 ){
 
   image.style.display =
     "none";
+
 
   video.style.display =
     "block";
@@ -659,7 +1529,8 @@ function playVideo(
 
 
   if(
-    content.fitMode === "cover"
+    content.fitMode ===
+    "cover"
   ){
 
     video.classList.add(
@@ -684,8 +1555,32 @@ function playVideo(
   video.pause();
 
 
+  video.removeAttribute(
+    "src"
+  );
+
+
+  video.load();
+
+
+  const mediaUrl =
+    await resolveMediaUrl(
+      item
+    );
+
+
+  if(
+    currentItems[currentIndex] !==
+    item
+  ){
+
+    return;
+
+  }
+
+
   video.src =
-    item.url;
+    mediaUrl;
 
 
   video.currentTime =
@@ -727,12 +1622,30 @@ function playVideo(
     };
 
 
+  video.onerror =
+    ()=>{
+
+      if(
+        !navigator.onLine
+      ){
+
+        showInfo(
+          "تعذر تشغيل الفيديو المحفوظ"
+        );
+
+      }
+
+    };
+
+
   video.play()
     .catch(
       ()=>{
+
         showInfo(
           "اضغط على الشاشة لتفعيل الفيديو"
         );
+
       }
     );
 
@@ -747,13 +1660,17 @@ function playCurrent(){
 
   clearTimers();
 
+
   currentItems =
     getActiveItems();
 
 
-  if(!currentItems.length){
+  if(
+    !currentItems.length
+  ){
 
     resetMedia();
+
 
     image.style.display =
       "none";
@@ -761,9 +1678,22 @@ function playCurrent(){
     video.style.display =
       "none";
 
+
+    maintenance.style.display =
+      "flex";
+
+
+    maintenance.textContent =
+      "لا يوجد محتوى منشور لهذه الشاشة";
+
+
     return;
 
   }
+
+
+  maintenance.style.display =
+    "none";
 
 
   if(
@@ -771,7 +1701,8 @@ function playCurrent(){
     currentItems.length
   ){
 
-    currentIndex=0;
+    currentIndex =
+      0;
 
   }
 
@@ -783,7 +1714,8 @@ function playCurrent(){
 
 
   if(
-    item.type === "video"
+    item.type ===
+    "video"
   ){
 
     playVideo(item);
@@ -811,7 +1743,9 @@ function nextItem(){
     getActiveItems();
 
 
-  if(!currentItems.length)
+  if(
+    !currentItems.length
+  )
     return;
 
 
@@ -824,15 +1758,17 @@ function nextItem(){
   ){
 
     if(
-      content.repeatAll !== false
+      content.repeatAll !==
+      false
     ){
 
-      currentIndex=0;
+      currentIndex =
+        0;
 
     }else{
 
       currentIndex =
-        currentItems.length-1;
+        currentItems.length - 1;
 
       return;
 
@@ -856,18 +1792,21 @@ function previousItem(){
     getActiveItems();
 
 
-  if(!currentItems.length)
+  if(
+    !currentItems.length
+  )
     return;
 
 
   currentIndex--;
+
 
   if(
     currentIndex < 0
   ){
 
     currentIndex =
-      currentItems.length-1;
+      currentItems.length - 1;
 
   }
 
@@ -878,156 +1817,224 @@ function previousItem(){
 
 
 /* =====================================================
-   BROADCAST
+   HEARTBEAT
 ===================================================== */
 
-function updateBroadcast(){
-
-  const broadcast =
-    database.broadcast;
-
+async function sendHeartbeat(){
 
   if(
-    broadcast &&
-    broadcast.active &&
-    Array.isArray(
-      broadcast.screenIds
-    ) &&
-    broadcast.screenIds.includes(
-      SCREEN_ID
-    )
+    !navigator.onLine
+  )
+    return;
+
+
+  try{
+
+    const browser =
+      navigator.userAgent
+        .slice(
+          0,
+          500
+        );
+
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .from(
+          "screen_heartbeats"
+        )
+        .upsert(
+          {
+            screen_id:
+              SCREEN_ID,
+
+            last_seen_at:
+              new Date()
+                .toISOString(),
+
+            browser:
+              browser,
+
+            updated_at:
+              new Date()
+                .toISOString()
+          },
+          {
+            onConflict:
+              "screen_id"
+          }
+        );
+
+
+    if(error){
+
+      console.warn(
+        "Heartbeat error:",
+        error
+      );
+
+    }
+
+  }catch(error){
+
+    console.warn(
+      "Heartbeat failed:",
+      error
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   HEARTBEAT LOOP
+===================================================== */
+
+function startHeartbeat(){
+
+  clearInterval(
+    heartbeatTimer
+  );
+
+
+  sendHeartbeat();
+
+
+  heartbeatTimer =
+    setInterval(
+      sendHeartbeat,
+      30000
+    );
+
+}
+
+
+/* =====================================================
+   REALTIME
+===================================================== */
+
+function setupRealtime(){
+
+  if(
+    realtimeChannel
   ){
 
-    const state =
-      JSON.stringify(
-        broadcast
+    supabaseClient
+      .removeChannel(
+        realtimeChannel
+      );
+
+  }
+
+
+  realtimeChannel =
+    supabaseClient
+      .channel(
+        "screen-" +
+        SCREEN_ID +
+        "-realtime"
       );
 
 
-    if(
-      state !==
-      lastBroadcastState
-    ){
+  realtimeChannel
+    .on(
+      "postgres_changes",
+      {
+        event:"*",
+        schema:"public",
+        table:"screen_publish_state",
+        filter:
+          "screen_id=eq." +
+          SCREEN_ID
+      },
+      ()=>{
+        syncFromSupabase(
+          true
+        );
+      }
+    )
+    .on(
+      "postgres_changes",
+      {
+        event:"*",
+        schema:"public",
+        table:"screens",
+        filter:
+          "id=eq." +
+          SCREEN_ID
+      },
+      ()=>{
+        syncFromSupabase(
+          true
+        );
+      }
+    )
+    .on(
+      "postgres_changes",
+      {
+        event:"*",
+        schema:"public",
+        table:"playlists"
+      },
+      ()=>{
+        syncFromSupabase(
+          true
+        );
+      }
+    )
+    .on(
+      "postgres_changes",
+      {
+        event:"*",
+        schema:"public",
+        table:"playlist_items"
+      },
+      ()=>{
+        syncFromSupabase(
+          true
+        );
+      }
+    )
+    .on(
+      "postgres_changes",
+      {
+        event:"*",
+        schema:"public",
+        table:"media"
+      },
+      ()=>{
+        syncFromSupabase(
+          true
+        );
+      }
+    )
+    .subscribe(
+      status=>{
 
-      lastBroadcastState =
-        state;
+        console.log(
+          "Realtime:",
+          status
+        );
 
-      overlay.textContent =
-        broadcast.text
-        ||
-        "تنبيه عاجل";
-
-      overlay.style.display =
-        "flex";
-
-    }
-
-  }else{
-
-    if(
-      overlay.style.display !==
-      "none"
-    ){
-
-      overlay.style.display =
-        "none";
-
-    }
-
-    lastBroadcastState =
-      "";
-
-  }
+      }
+    );
 
 }
 
 
 /* =====================================================
-   SCREEN STATUS
+   PERIODIC SYNC
 ===================================================== */
 
-function checkScreen(){
-
-  if(!screen){
-
-    maintenance.style.display =
-      "flex";
-
-    maintenance.textContent =
-      "الشاشة غير موجودة";
-
-    return false;
-
-  }
-
-
-  if(
-    screen.enabled === false
-  ){
-
-    maintenance.style.display =
-      "flex";
-
-    maintenance.textContent =
-      "هذه الشاشة غير مفعلة";
-
-    return false;
-
-  }
-
-
-  maintenance.style.display =
-    "none";
-
-
-  return true;
-
-}
-
-
-/* =====================================================
-   MAIN START
-===================================================== */
-
-function startPlayer(){
-
-  loadDatabase();
-
-
-  if(
-    !checkScreen()
-  ){
-
-    return;
-
-  }
-
-
-  updateBroadcast();
-
-
-  const newState =
-    getStateHash();
-
-
-  if(
-    newState !==
-    lastState
-  ){
-
-    lastState =
-      newState;
-
-
-    currentIndex =
-      0;
-
-
-    playCurrent();
-
-  }
-
-}
+setInterval(
+  ()=>{
+    syncFromSupabase();
+  },
+  30000
+);
 
 
 /* =====================================================
@@ -1040,6 +2047,7 @@ function showInfo(
 
   info.textContent =
     message;
+
 
   info.classList.add(
     "show"
@@ -1054,9 +2062,11 @@ function showInfo(
   window.infoTimer =
     setTimeout(
       ()=>{
+
         info.classList.remove(
           "show"
         );
+
       },
       2500
     );
@@ -1095,10 +2105,12 @@ document.addEventListener(
   event=>{
 
     if(
-      event.key === " "
+      event.key ===
+      " "
     ){
 
       event.preventDefault();
+
 
       paused =
         !paused;
@@ -1110,6 +2122,7 @@ document.addEventListener(
 
         video.pause();
 
+
         showInfo(
           "متوقف مؤقتًا"
         );
@@ -1117,6 +2130,7 @@ document.addEventListener(
       }else{
 
         playCurrent();
+
 
         showInfo(
           "تم استئناف التشغيل"
@@ -1149,8 +2163,7 @@ document.addEventListener(
 
     if(
       event.key ===
-      "f"
-      ||
+      "f" ||
       event.key ===
       "F"
     ){
@@ -1200,109 +2213,118 @@ document.body.addEventListener(
 
 
 /* =====================================================
-   CONNECTION INDICATOR
+   INITIALIZATION
 ===================================================== */
 
-window.addEventListener(
-  "offline",
-  ()=>{
-    offline.style.display =
-      "block";
-  }
-);
+async function initialize(){
+
+  updateConnectionStatus();
 
 
-window.addEventListener(
-  "online",
-  ()=>{
-    offline.style.display =
-      "none";
-  }
-);
+  /*
+    أول شيء:
+    نحاول تشغيل آخر نسخة محفوظة
+    حتى لو الشاشة بدون إنترنت.
+  */
+
+  const cached =
+    loadLocalCache();
 
 
-/* =====================================================
-   AUTO REFRESH
-===================================================== */
+  if(cached){
 
-setInterval(
-  ()=>{
-
-    try{
-
-      loadDatabase();
-
-      if(
-        !checkScreen()
-      )
-        return;
+    lastContentHash =
+      getContentHash();
 
 
-      updateBroadcast();
+    if(
+      checkScreen()
+    ){
 
+      currentIndex =
+        0;
 
-      const newState =
-        getStateHash();
-
-
-      if(
-        newState !==
-        lastState
-      ){
-
-        lastState =
-          newState;
-
-
-        currentIndex =
-          0;
-
-
-        playCurrent();
-
-      }
-
-    }catch(error){
-
-      console.error(error);
+      playCurrent();
 
     }
 
-  },
-  2000
-);
+  }
 
 
-/* =====================================================
-   INITIALIZE
-===================================================== */
+  /*
+    إذا كان الإنترنت متوفر:
+    نسحب النسخة الأحدث من Supabase.
+  */
 
-window.addEventListener(
-  "load",
-  ()=>{
+  if(
+    navigator.onLine
+  ){
 
-    loadDatabase();
+    await syncFromSupabase();
 
-    startPlayer();
+  }else if(!cached){
 
+    maintenance.style.display =
+      "flex";
+
+    maintenance.textContent =
+      "لا يوجد اتصال ولا يوجد محتوى محفوظ";
+
+  }
+
+
+  /*
+    Realtime
+  */
+
+  setupRealtime();
+
+
+  /*
+    Heartbeat
+  */
+
+  startHeartbeat();
+
+
+  /*
+    تخزين ملفات الوسائط
+    للاستخدام عند انقطاع الإنترنت.
+  */
+
+  preloadMedia();
+
+
+  /*
+    رسالة تعريف بسيطة
+  */
+
+  if(screen){
 
     showInfo(
       (
-        screen?.name
-        ||
+        screen.name ||
         "Screen"
-      )
-      +
-      " · ID "
-      +
+      ) +
+      " · ID " +
       SCREEN_ID
     );
 
   }
+
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+window.addEventListener(
+  "load",
+  initialize
 );
 
 </script>
 
 </body>
 </html>
-```
