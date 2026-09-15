@@ -1381,10 +1381,6 @@ const SUPABASE_KEY =
 const STORAGE_BUCKET =
 "signage-media";
 
-/*
- * الحد الأقصى لحجم الملف:
- * 500 ميجابايت
- */
 const MAX_FILE_SIZE =
   500 * 1024 * 1024;
 
@@ -1442,12 +1438,24 @@ function setConnection(online,text){
   document.getElementById("connectionText").textContent=text;
 }
 
+/* =========================
+   SCREEN URL
+========================= */
+
 function getScreenUrl(id){
 
-  return location.origin+
-    location.pathname
-      .replace("index.html","screen.html")+
-    "?id="+id;
+  const url =
+    new URL(
+      "screen.html",
+      location.href
+    );
+
+  url.searchParams.set(
+    "id",
+    id
+  );
+
+  return url.href;
 }
 
 const pageNames={
@@ -1583,10 +1591,6 @@ async function loadAll(){
     playlistItems=itemsResult.data||[];
     schedules=schedulesResult.data||[];
 
-    /*
-     * التأكد من وجود قائمة محتوى لكل شاشة.
-     * إذا الشاشة ما عندها Playlist، ينشئ لها واحدة تلقائيًا.
-     */
     await ensureDefaultPlaylists();
 
     renderDashboard();
@@ -1997,10 +2001,6 @@ function renderMedia(){
 
 function openMediaModal(addToContent=false){
 
-  /*
-   * إذا فتحنا النافذة من داخل المحتوى،
-   * نتأكد أن الشاشة وقائمة المحتوى موجودة.
-   */
   if(addToContent){
 
     if(!selectedScreenId){
@@ -2064,9 +2064,6 @@ document.getElementById("mediaFile")
       return;
     }
 
-    /*
-     * إذا اختار المستخدم فيديو، لا نحتاج مدة الصورة.
-     */
     document.getElementById("mediaDuration").disabled=
       file.type.startsWith("video/");
   });
@@ -2273,11 +2270,6 @@ async function saveMedia(){
     document.getElementById("mediaTags")
       .value.trim();
 
-  /*
-   * المصدر الوحيد للوسائط:
-   * ملف من جهاز المستخدم.
-   */
-
   if(!file){
 
     showToast(
@@ -2287,10 +2279,6 @@ async function saveMedia(){
     return;
   }
 
-  /*
-   * التحقق من الحجم.
-   */
-
   if(file.size>MAX_FILE_SIZE){
 
     showToast(
@@ -2299,10 +2287,6 @@ async function saveMedia(){
 
     return;
   }
-
-  /*
-   * التحقق من نوع الملف.
-   */
 
   const isImage=
     file.type.startsWith("image/");
@@ -2322,11 +2306,6 @@ async function saveMedia(){
       ?"image"
       :"video";
 
-  /*
-   * إذا كان المستخدم اختار النوع يدويًا بشكل مخالف
-   * لنوع الملف الحقيقي، نعتمد على نوع الملف الحقيقي.
-   */
-
   document.getElementById("mediaType").value=
     type;
 
@@ -2341,11 +2320,6 @@ async function saveMedia(){
         .map(tag=>tag.trim())
         .filter(Boolean)
       :[];
-
-  /*
-   * إذا أضفنا من داخل المحتوى،
-   * نتأكد من وجود Playlist.
-   */
 
   if(addingToContent){
 
@@ -2423,11 +2397,6 @@ async function saveMedia(){
 
   try{
 
-    /*
-     * قراءة أبعاد الملف قبل رفعه.
-     * هذا يمنع رفع ملف تالف أو غير قابل للقراءة.
-     */
-
     const dimensions=
       await readDimensions(
         file,
@@ -2441,10 +2410,6 @@ async function saveMedia(){
       "..."
     );
 
-    /*
-     * استخراج الامتداد.
-     */
-
     let extension="";
 
     if(file.name.includes(".")){
@@ -2457,10 +2422,6 @@ async function saveMedia(){
 
     }
 
-    /*
-     * تنظيف اسم الملف.
-     */
-
     const safeName=
       finalName
         .replace(
@@ -2471,10 +2432,6 @@ async function saveMedia(){
         .replace(/^-|-$/g,"")
         .substring(0,80);
 
-    /*
-     * اسم فريد للملف داخل Storage.
-     */
-
     filePath=
       Date.now()+
       "-"+
@@ -2484,10 +2441,6 @@ async function saveMedia(){
       "-"+
       (safeName||"media")+
       (extension?"."+extension:"");
-
-    /*
-     * رفع الملف الحقيقي إلى Supabase Storage.
-     */
 
     const uploadResult=
       await supabaseClient
@@ -2527,11 +2480,6 @@ async function saveMedia(){
       "تم رفع الملف، جاري حفظ بياناته..."
     );
 
-    /*
-     * إنشاء الرابط تلقائيًا.
-     * المستخدم لا يكتبه.
-     */
-
     const publicResult=
       supabaseClient
         .storage
@@ -2550,11 +2498,6 @@ async function saveMedia(){
       );
     }
 
-    /*
-     * مدة الفيديو إذا كانت متوفرة.
-     * الصور تستخدم المدة التي حددها المستخدم.
-     */
-
     let finalDuration=null;
 
     let videoDuration=null;
@@ -2570,10 +2513,6 @@ async function saveMedia(){
           ?dimensions.duration
           :null;
     }
-
-    /*
-     * حفظ بيانات الملف في جدول media.
-     */
 
     const {
       data,
@@ -2609,11 +2548,6 @@ async function saveMedia(){
 
     if(error){
 
-      /*
-       * إذا فشل حفظ بيانات الملف،
-       * نحذف الملف الذي رفعناه من Storage.
-       */
-
       await supabaseClient
         .storage
         .from(STORAGE_BUCKET)
@@ -2624,10 +2558,6 @@ async function saveMedia(){
       throw error;
     }
 
-    /*
-     * إضافة مدة الفيديو للواجهة فقط.
-     * جدول media الحالي يعتمد duration للصور.
-     */
     if(
       data&&
       type==="video"
@@ -2639,25 +2569,12 @@ async function saveMedia(){
 
     media.unshift(data);
 
-    /*
-     * إغلاق نافذة الرفع.
-     */
-
     closeModal(
       "mediaModal"
     );
 
-    /*
-     * إعادة عرض مكتبة الوسائط.
-     */
-
     renderMedia();
     updateStats();
-
-    /*
-     * إذا كان المستخدم أضاف الملف من داخل المحتوى،
-     * نضيفه مباشرة إلى Playlist.
-     */
 
     if(
       addingToContent&&
@@ -2680,11 +2597,6 @@ async function saveMedia(){
       "Media upload error:",
       error
     );
-
-    /*
-     * إذا تم رفع الملف إلى Storage
-     * ثم حدث خطأ بعد ذلك، نحاول تنظيفه.
-     */
 
     if(filePath){
 
@@ -2758,10 +2670,6 @@ async function deleteMedia(id){
 
   try{
 
-    /*
-     * نحذف من Storage أولًا.
-     */
-
     if(item.file_path){
 
       const {
@@ -2779,10 +2687,6 @@ async function deleteMedia(id){
         throw storageError;
       }
     }
-
-    /*
-     * ثم نحذف سجل قاعدة البيانات.
-     */
 
     const {error}=
       await supabaseClient
@@ -4075,10 +3979,6 @@ async function deleteSchedule(id){
 
 function closeModal(id){
 
-  /*
-   * لا نسمح بإغلاق نافذة الرفع
-   * أثناء رفع الملف.
-   */
   if(
     id==="mediaModal"&&
     mediaUploading
