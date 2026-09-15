@@ -611,17 +611,294 @@ html[dir=ltr] td{text-align:left}
 }
 
 @media(max-width:800px){
-  :root{--side:0px}
-  .sidebar{display:none}
-  .main{margin:0!important}
-  .screen-grid{grid-template-columns:repeat(2,1fr)}
-  .editor-layout{grid-template-columns:1fr}
+
+  :root{
+    --side:0px
+  }
+
+  .app{
+    display:block;
+    width:100%;
+    min-width:0
+  }
+
+  .sidebar{
+    position:relative;
+    top:auto;
+    right:auto;
+    bottom:auto;
+    left:auto;
+    width:100%;
+    height:auto;
+    border-left:0;
+    border-right:0;
+    border-bottom:1px solid var(--border);
+    display:block
+  }
+
+  html[dir=ltr] .sidebar{
+    right:auto;
+    left:auto;
+    border-left:0;
+    border-right:0;
+    border-bottom:1px solid var(--border)
+  }
+
+  .logo{
+    height:60px;
+    padding:0 15px
+  }
+
+  .logo-mark{
+    width:34px;
+    height:34px;
+    flex-shrink:0
+  }
+
+  .nav{
+    display:flex;
+    overflow-x:auto;
+    padding:7px 8px;
+    gap:4px;
+    flex:0;
+    scrollbar-width:none
+  }
+
+  .nav::-webkit-scrollbar{
+    display:none
+  }
+
+  .nav-button{
+    width:auto;
+    min-width:max-content;
+    margin:0;
+    padding:9px 11px;
+    justify-content:center;
+    text-align:center;
+    gap:6px;
+    white-space:nowrap;
+    flex-shrink:0
+  }
+
+  html[dir=ltr] .nav-button{
+    text-align:center
+  }
+
+  .nav-icon{
+    width:auto
+  }
+
+  .sidebar-bottom{
+    display:none
+  }
+
+  .main{
+    width:100%;
+    margin:0!important;
+    min-width:0
+  }
+
+  html[dir=ltr] .main{
+    width:100%;
+    margin:0!important
+  }
+
+  .topbar{
+    width:100%;
+    height:auto;
+    min-height:64px;
+    padding:10px 12px;
+    gap:10px
+  }
+
+  .page-title{
+    font-size:16px
+  }
+
+  .page-subtitle{
+    font-size:10px
+  }
+
+  .top-actions{
+    flex-shrink:0
+  }
+
+  .lang-button,
+  .refresh-button,
+  .btn{
+    font-size:10px
+  }
+
+  .content{
+    width:100%;
+    padding:12px
+  }
+
+  .screen-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    width:100%
+  }
+
+  .stats{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    width:100%
+  }
+
+  .editor-layout{
+    grid-template-columns:1fr;
+    width:100%
+  }
+
+  .card{
+    width:100%;
+    min-width:0;
+    overflow:hidden
+  }
+
+  .table-wrap{
+    width:100%;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch
+  }
+
+  table{
+    min-width:700px
+  }
+
+  .modal-backdrop{
+    padding:10px
+  }
+
+  .modal{
+    max-width:100%;
+    max-height:92vh;
+    padding:14px
+  }
 }
 
 @media(max-width:520px){
-  .content{padding:12px}
-  .screen-grid,.stats{grid-template-columns:1fr}
-  .topbar{padding:0 12px}
+
+  .logo{
+    height:56px;
+    padding:0 12px
+  }
+
+  .logo-mark{
+    width:32px;
+    height:32px;
+    border-radius:8px;
+    margin-left:8px
+  }
+
+  .logo-text{
+    font-size:14px
+  }
+
+  .logo-sub{
+    font-size:9px
+  }
+
+  .nav{
+    padding:6px
+  }
+
+  .nav-button{
+    padding:8px 10px;
+    font-size:10px
+  }
+
+  .topbar{
+    padding:9px 10px
+  }
+
+  .page-title{
+    font-size:15px
+  }
+
+  .page-subtitle{
+    font-size:9px
+  }
+
+  .top-actions{
+    gap:5px
+  }
+
+  .lang-button,
+  .refresh-button{
+    padding:7px 8px;
+    font-size:9px
+  }
+
+  .content{
+    padding:10px
+  }
+
+  .screen-grid{
+    grid-template-columns:1fr
+  }
+
+  .stats{
+    grid-template-columns:1fr 1fr;
+    gap:8px
+  }
+
+  .stat{
+    padding:12px
+  }
+
+  .stat-value{
+    font-size:21px
+  }
+
+  .card{
+    padding:12px
+  }
+
+  .card-header{
+    gap:8px
+  }
+
+  .card-title{
+    font-size:13px
+  }
+
+  .card-subtitle{
+    font-size:9px
+  }
+
+  .form-grid{
+    grid-template-columns:1fr
+  }
+
+  .form-group.full{
+    grid-column:auto
+  }
+
+  .content-item{
+    flex-wrap:wrap
+  }
+
+  .item-info{
+    min-width:calc(100% - 90px)
+  }
+
+  .item-controls{
+    width:100%;
+    justify-content:flex-start
+  }
+
+  .content-item select{
+    width:85px!important
+  }
+
+  .modal-actions{
+    flex-wrap:wrap
+  }
+
+  .modal-actions .btn{
+    flex:1;
+    min-width:80px
+  }
 }
 </style>
 </head>
@@ -1071,8 +1348,6 @@ html[dir=ltr] td{text-align:left}
 
 </div>
 
-<!-- SCREEN MODAL -->
-
 <div id="screenModal" class="modal-backdrop">
 
 <div class="modal">
@@ -1180,8 +1455,6 @@ word-break:break-all">
 
 </div>
 
-<!-- MEDIA MODAL -->
-
 <div id="mediaModal" class="modal-backdrop">
 
 <div class="modal">
@@ -1285,8 +1558,6 @@ line-height:1.6">
 </div>
 
 </div>
-
-<!-- SCHEDULE MODAL -->
 
 <div id="scheduleModal" class="modal-backdrop">
 
@@ -1438,10 +1709,6 @@ function setConnection(online,text){
   document.getElementById("connectionText").textContent=text;
 }
 
-/* =========================
-   SCREEN URL
-========================= */
-
 function getScreenUrl(id){
 
   const url =
@@ -1534,10 +1801,6 @@ document.getElementById("languageButton").onclick=()=>{
   );
 };
 
-/* =========================
-   LOAD DATA
-========================= */
-
 async function loadAll(){
 
   setConnection(true,"جاري الاتصال...");
@@ -1615,10 +1878,6 @@ async function loadAll(){
   }
 }
 
-/* =========================
-   AUTO CREATE PLAYLISTS
-========================= */
-
 async function ensureDefaultPlaylists(){
 
   const missingScreens=
@@ -1670,10 +1929,6 @@ async function ensureDefaultPlaylists(){
   }
 }
 
-/* =========================
-   STATS
-========================= */
-
 function updateStats(){
 
   document.getElementById("statScreens").textContent=
@@ -1693,10 +1948,6 @@ function updateStats(){
   document.getElementById("settingsScreenCount").textContent=
     screens.length;
 }
-
-/* =========================
-   SCREENS
-========================= */
 
 function orientationText(orientation){
 
@@ -1898,10 +2149,6 @@ function openSelectedScreen(){
   }
 }
 
-/* =========================
-   MEDIA
-========================= */
-
 function renderMedia(){
 
   const table=document.getElementById("mediaTable");
@@ -2033,10 +2280,6 @@ function openMediaModal(addToContent=false){
     .classList.add("show");
 }
 
-/* =========================
-   FILE TYPE
-========================= */
-
 document.getElementById("mediaFile")
   .addEventListener("change",function(){
 
@@ -2067,10 +2310,6 @@ document.getElementById("mediaFile")
     document.getElementById("mediaDuration").disabled=
       file.type.startsWith("video/");
   });
-
-/* =========================
-   UPLOAD UI
-========================= */
 
 function setUploadBusy(busy,message="جاري رفع الملف..."){
 
@@ -2107,10 +2346,6 @@ function setUploadBusy(busy,message="جاري رفع الملف..."){
   }
 }
 
-/* =========================
-   FILE SIZE
-========================= */
-
 function formatFileSize(bytes){
 
   if(!Number.isFinite(bytes))return "-";
@@ -2129,10 +2364,6 @@ function formatFileSize(bytes){
 
   return (bytes/(1024*1024*1024)).toFixed(2)+" GB";
 }
-
-/* =========================
-   READ FILE DIMENSIONS
-========================= */
 
 async function readDimensions(file,type){
 
@@ -2239,10 +2470,6 @@ async function readDimensions(file,type){
 
   }
 }
-
-/* =========================
-   UPLOAD MEDIA
-========================= */
 
 async function saveMedia(){
 
@@ -2634,10 +2861,6 @@ async function saveMedia(){
   }
 }
 
-/* =========================
-   DELETE MEDIA
-========================= */
-
 async function deleteMedia(id){
 
   const item=
@@ -2727,10 +2950,6 @@ async function deleteMedia(id){
     );
   }
 }
-
-/* =========================
-   CONTENT
-========================= */
 
 function prepareContentSelector(){
 
@@ -3091,10 +3310,6 @@ function renderContentItems(){
     ).join("");
 }
 
-/* =========================
-   ADD MEDIA TO PLAYLIST
-========================= */
-
 async function addMediaToPlaylist(mediaId){
 
   if(!selectedPlaylistId){
@@ -3184,10 +3399,6 @@ async function addMediaToPlaylist(mediaId){
     "تمت إضافة المحتوى"
   );
 }
-
-/* =========================
-   ITEM SETTINGS
-========================= */
 
 async function updateItemDuration(id,value){
 
@@ -3279,10 +3490,6 @@ async function updateItemTransition(id,value){
   }
 }
 
-/* =========================
-   DELETE PLAYLIST ITEM
-========================= */
-
 async function deletePlaylistItem(id){
 
   const {error}=
@@ -3313,10 +3520,6 @@ async function deletePlaylistItem(id){
     "تم حذف المحتوى"
   );
 }
-
-/* =========================
-   DRAG & DROP
-========================= */
 
 function dragStart(event){
 
@@ -3430,10 +3633,6 @@ async function dropItem(event){
   renderContentItems();
 }
 
-/* =========================
-   NORMALIZE POSITIONS
-========================= */
-
 async function normalizePositions(){
 
   const items=
@@ -3475,10 +3674,6 @@ async function normalizePositions(){
       );
   }
 }
-
-/* =========================
-   PLAYLIST SETTINGS
-========================= */
 
 async function savePlaylistSettings(){
 
@@ -3549,10 +3744,6 @@ async function savePlaylistSettings(){
     );
   }
 }
-
-/* =========================
-   PUBLISH
-========================= */
 
 async function publishCurrentScreen(){
 
@@ -3645,10 +3836,6 @@ async function publishCurrentScreen(){
     "🚀 تم نشر المحتوى على الشاشة"
   );
 }
-
-/* =========================
-   SCHEDULES
-========================= */
 
 function renderSchedules(){
 
@@ -3757,10 +3944,6 @@ function renderSchedules(){
     ).join("");
 }
 
-/* =========================
-   SCHEDULE MODAL
-========================= */
-
 function openScheduleModal(){
 
   const screenSelect=
@@ -3824,10 +4007,6 @@ function renderSchedulePlaylists(){
       )
       .join("");
 }
-
-/* =========================
-   SAVE SCHEDULE
-========================= */
 
 async function saveSchedule(){
 
@@ -3937,10 +4116,6 @@ async function saveSchedule(){
   );
 }
 
-/* =========================
-   DELETE SCHEDULE
-========================= */
-
 async function deleteSchedule(id){
 
   const {error}=
@@ -3972,10 +4147,6 @@ async function deleteSchedule(id){
     "تم حذف الجدولة"
   );
 }
-
-/* =========================
-   MODALS
-========================= */
 
 function closeModal(id){
 
@@ -4013,10 +4184,6 @@ document.querySelectorAll(".modal-backdrop")
     };
 
   });
-
-/* =========================
-   REALTIME
-========================= */
 
 function setupRealtime(){
 
@@ -4095,10 +4262,6 @@ function setupRealtime(){
     );
 }
 
-/* =========================
-   CONNECTION
-========================= */
-
 window.addEventListener(
   "online",
   ()=>{
@@ -4125,10 +4288,6 @@ window.addEventListener(
   }
 );
 
-/* =========================
-   LANGUAGE
-========================= */
-
 document.getElementById(
   "settingsLanguage"
 ).value=
@@ -4148,10 +4307,6 @@ document.getElementById(
   currentLanguage==="ar"
     ?"English"
     :"العربية";
-
-/* =========================
-   START
-========================= */
 
 (async function(){
 
