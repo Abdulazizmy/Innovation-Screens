@@ -2274,6 +2274,10 @@ html[dir="ltr"] .toast-container{
                   </select>
                 </div>
                 <div class="form-group">
+                  <label>مدة عرض الصورة (بالثواني)</label>
+                  <input class="form-input" id="playlistDuration" type="number" min="1" step="1" value="10" placeholder="10">
+                </div>
+                <div class="form-group">
                   <label data-i18n="fitMode">
                     طريقة عرض الوسائط
                   </label>
@@ -4512,7 +4516,7 @@ function loadPlaylistSettingsUI(){
  const p=selectedPlaylist; if(!p)return;
  document.getElementById("playlistName").value=p.name||"";
 
- document.getElementById("playlistTransition").value=p.default_transition||"fade";document.getElementById("playlistFit").value=p.fit_mode||"contain";
+ document.getElementById("playlistTransition").value=p.default_transition||"fade";document.getElementById("playlistFit").value=p.fit_mode||"contain";document.getElementById("playlistDuration").value=Number(p.default_duration)>0?Number(p.default_duration):10;
  document.getElementById("repeatSwitch").classList.toggle("active",p.repeat_all!==false);
 }
 function toggleRepeat(){document.getElementById("repeatSwitch").classList.toggle("active");}
@@ -4545,7 +4549,7 @@ function openScreenContent(id){
   navigate("content");
 }
 async function savePlaylistSettings(){
- if(!selectedPlaylist)return;const payload={name:document.getElementById("playlistName").value.trim()||selectedPlaylist.name,default_duration:0,default_transition:document.getElementById("playlistTransition").value,fit_mode:document.getElementById("playlistFit").value,repeat_all:document.getElementById("repeatSwitch").classList.contains("active")};
+ if(!selectedPlaylist)return;const duration=Math.max(1,Number(document.getElementById("playlistDuration").value)||10);const payload={name:document.getElementById("playlistName").value.trim()||selectedPlaylist.name,default_duration:duration,default_transition:document.getElementById("playlistTransition").value,fit_mode:document.getElementById("playlistFit").value,repeat_all:document.getElementById("repeatSwitch").classList.contains("active")};
  const {data,error}=await supabaseClient.from("playlists").update(payload).eq("id",selectedPlaylist.id).select().single();if(error){toast(error.message||t("error"),"error");return;}selectedPlaylist=data;playlists=playlists.map(p=>p.id===data.id?data:p);toast("تم حفظ إعدادات المحتوى");renderPlaylistItems();
 }
 async function updatePlaylistItem(id,patch){const {data,error}=await supabaseClient.from("playlist_items").update(patch).eq("id",id).select(`*,media:media_id(*)`).single();if(error){toast(error.message||t("error"),"error");return;}playlistItems=playlistItems.map(i=>String(i.id)===String(id)?data:i);if(selectedPlaylist&&selectedContentScreenId) await autoPublishPlaylistForScreen(selectedContentScreenId,selectedPlaylist.id);renderPlaylistItems();}
