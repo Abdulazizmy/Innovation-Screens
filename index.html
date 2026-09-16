@@ -17,16 +17,16 @@
   --panel3:#211b30;
   --border:#2c2539;
   --border2:#382f48;
-  --primary:#6d5dfc;
-  --primary2:#8174ff;
-  --primary-dark:#5144d8;
+  --primary:#2A206A;
+  --primary2:#7C32C9;
+  --primary-dark:#211851;
   --text:#f4f1fa;
   --text2:#c7c1d4;
   --muted:#8f889d;
-  --success:#36c98f;
+  --success:#1CC182;
   --warning:#f3b84b;
   --danger:#ef6262;
-  --info:#5da9ff;
+  --info:#00ABAF;
   --sidebar:270px;
   --topbar:72px;
   --radius:14px;
@@ -49,6 +49,129 @@ body.theme-light .card,body.theme-light .screen-card,body.theme-light .settings-
 body.theme-light .media-picker-item,body.theme-light .picker-item{background:#fff;color:var(--text)}
 body.theme-light .media-picker-thumb,body.theme-light .item-thumb{background:#f0f1f4}
 body.theme-light .screen-preview{background:#eef0f4}
+
+/* =========================
+   ADMIN PIN LOCK
+========================= */
+body.pin-locked{
+  overflow:hidden;
+}
+body.pin-locked .app,
+body.pin-locked .toast-container{
+  visibility:hidden;
+  pointer-events:none;
+}
+.pin-lock{
+  position:fixed;
+  inset:0;
+  z-index:100000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:
+    radial-gradient(circle at 50% 15%, rgba(124,50,201,.18), transparent 34%),
+    #0b0912;
+}
+.pin-lock-card{
+  width:min(420px,100%);
+  padding:34px;
+  border:1px solid #382f48;
+  border-radius:20px;
+  background:#15111f;
+  box-shadow:0 24px 80px rgba(0,0,0,.45);
+  text-align:center;
+}
+.pin-lock-icon{
+  width:58px;
+  height:58px;
+  margin:0 auto 18px;
+  display:grid;
+  place-items:center;
+  border-radius:16px;
+  background:linear-gradient(135deg,#2A206A,#7C32C9);
+  font-size:25px;
+}
+.pin-lock-card h1{
+  margin:0 0 8px;
+  color:#f4f1fa;
+  font-size:23px;
+}
+.pin-lock-card p{
+  margin:0 0 22px;
+  color:#a9a2b6;
+  font-size:14px;
+  line-height:1.7;
+}
+.pin-input{
+  width:100%;
+  height:50px;
+  border:1px solid #382f48;
+  border-radius:12px;
+  background:#0f0c17;
+  color:#f4f1fa;
+  text-align:center;
+  font-size:20px;
+  letter-spacing:6px;
+  outline:none;
+}
+.pin-input:focus{
+  border-color:#7C32C9;
+  box-shadow:0 0 0 3px rgba(124,50,201,.14);
+}
+.pin-submit{
+  width:100%;
+  height:48px;
+  margin-top:12px;
+  border:0;
+  border-radius:12px;
+  background:linear-gradient(135deg,#2A206A,#7C32C9);
+  color:#fff;
+  font-weight:700;
+}
+.pin-submit:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+.pin-error{
+  min-height:22px;
+  margin-top:12px;
+  color:#ef6262;
+  font-size:13px;
+}
+.pin-lock-btn{
+  width:100%;
+  min-height:40px;
+  margin-bottom:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:transparent;
+  color:var(--text2);
+  font-size:12px;
+}
+.pin-lock-btn:hover{
+  border-color:var(--primary2);
+  color:var(--text);
+}
+body.theme-light .pin-lock{
+  background:#e7e8ec;
+}
+body.theme-light .pin-lock-card{
+  background:#dfe1e6;
+  border-color:#c9ccd3;
+  box-shadow:0 24px 70px rgba(30,32,40,.14);
+}
+body.theme-light .pin-lock-card h1{color:#29272e}
+body.theme-light .pin-lock-card p{color:#625e68}
+body.theme-light .pin-input{
+  background:#d5d7dc;
+  color:#29272e;
+  border-color:#c0c3ca;
+}
 
 html,
 body{
@@ -87,7 +210,7 @@ a{
   background:
     radial-gradient(
       circle at 85% -10%,
-      rgba(109,93,252,.12),
+      rgba(42,32,106,.16),
       transparent 30%
     ),
     var(--bg);
@@ -211,8 +334,8 @@ html[dir="ltr"] .sidebar{
   background:
     linear-gradient(
       90deg,
-      rgba(109,93,252,.22),
-      rgba(109,93,252,.08)
+      rgba(42,32,106,.24),
+      rgba(124,50,201,.10)
     );
   color:#fff;
   box-shadow:
@@ -494,7 +617,7 @@ html[dir="ltr"] .main{
   width:80px;
   height:80px;
   border-radius:50%;
-  background:rgba(109,93,252,.08);
+  background:rgba(124,50,201,.10);
   top:-35px;
   left:-25px;
 }
@@ -1644,9 +1767,133 @@ html[dir="ltr"] .toast-container{
 *::-webkit-scrollbar-track{background:#0c0910}
 *::-webkit-scrollbar-thumb{background:#3b3348;border-radius:999px;border:1px solid #17131e}
 *::-webkit-scrollbar-thumb:hover{background:#514665}
+
+/* ===== Innovation Screens Brand Color Refresh ===== */
+:root{
+  --bg:#090714;
+  --bg2:#100b1d;
+  --panel:#151025;
+  --panel2:#1b1430;
+  --panel3:#241a3d;
+  --border:#34265a;
+  --border2:#4a3474;
+  --primary:#2A206A;
+  --primary2:#7C32C9;
+  --primary-dark:#211851;
+  --success:#1CC182;
+  --info:#00ABAF;
+  --warning:#f3b84b;
+  --danger:#ef6262;
+}
+body.theme-light{
+  --bg:#f7f5fb;
+  --bg2:#f0edf7;
+  --panel:#ffffff;
+  --panel2:#faf8fd;
+  --panel3:#f1edf8;
+  --border:#ddd5eb;
+  --border2:#c9b9df;
+  --primary:#2A206A;
+  --primary2:#7C32C9;
+  --primary-dark:#211851;
+  --success:#1CC182;
+  --info:#00ABAF;
+}
+.app{
+  background:
+    radial-gradient(circle at 88% -8%, rgba(124,50,201,.24), transparent 28%),
+    radial-gradient(circle at 5% 105%, rgba(0,171,175,.10), transparent 25%),
+    var(--bg);
+}
+.sidebar{
+  background:linear-gradient(180deg,#17102b 0%,#100b1d 100%) !important;
+  border-left-color:#34265a !important;
+}
+.sidebar .nav-item.active,
+.sidebar .menu-item.active{
+  background:linear-gradient(135deg,rgba(42,32,106,.95),rgba(124,50,201,.78)) !important;
+  border-color:rgba(124,50,201,.55) !important;
+  box-shadow:0 8px 22px rgba(42,32,106,.28);
+}
+.topbar{
+  background:rgba(15,10,27,.90) !important;
+  border-bottom-color:#34265a !important;
+  backdrop-filter:blur(14px);
+}
+.btn.primary,
+.btn-primary,
+button.primary{
+  background:linear-gradient(135deg,#2A206A,#7C32C9) !important;
+  border-color:#7C32C9 !important;
+  box-shadow:0 6px 18px rgba(124,50,201,.22);
+}
+.btn.primary:hover,
+.btn-primary:hover,
+button.primary:hover{
+  filter:brightness(1.10);
+}
+.badge.success,.status.success,.tag.success{background:rgba(28,193,130,.14) !important;color:#62e0ad !important;border-color:rgba(28,193,130,.30) !important}
+.badge.info,.status.info,.tag.info{background:rgba(0,171,175,.14) !important;color:#58dadd !important;border-color:rgba(0,171,175,.30) !important}
+.stat-card,
+.card,
+.screen-card,
+.settings-section,
+.media-card,
+.schedule-card{
+  border-color:#34265a !important;
+}
+.stat-card:hover,
+.card:hover,
+.screen-card:hover,
+.media-card:hover,
+.schedule-card:hover{
+  border-color:#7C32C9 !important;
+  box-shadow:0 12px 30px rgba(42,32,106,.18) !important;
+}
+.screen-preview{
+  background:linear-gradient(145deg,#17112a,#241a3d) !important;
+  border-color:#34265a !important;
+}
+input:focus,select:focus,textarea:focus{
+  border-color:#00ABAF !important;
+  box-shadow:0 0 0 3px rgba(0,171,175,.12) !important;
+}
+.switch input:checked + .slider,
+input[type="checkbox"]:checked{
+  accent-color:#1CC182;
+}
+.filter-btn.active,
+.tab.active,
+.segment.active{
+  background:rgba(124,50,201,.18) !important;
+  border-color:#7C32C9 !important;
+  color:#d8b8ff !important;
+}
+.progress-bar,.progress-fill{background:linear-gradient(90deg,#2A206A,#7C32C9,#00ABAF) !important}
+*{scrollbar-color:#7C32C9 #100b1d !important}
+*::-webkit-scrollbar-track{background:#100b1d !important}
+*::-webkit-scrollbar-thumb{background:linear-gradient(#2A206A,#7C32C9) !important;border-color:#211851 !important}
+*::-webkit-scrollbar-thumb:hover{background:#00ABAF !important}
+body.theme-light .sidebar{background:linear-gradient(180deg,#ffffff 0%,#f3effa 100%) !important}
+body.theme-light .topbar{background:rgba(255,255,255,.94) !important}
+body.theme-light .app{background:radial-gradient(circle at 88% -8%,rgba(124,50,201,.10),transparent 28%),var(--bg)}
+
 </style>
 </head>
-<body>
+<body class="pin-locked">
+<!-- Admin PIN lock -->
+<div class="pin-lock" id="pinLock">
+  <div class="pin-lock-card">
+    <div class="pin-lock-icon">🔐</div>
+    <h1 data-i18n="pinTitle">تسجيل الدخول</h1>
+    <p data-i18n="pinDesc">أدخل الرقم السري للوصول إلى لوحة التحكم.</p>
+    <form id="pinForm" onsubmit="return verifyAdminPin(event)">
+      <input id="adminPinInput" class="pin-input" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="12" autocomplete="off" data-i18n-placeholder="pinPlaceholder" placeholder="الرقم السري" aria-label="الرقم السري">
+      <button class="pin-submit" type="submit" data-i18n="pinEnter">دخول</button>
+    </form>
+    <div class="pin-error" id="pinError" role="alert"></div>
+  </div>
+</div>
 <div class="app">
   <!-- =========================
        SIDEBAR
@@ -1766,6 +2013,10 @@ html[dir="ltr"] .toast-container{
       </button>
     </nav>
     <div class="sidebar-footer">
+      <button class="pin-lock-btn" type="button" onclick="lockAdminPanel()">
+        <span>🔒</span>
+        <span data-i18n="lockPanel">قفل لوحة التحكم</span>
+      </button>
       <div class="connection">
         <span
           class="connection-dot"
@@ -1802,7 +2053,7 @@ html[dir="ltr"] .toast-container{
         <button
           class="menu-button"
           onclick="toggleSidebar()"
-          aria-label="Menu"
+          aria-label="Menu" data-i18n-aria-label="menu"
         >
           ☰
         </button>
@@ -2274,7 +2525,7 @@ html[dir="ltr"] .toast-container{
                   </select>
                 </div>
                 <div class="form-group">
-                  <label>مدة عرض الصورة (بالثواني)</label>
+                  <label data-i18n="imageDuration">مدة عرض الصورة (بالثواني)</label>
                   <input class="form-input" id="playlistDuration" type="number" min="1" step="1" value="10" placeholder="10">
                 </div>
                 <div class="form-group">
@@ -2437,8 +2688,8 @@ html[dir="ltr"] .toast-container{
                 <span data-i18n="themeDesc">اختر مظهر لوحة التحكم.</span>
               </div>
               <div class="lang-switch">
-                <button class="lang-btn" id="themeDarkBtn" onclick="setTheme('dark')">داكن</button>
-                <button class="lang-btn" id="themeLightBtn" onclick="setTheme('light')">طبيعي</button>
+                <button class="lang-btn" id="themeDarkBtn" onclick="setTheme('dark')" data-i18n="dark">داكن</button>
+                <button class="lang-btn" id="themeLightBtn" onclick="setTheme('light')" data-i18n="light">طبيعي</button>
               </div>
             </div>
           </div>
@@ -2535,19 +2786,19 @@ html[dir="ltr"] .toast-container{
           >
         </div>
         <div class="form-group full">
-          <label>مقاس الشاشة</label>
+          <label data-i18n="screenSize">مقاس الشاشة</label>
           <select class="form-select" id="screenPreset" onchange="applyScreenPreset()">
-            <option value="1920x1080">1920 × 1080 — أفقي Full HD</option>
-            <option value="1080x1920">1080 × 1920 — عمودي Full HD</option>
-            <option value="1280x720">1280 × 720 — أفقي HD</option>
-            <option value="720x1280">720 × 1280 — عمودي HD</option>
-            <option value="1366x768">1366 × 768 — شاشة كمبيوتر</option>
-            <option value="768x1366">768 × 1366 — عمودي</option>
-            <option value="3840x2160">3840 × 2160 — أفقي 4K</option>
-            <option value="2160x3840">2160 × 3840 — عمودي 4K</option>
-            <option value="1080x1080">1080 × 1080 — مربع</option>
-            <option value="358x1600">358 × 1600 — طولي</option>
-            <option value="custom">مقاس مخصص</option>
+            <option value="1920x1080" data-i18n="presetFhdLandscape">1920 × 1080 — أفقي Full HD</option>
+            <option value="1080x1920" data-i18n="presetFhdPortrait">1080 × 1920 — عمودي Full HD</option>
+            <option value="1280x720" data-i18n="presetHdLandscape">1280 × 720 — أفقي HD</option>
+            <option value="720x1280" data-i18n="presetHdPortrait">720 × 1280 — عمودي HD</option>
+            <option value="1366x768" data-i18n="presetComputer">1366 × 768 — شاشة كمبيوتر</option>
+            <option value="768x1366" data-i18n="presetPortrait">768 × 1366 — عمودي</option>
+            <option value="3840x2160" data-i18n="preset4kLandscape">3840 × 2160 — أفقي 4K</option>
+            <option value="2160x3840" data-i18n="preset4kPortrait">2160 × 3840 — عمودي 4K</option>
+            <option value="1080x1080" data-i18n="presetSquare">1080 × 1080 — مربع</option>
+            <option value="358x1600" data-i18n="presetColumn">358 × 1600 — طولي</option>
+            <option value="custom" data-i18n="presetCustom">مقاس مخصص</option>
           </select>
         </div>
         <div class="form-group">
@@ -2917,6 +3168,22 @@ let realtimeChannels = [];
 ========================================================= */
 const I18N = {
   ar: {
+    pinTitle:
+      "تسجيل الدخول",
+    pinDesc:
+      "أدخل الرقم السري للوصول إلى لوحة التحكم.",
+    pinPlaceholder:
+      "الرقم السري",
+    pinEnter:
+      "دخول",
+    pinWrong:
+      "الرقم السري غير صحيح.",
+    pinConnectionError:
+      "تعذر التحقق من الرقم السري.",
+    pinEmpty:
+      "أدخل الرقم السري.",
+    lockPanel:
+      "قفل لوحة التحكم",
     brandName:
       "مركز الابتكار",
     brandSub:
@@ -3191,10 +3458,167 @@ const I18N = {
       "صورة",
     video:
       "فيديو",
+
+    menu:
+      "القائمة",
+    resolution:
+      "الدقة",
+    screenStopped:
+      "الشاشة متوقفة",
+    copyUrl:
+      "نسخ الرابط",
+    manageContent:
+      "إدارة المحتوى",
+    turnOn:
+      "تشغيل",
+    turnOff:
+      "إيقاف",
+    screenSize:
+      "مقاس الشاشة",
+    presetFhdLandscape:
+      "1920 × 1080 — أفقي Full HD",
+    presetFhdPortrait:
+      "1080 × 1920 — عمودي Full HD",
+    presetHdLandscape:
+      "1280 × 720 — أفقي HD",
+    presetHdPortrait:
+      "720 × 1280 — عمودي HD",
+    presetComputer:
+      "1366 × 768 — شاشة كمبيوتر",
+    presetPortrait:
+      "768 × 1366 — عمودي",
+    preset4kLandscape:
+      "3840 × 2160 — أفقي 4K",
+    preset4kPortrait:
+      "2160 × 3840 — عمودي 4K",
+    presetSquare:
+      "1080 × 1080 — مربع",
+    presetColumn:
+      "358 × 1600 — طولي",
+    presetCustom:
+      "مقاس مخصص",
+    imageDuration:
+      "مدة عرض الصورة (بالثواني)",
+    dark:
+      "داكن",
+    light:
+      "طبيعي",
+    noPlaylistForScreen:
+      "لا توجد قائمة محتوى لهذه الشاشة",
+    playlistWillBeCreated:
+      "سيتم إنشاء قائمة عند إضافة أول محتوى.",
+    screenContent:
+      "محتوى الشاشة",
+    contentCountNote:
+      "عنصر · يمكنك حذف المحتوى من الشاشة فقط، وسيبقى في مكتبة الوسائط.",
+    noContentForScreen:
+      "لا يوجد محتوى لهذه الشاشة",
+    addImagesVideos:
+      "أضف الصور أو الفيديوهات من مكتبة الوسائط.",
+    staticImage:
+      "صورة ثابتة",
+    firstItem:
+      "سيظهر أولًا",
+    orderNumber:
+      "ترتيب رقم",
+    makeFirst:
+      "جعله أول عنصر",
+    moveUp:
+      "تقديم",
+    moveDown:
+      "تأخير",
+    deleteContentOnly:
+      "حذف هذا المحتوى من الشاشة فقط",
+    deleteContentConfirm:
+      "حذف هذا المحتوى من الشاشة فقط؟\n\nالملف سيبقى محفوظًا في مكتبة الوسائط.",
+    chooseScreenFirst:
+      "اختر شاشة أولاً",
+    contentNotFound:
+      "تعذر العثور على المحتوى داخل هذه الشاشة",
+    deleteContentError:
+      "تعذر حذف المحتوى من الشاشة",
+    deleteUpdatedWarning:
+      "تم الحذف، لكن تعذر تحديث القائمة مباشرة. أعد فتح الصفحة.",
+    contentDeletedFromScreen:
+      "تم حذف المحتوى من الشاشة فقط، وبقي في مكتبة الوسائط",
+    noMediaShort:
+      "لا توجد وسائط.",
+    selectAtLeastOne:
+      "حدد محتوى واحدًا على الأقل",
+    screenNotFound:
+      "الشاشة غير موجودة",
+    createPlaylistError:
+      "تعذر إنشاء قائمة المحتوى",
+    addContentError:
+      "تعذر إضافة المحتوى",
+    contentAddedAndUpdated:
+      "تمت إضافة {count} محتوى وتحديث الشاشة تلقائيًا",
+    screenUpdateError:
+      "تعذر تحديث الشاشة",
+    contentPublishedToScreen:
+      "تم نشر المحتوى للشاشة",
+    noSchedules:
+      "لا توجد جدولات",
+    noSchedulesDesc:
+      "أضف جدولة لتحديد المحتوى الذي يظهر على الشاشة في وقت معين.",
+    scheduleTableScreen:
+      "الشاشة",
+    scheduleTableContent:
+      "المحتوى",
+    scheduleTablePeriod:
+      "الفترة",
+    scheduleTablePriority:
+      "الأولوية",
+    scheduleTableStatus:
+      "الحالة",
+    scheduleTableActions:
+      "الإجراءات",
+    inactiveStatus:
+      "غير نشطة",
+    activeStatus:
+      "نشطة",
+    endDateAfterStart:
+      "تاريخ النهاية يجب أن يكون بعد تاريخ البداية",
+    playlistWrongScreen:
+      "قائمة المحتوى لا تتبع الشاشة المحددة",
+    addScreenFirst:
+      "أضف شاشة أولاً",
+    editSchedule:
+      "تعديل جدولة",
+    editScreen:
+      "تعديل الشاشة",
+    contentSettingsSaved:
+      "تم حفظ إعدادات المحتوى",
+    orderUpdated:
+      "تم تغيير ترتيب المحتوى وتحديث الشاشة",
+    screenStoppedOption:
+      "متوقفة",
+    file:
+      "ملف",
+    playlistFallback:
+      "قائمة محتوى",
+    contentFor:
+      "محتوى",
     seconds:
       "ثانية"
   },
   en: {
+    pinTitle:
+      "Sign in",
+    pinDesc:
+      "Enter the PIN to access the admin panel.",
+    pinPlaceholder:
+      "PIN",
+    pinEnter:
+      "Enter",
+    pinWrong:
+      "Incorrect PIN.",
+    pinConnectionError:
+      "Unable to verify the PIN.",
+    pinEmpty:
+      "Enter the PIN.",
+    lockPanel:
+      "Lock admin panel",
     brandName:
       "Innovation Hub",
     brandSub:
@@ -3469,6 +3893,147 @@ const I18N = {
       "Image",
     video:
       "Video",
+
+    menu:
+      "Menu",
+    resolution:
+      "Resolution",
+    screenStopped:
+      "Screen stopped",
+    copyUrl:
+      "Copy URL",
+    manageContent:
+      "Manage Content",
+    turnOn:
+      "Start",
+    turnOff:
+      "Stop",
+    screenSize:
+      "Screen Size",
+    presetFhdLandscape:
+      "1920 × 1080 — Landscape Full HD",
+    presetFhdPortrait:
+      "1080 × 1920 — Portrait Full HD",
+    presetHdLandscape:
+      "1280 × 720 — Landscape HD",
+    presetHdPortrait:
+      "720 × 1280 — Portrait HD",
+    presetComputer:
+      "1366 × 768 — Computer Display",
+    presetPortrait:
+      "768 × 1366 — Portrait",
+    preset4kLandscape:
+      "3840 × 2160 — Landscape 4K",
+    preset4kPortrait:
+      "2160 × 3840 — Portrait 4K",
+    presetSquare:
+      "1080 × 1080 — Square",
+    presetColumn:
+      "358 × 1600 — Tall",
+    presetCustom:
+      "Custom Size",
+    imageDuration:
+      "Image display duration (seconds)",
+    dark:
+      "Dark",
+    light:
+      "Light",
+    noPlaylistForScreen:
+      "No playlist for this screen",
+    playlistWillBeCreated:
+      "A playlist will be created when you add the first item.",
+    screenContent:
+      "Screen content",
+    contentCountNote:
+      "items · You can remove content from the screen only; it will remain in the media library.",
+    noContentForScreen:
+      "No content for this screen",
+    addImagesVideos:
+      "Add images or videos from the media library.",
+    staticImage:
+      "Static image",
+    firstItem:
+      "Shown first",
+    orderNumber:
+      "Order",
+    makeFirst:
+      "Make first item",
+    moveUp:
+      "Move up",
+    moveDown:
+      "Move down",
+    deleteContentOnly:
+      "Remove this content from the screen only",
+    deleteContentConfirm:
+      "Remove this content from the screen only?\n\nThe file will remain in the media library.",
+    chooseScreenFirst:
+      "Select a screen first",
+    contentNotFound:
+      "Could not find this content on the selected screen",
+    deleteContentError:
+      "Could not remove content from the screen",
+    deleteUpdatedWarning:
+      "Deleted, but the list could not be refreshed. Reopen the page.",
+    contentDeletedFromScreen:
+      "Content removed from the screen only; it remains in the media library",
+    noMediaShort:
+      "No media.",
+    selectAtLeastOne:
+      "Select at least one item",
+    screenNotFound:
+      "Screen not found",
+    createPlaylistError:
+      "Could not create the playlist",
+    addContentError:
+      "Could not add content",
+    contentAddedAndUpdated:
+      "Added {count} item(s) and updated the screen automatically",
+    screenUpdateError:
+      "Could not update the screen",
+    contentPublishedToScreen:
+      "Content published to screen",
+    noSchedules:
+      "No schedules",
+    noSchedulesDesc:
+      "Add a schedule to define what content appears on the screen at a specific time.",
+    scheduleTableScreen:
+      "Screen",
+    scheduleTableContent:
+      "Content",
+    scheduleTablePeriod:
+      "Period",
+    scheduleTablePriority:
+      "Priority",
+    scheduleTableStatus:
+      "Status",
+    scheduleTableActions:
+      "Actions",
+    inactiveStatus:
+      "Inactive",
+    activeStatus:
+      "Active",
+    endDateAfterStart:
+      "End date must be on or after the start date",
+    playlistWrongScreen:
+      "The playlist does not belong to the selected screen",
+    addScreenFirst:
+      "Add a screen first",
+    editSchedule:
+      "Edit Schedule",
+    editScreen:
+      "Edit Screen",
+    contentSettingsSaved:
+      "Content settings saved",
+    orderUpdated:
+      "Content order updated and screen refreshed",
+    screenStoppedOption:
+      "Stopped",
+    file:
+      "File",
+    playlistFallback:
+      "Playlist",
+    contentFor:
+      "Content for",
     seconds:
       "seconds"
   }
@@ -3497,6 +4062,12 @@ function applyTranslations(){
         el.getAttribute("data-i18n");
       el.textContent =
         t(key);
+    });
+  document
+    .querySelectorAll("[data-i18n-aria-label]")
+    .forEach(el => {
+      const key = el.getAttribute("data-i18n-aria-label");
+      el.setAttribute("aria-label", t(key));
     });
   document
     .querySelectorAll("[data-i18n-placeholder]")
@@ -4246,7 +4817,7 @@ function renderScreens(){
                 )}
               </span>
             </div>
-            ${screen.enabled === false ? `<div style="position:absolute;left:10px;top:10px;background:#5b1f2a;color:#ffd9df;padding:5px 9px;border-radius:8px;font-size:11px">الشاشة متوقفة</div>` : ""}
+            ${screen.enabled === false ? `<div style="position:absolute;left:10px;top:10px;background:#5b1f2a;color:#ffd9df;padding:5px 9px;border-radius:8px;font-size:11px">${escapeHtml(t("screenStopped"))}</div>` : ""}
             <div class="screen-status">
               <span
                 class="screen-status-dot ${
@@ -4279,9 +4850,7 @@ function renderScreens(){
               <div class="info-box">
                 <span data-i18n="resolution">
                   ${escapeHtml(
-                    currentLanguage === "ar"
-                      ? "الدقة"
-                      : "Resolution"
+                    t("resolution")
                   )}
                 </span>
                 <strong>
@@ -4295,9 +4864,7 @@ function renderScreens(){
               <div class="info-box">
                 <span>
                   ${escapeHtml(
-                    currentLanguage === "ar"
-                      ? "الاتجاه"
-                      : "Orientation"
+                    t("orientation")
                   )}
                 </span>
                 <strong>
@@ -4309,9 +4876,9 @@ function renderScreens(){
             </div>
             <div class="screen-actions">
               <button class="btn btn-sm" onclick="openScreenUrl(${Number(screen.id)})">${escapeHtml(t("open"))}</button>
-              <button class="btn btn-sm" onclick="copyScreenUrl(${Number(screen.id)})">نسخ الرابط</button>
-              <button class="btn btn-sm btn-primary" onclick="openScreenContent(${Number(screen.id)})">إدارة المحتوى</button>
-              <button class="btn btn-sm ${screen.enabled === false ? "btn-primary" : ""}" onclick="toggleScreenEnabled(${Number(screen.id)})">${screen.enabled === false ? "تشغيل" : "إيقاف"}</button>
+              <button class="btn btn-sm" onclick="copyScreenUrl(${Number(screen.id)})">${escapeHtml(t("copyUrl"))}</button>
+              <button class="btn btn-sm btn-primary" onclick="openScreenContent(${Number(screen.id)})">${escapeHtml(t("manageContent"))}</button>
+              <button class="btn btn-sm ${screen.enabled === false ? "btn-primary" : ""}" onclick="toggleScreenEnabled(${Number(screen.id)})">${screen.enabled === false ? t("turnOn") : t("turnOff")}</button>
               <button
                 class="btn btn-sm"
                 onclick="openScreenModal(${Number(screen.id)})"
@@ -4348,9 +4915,7 @@ function openScreenModal(id = null){
     document.getElementById(
       "screenModalTitle"
     ).textContent =
-      currentLanguage === "ar"
-        ? "تعديل الشاشة"
-        : "Edit Screen";
+      t("editScreen");
     document.getElementById(
       "screenName"
     ).value =
@@ -4373,9 +4938,7 @@ function openScreenModal(id = null){
     document.getElementById(
       "screenModalTitle"
     ).textContent =
-      currentLanguage === "ar"
-        ? "إضافة شاشة"
-        : "Add Screen";
+      t("addScreen");
     document.getElementById(
       "screenName"
     ).value =
@@ -4508,7 +5071,7 @@ function renderContentPage(){
  if(!selectedContentScreenId&&screens.length)selectedContentScreenId=Number(screens[0].id);
  selectedPlaylist=selectedContentScreenId?getPlaylistForScreen(selectedContentScreenId):null;
  const sel=document.getElementById("contentScreenSelect");if(!sel)return;
- sel.innerHTML=screens.map(x=>`<option value="${x.id}" ${Number(x.id)===Number(selectedContentScreenId)?"selected":""}>${escapeHtml(x.name)}${x.enabled===false?" — متوقفة":""}</option>`).join("");
+ sel.innerHTML=screens.map(x=>`<option value="${x.id}" ${Number(x.id)===Number(selectedContentScreenId)?"selected":""}>${escapeHtml(x.name)}${x.enabled===false?` — ${t("screenStoppedOption")}`:""}</option>`).join("");
  loadPlaylistSettingsUI();renderPlaylistItems();
 }
 function selectContentScreen(id){selectedContentScreenId=Number(id);renderContentPage();}
@@ -4524,23 +5087,23 @@ function renderPlaylistItems(){
   const box=document.getElementById("playlistItems");
   if(!box)return;
   const items=selectedPlaylist?getItemsForPlaylist(selectedPlaylist.id).filter(i=>i.enabled!==false):[];
-  const addButton=`<button class="btn btn-sm btn-primary" onclick="openMediaPicker()">+ إضافة من المكتبة</button>`;
+  const addButton=`<button class="btn btn-sm btn-primary" onclick="openMediaPicker()">+ ${escapeHtml(t("addFromLibrary"))}</button>`;
   if(!selectedPlaylist){
-    box.innerHTML=`<div class="empty-state"><div class="empty-icon">☷</div><strong>لا توجد قائمة محتوى لهذه الشاشة</strong><span>سيتم إنشاء قائمة عند إضافة أول محتوى.</span><div style="margin-top:14px">${addButton}</div></div>`;
+    box.innerHTML=`<div class="empty-state"><div class="empty-icon">☷</div><strong>${escapeHtml(t("noPlaylistForScreen"))}</strong><span>${escapeHtml(t("playlistWillBeCreated"))}</span><div style="margin-top:14px">${addButton}</div></div>`;
     return;
   }
-  const summary=`<div class="content-summary"><div><strong>محتوى الشاشة: ${escapeHtml(selectedPlaylist.name||"")}</strong><span style="display:block;margin-top:4px">${items.length} عنصر · يمكنك حذف المحتوى من الشاشة فقط، وسيبقى في مكتبة الوسائط.</span></div>${addButton}</div>`;
+  const summary=`<div class="content-summary"><div><strong>${escapeHtml(t("screenContent"))}: ${escapeHtml(selectedPlaylist.name||"")}</strong><span style="display:block;margin-top:4px">${items.length} ${escapeHtml(t("contentCountNote"))}</span></div>${addButton}</div>`;
   if(!items.length){
-    box.innerHTML=summary+`<div class="empty-state"><div class="empty-icon">☷</div><strong>لا يوجد محتوى لهذه الشاشة</strong><span>أضف الصور أو الفيديوهات من مكتبة الوسائط.</span></div>`;
+    box.innerHTML=summary+`<div class="empty-state"><div class="empty-icon">☷</div><strong>${escapeHtml(t("noContentForScreen"))}</strong><span>${escapeHtml(t("addImagesVideos"))}</span></div>`;
     return;
   }
   box.innerHTML=summary+items.map((item,index)=>{
     const m=item.media||media.find(x=>String(x.id)===String(item.media_id))||{};
     return `<div class="playlist-item">
       <div class="playlist-number">${index+1}</div>
-      <div class="item-thumb">${m.type==="image"?`<img src="${escapeHtml(m.file_url||"")}" alt="">`:`<video src="${escapeHtml(m.file_url||"")}" muted playsinline></video>`}<span class="thumb-type">${m.type==="image"?"صورة":"فيديو"}</span></div>
-      <div class="item-info"><strong>${escapeHtml(m.name||"ملف")}</strong><span class="item-position">${index===0?"سيظهر أولًا · ":"ترتيب رقم "+(index+1)+" · "}${m.type==="image"?"صورة ثابتة":"فيديو"}</span></div>
-      <div class="item-controls"><button class="btn btn-sm" title="جعله أول عنصر" onclick="movePlaylistItemTo('${item.id}',0)" ${index===0?"disabled":""}>الأول</button><button class="btn btn-sm" title="تقديم" onclick="movePlaylistItem('${item.id}',-1)" ${index===0?"disabled":""}>↑</button><button class="btn btn-sm" title="تأخير" onclick="movePlaylistItem('${item.id}',1)" ${index===items.length-1?"disabled":""}>↓</button><button type="button" class="btn btn-sm btn-danger content-delete-btn" title="حذف هذا المحتوى من الشاشة فقط" onclick="event.stopPropagation(); removePlaylistItem('${item.id}')">🗑 حذف المحتوى من الشاشة</button></div>
+      <div class="item-thumb">${m.type==="image"?`<img src="${escapeHtml(m.file_url||"")}" alt="">`:`<video src="${escapeHtml(m.file_url||"")}" muted playsinline></video>`}<span class="thumb-type">${m.type==="image"?t("image"):t("video")}</span></div>
+      <div class="item-info"><strong>${escapeHtml(m.name||t("file"))}</strong><span class="item-position">${index===0?`${t("firstItem")} · `:`${t("orderNumber")} ${index+1} · `}${m.type==="image"?t("staticImage"):t("video")}</span></div>
+      <div class="item-controls"><button class="btn btn-sm" title="${escapeHtml(t("makeFirst"))}" onclick="movePlaylistItemTo('${item.id}',0)" ${index===0?"disabled":""}>${escapeHtml(t("firstItem"))}</button><button class="btn btn-sm" title="${escapeHtml(t("moveUp"))}" onclick="movePlaylistItem('${item.id}',-1)" ${index===0?"disabled":""}>↑</button><button class="btn btn-sm" title="${escapeHtml(t("moveDown"))}" onclick="movePlaylistItem('${item.id}',1)" ${index===items.length-1?"disabled":""}>↓</button><button type="button" class="btn btn-sm btn-danger content-delete-btn" title="${escapeHtml(t("deleteContentOnly"))}" onclick="event.stopPropagation(); removePlaylistItem('${item.id}')">🗑 ${escapeHtml(t("deleteContentOnly"))}</button></div>
     </div>`;
   }).join("");
 }
@@ -4550,15 +5113,15 @@ function openScreenContent(id){
 }
 async function savePlaylistSettings(){
  if(!selectedPlaylist)return;const duration=Math.max(1,Number(document.getElementById("playlistDuration").value)||10);const payload={name:document.getElementById("playlistName").value.trim()||selectedPlaylist.name,default_duration:duration,default_transition:document.getElementById("playlistTransition").value,fit_mode:document.getElementById("playlistFit").value,repeat_all:document.getElementById("repeatSwitch").classList.contains("active")};
- const {data,error}=await supabaseClient.from("playlists").update(payload).eq("id",selectedPlaylist.id).select().single();if(error){toast(error.message||t("error"),"error");return;}selectedPlaylist=data;playlists=playlists.map(p=>p.id===data.id?data:p);toast("تم حفظ إعدادات المحتوى");renderPlaylistItems();
+ const {data,error}=await supabaseClient.from("playlists").update(payload).eq("id",selectedPlaylist.id).select().single();if(error){toast(error.message||t("error"),"error");return;}selectedPlaylist=data;playlists=playlists.map(p=>p.id===data.id?data:p);toast(t("contentSettingsSaved"));renderPlaylistItems();
 }
 async function updatePlaylistItem(id,patch){const {data,error}=await supabaseClient.from("playlist_items").update(patch).eq("id",id).select(`*,media:media_id(*)`).single();if(error){toast(error.message||t("error"),"error");return;}playlistItems=playlistItems.map(i=>String(i.id)===String(id)?data:i);if(selectedPlaylist&&selectedContentScreenId) await autoPublishPlaylistForScreen(selectedContentScreenId,selectedPlaylist.id);renderPlaylistItems();}
 function setItemStatic(id,v){updatePlaylistItem(id,{duration:v?0:(selectedPlaylist?.default_duration??0)});}
 async function removePlaylistItem(id){
-  if(!selectedPlaylist){toast("اختر شاشة أولاً","warning");return;}
+  if(!selectedPlaylist){toast(t("chooseScreenFirst"),"warning");return;}
   const item=playlistItems.find(i=>String(i.id)===String(id) && String(i.playlist_id)===String(selectedPlaylist.id));
-  if(!item){toast("تعذر العثور على المحتوى داخل هذه الشاشة","error");return;}
-  if(!confirm("حذف هذا المحتوى من الشاشة فقط؟\n\nالملف سيبقى محفوظًا في مكتبة الوسائط."))return;
+  if(!item){toast(t("contentNotFound"),"error");return;}
+  if(!confirm(t("deleteContentConfirm")))return;
 
   // مهم: نحذف العلاقة من playlist_items فقط، ولا نحذف media.
   const {error}=await supabaseClient
@@ -4569,7 +5132,7 @@ async function removePlaylistItem(id){
 
   if(error){
     console.error("delete playlist item error",error);
-    toast(error.message||"تعذر حذف المحتوى من الشاشة","error");
+    toast(error.message||t("deleteContentError"),"error");
     return;
   }
 
@@ -4581,7 +5144,7 @@ async function removePlaylistItem(id){
     .order("position");
   if(reloadError){
     console.error("reload playlist items error",reloadError);
-    toast("تم الحذف، لكن تعذر تحديث القائمة مباشرة. أعد فتح الصفحة.","warning");
+    toast(t("deleteUpdatedWarning"),"warning");
     return;
   }
 
@@ -4590,13 +5153,13 @@ async function removePlaylistItem(id){
   await normalizePlaylistPositions();
   if(selectedContentScreenId) await autoPublishPlaylistForScreen(selectedContentScreenId,selectedPlaylist.id);
   renderPlaylistItems();
-  toast("تم حذف المحتوى من الشاشة فقط، وبقي في مكتبة الوسائط");
+  toast(t("contentDeletedFromScreen"));
 }
 async function normalizePlaylistPositions(){if(!selectedPlaylist)return;const a=getItemsForPlaylist(selectedPlaylist.id);for(let i=0;i<a.length;i++){a[i].position=i;await supabaseClient.from("playlist_items").update({position:i}).eq("id",a[i].id);}}
 async function movePlaylistItem(id,dir){const a=getItemsForPlaylist(selectedPlaylist.id),i=a.findIndex(x=>String(x.id)===String(id)),j=i+dir;if(i<0||j<0||j>=a.length)return;await swapPlaylistPositions(a[i],a[j]);}
-async function movePlaylistItemTo(id,target){const a=getItemsForPlaylist(selectedPlaylist.id),from=a.findIndex(x=>String(x.id)===String(id));if(from<0||target<0||target>=a.length||from===target)return;const item=a.splice(from,1)[0];a.splice(target,0,item);for(let n=0;n<a.length;n++){a[n].position=n;const r=await supabaseClient.from("playlist_items").update({position:n}).eq("id",a[n].id);if(r.error){toast(r.error.message||t("error"),"error");return;}}playlistItems=playlistItems.map(x=>{const n=a.findIndex(y=>String(y.id)===String(x.id));return n<0?x:{...x,position:n};});if(selectedContentScreenId)await autoPublishPlaylistForScreen(selectedContentScreenId,selectedPlaylist.id);renderPlaylistItems();toast("تم تغيير ترتيب المحتوى وتحديث الشاشة");}
+async function movePlaylistItemTo(id,target){const a=getItemsForPlaylist(selectedPlaylist.id),from=a.findIndex(x=>String(x.id)===String(id));if(from<0||target<0||target>=a.length||from===target)return;const item=a.splice(from,1)[0];a.splice(target,0,item);for(let n=0;n<a.length;n++){a[n].position=n;const r=await supabaseClient.from("playlist_items").update({position:n}).eq("id",a[n].id);if(r.error){toast(r.error.message||t("error"),"error");return;}}playlistItems=playlistItems.map(x=>{const n=a.findIndex(y=>String(y.id)===String(x.id));return n<0?x:{...x,position:n};});if(selectedContentScreenId)await autoPublishPlaylistForScreen(selectedContentScreenId,selectedPlaylist.id);renderPlaylistItems();toast(t("orderUpdated"));}
 async function swapPlaylistPositions(a,b){const pa=a.position,pb=b.position;let r=await supabaseClient.from("playlist_items").update({position:-999999}).eq("id",a.id);if(r.error){toast(r.error.message||t("error"),"error");return;}r=await supabaseClient.from("playlist_items").update({position:pa}).eq("id",b.id);if(r.error){toast(r.error.message||t("error"),"error");return;}r=await supabaseClient.from("playlist_items").update({position:pb}).eq("id",a.id);if(r.error){toast(r.error.message||t("error"),"error");return;}a.position=pb;b.position=pa;if(selectedContentScreenId)await autoPublishPlaylistForScreen(selectedContentScreenId,selectedPlaylist.id);renderPlaylistItems();}
-function openMediaPicker(){if(!selectedPlaylist){toast("اختر شاشة أولاً","warning");return;}selectedPickerMedia.clear();renderMediaPicker();openModal("mediaPickerModal");}
+function openMediaPicker(){if(!selectedPlaylist){toast(t("chooseScreenFirst"),"warning");return;}selectedPickerMedia.clear();renderMediaPicker();openModal("mediaPickerModal");}
 function renderMediaPicker(){
   const g=document.getElementById("mediaPickerGrid");
   if(!g)return;
@@ -4604,22 +5167,22 @@ function renderMediaPicker(){
   const list=media.filter(m=>!q||String(m.name||"").toLowerCase().includes(q));
   g.innerHTML=list.map(m=>`<button type="button" class="media-picker-item ${selectedPickerMedia.has(String(m.id))?"selected":""}" onclick="togglePickerMedia('${m.id}')">
     <div class="media-picker-thumb">${m.type==="image"?`<img src="${escapeHtml(m.file_url||"")}" alt="">`:`<video src="${escapeHtml(m.file_url||"")}" muted playsinline preload="metadata"></video>`}</div>
-    <span>${escapeHtml(m.name||"ملف")}</span>
-  </button>`).join("")||`<div class="empty-state">لا توجد وسائط.</div>`;
+    <span>${escapeHtml(m.name||t("file"))}</span>
+  </button>`).join("")||`<div class="empty-state">${escapeHtml(t("noMediaShort"))}</div>`;
 }
 function togglePickerMedia(id){const k=String(id);selectedPickerMedia.has(k)?selectedPickerMedia.delete(k):selectedPickerMedia.add(k);renderMediaPicker();}
 async function confirmMediaPicker(){
   const ids=[...selectedPickerMedia];
-  if(!ids.length){toast("حدد محتوى واحدًا على الأقل","warning");return;}
-  if(!selectedContentScreenId){toast("اختر شاشة أولاً","warning");return;}
+  if(!ids.length){toast(t("selectAtLeastOne"),"warning");return;}
+  if(!selectedContentScreenId){toast(t("chooseScreenFirst"),"warning");return;}
 
   let playlist=getPlaylistForScreen(selectedContentScreenId);
   if(!playlist){
     const screen=screens.find(x=>Number(x.id)===Number(selectedContentScreenId));
-    if(!screen){toast("الشاشة غير موجودة","error");return;}
+    if(!screen){toast(t("screenNotFound"),"error");return;}
     const {data,error}=await supabaseClient.from("playlists").insert({
       screen_id:screen.id,
-      name:`محتوى ${screen.name||"الشاشة"}`,
+      name:`${t("contentFor")} ${screen.name||t("screen")}`,
       repeat_all:true,
       default_duration:0,
       default_transition:"fade",
@@ -4627,7 +5190,7 @@ async function confirmMediaPicker(){
       enabled:true,
       published:false
     }).select().single();
-    if(error){toast(error.message||"تعذر إنشاء قائمة المحتوى","error");return;}
+    if(error){toast(error.message||t("createPlaylistError"),"error");return;}
     playlist=data;
     playlists.push(data);
   }
@@ -4640,7 +5203,7 @@ async function confirmMediaPicker(){
     if(!m)continue;
     const payload={playlist_id:playlist.id,media_id:m.id,position:start+added,duration:m.type==="image"?0:null,transition:playlist.default_transition||"fade",enabled:true};
     const {data,error}=await supabaseClient.from("playlist_items").insert(payload).select(`*,media:media_id(*)`).single();
-    if(error){console.error("playlist item insert error",error,payload);toast(error.message||"تعذر إضافة المحتوى","error");continue;}
+    if(error){console.error("playlist item insert error",error,payload);toast(error.message||t("addContentError"),"error");continue;}
     playlistItems.push(data);added++;
   }
   if(added){
@@ -4649,7 +5212,7 @@ async function confirmMediaPicker(){
   selectedPickerMedia.clear();
   closeModal("mediaPickerModal");
   renderContentPage();
-  if(added) toast(`تمت إضافة ${added} محتوى وتحديث الشاشة تلقائيًا`);
+  if(added) toast(t("contentAddedAndUpdated").replace("{count}",added));
 }
 async function autoPublishPlaylistForScreen(screenId,playlistId){
   try{
@@ -4661,9 +5224,9 @@ async function autoPublishPlaylistForScreen(screenId,playlistId){
     playlists=playlists.map(p=>String(p.id)===String(playlistId)?data:Number(p.screen_id)===Number(screenId)?{...p,published:false}:p);
     if(selectedPlaylist&&String(selectedPlaylist.id)===String(playlistId)) selectedPlaylist=data;
     return true;
-  }catch(e){console.error("auto publish error",e);toast(e.message||"تعذر تحديث الشاشة","error");return false;}
+   }catch(e){console.error("auto publish error",e);toast(e.message||t("screenUpdateError"),"error");return false;}
 }
-async function publishCurrentPlaylist(){if(!selectedPlaylist||!selectedContentScreenId){toast("اختر شاشة أولاً","warning");return;}await supabaseClient.from("playlists").update({published:false}).eq("screen_id",selectedContentScreenId);const {data,error}=await supabaseClient.from("playlists").update({published:true,published_at:new Date().toISOString()}).eq("id",selectedPlaylist.id).select().single();if(error){toast(error.message||t("error"),"error");return;}selectedPlaylist=data;playlists=playlists.map(p=>String(p.id)===String(data.id)?data:Number(p.screen_id)===Number(selectedContentScreenId)?{...p,published:false}:p);await supabaseClient.from("screen_publish_state").upsert({screen_id:selectedContentScreenId,published_playlist_id:selectedPlaylist.id,version:Date.now(),published_at:new Date().toISOString()},{onConflict:"screen_id"});toast("تم نشر المحتوى للشاشة");updateDashboardStats();}
+async function publishCurrentPlaylist(){if(!selectedPlaylist||!selectedContentScreenId){toast(t("chooseScreenFirst"),"warning");return;}await supabaseClient.from("playlists").update({published:false}).eq("screen_id",selectedContentScreenId);const {data,error}=await supabaseClient.from("playlists").update({published:true,published_at:new Date().toISOString()}).eq("id",selectedPlaylist.id).select().single();if(error){toast(error.message||t("error"),"error");return;}selectedPlaylist=data;playlists=playlists.map(p=>String(p.id)===String(data.id)?data:Number(p.screen_id)===Number(selectedContentScreenId)?{...p,published:false}:p);await supabaseClient.from("screen_publish_state").upsert({screen_id:selectedContentScreenId,published_playlist_id:selectedPlaylist.id,version:Date.now(),published_at:new Date().toISOString()},{onConflict:"screen_id"});toast(t("contentPublishedToScreen"));updateDashboardStats();}
 
 /* =========================================================
    SCHEDULING
@@ -4680,7 +5243,7 @@ function openScheduleModal(id=null){
   const row=id?schedules.find(x=>String(x.id)===String(id)):null;
   const select=document.getElementById("scheduleScreen");
   select.innerHTML=screens.map(x=>`<option value="${x.id}">${escapeHtml(x.name)}</option>`).join("");
-  if(!screens.length){toast("أضف شاشة أولاً","warning");return;}
+  if(!screens.length){toast(t("addScreenFirst"),"warning");return;}
   select.value=String(row?.screen_id||screens[0].id);
   loadSchedulePlaylists();
   document.getElementById("scheduleStartDate").value=row?.start_date||new Date().toISOString().slice(0,10);
@@ -4688,7 +5251,7 @@ function openScheduleModal(id=null){
   document.getElementById("scheduleStartTime").value=(row?.start_time||"00:00").slice(0,5);
   document.getElementById("scheduleEndTime").value=(row?.end_time||"23:59").slice(0,5);
   document.getElementById("schedulePriority").value=Number(row?.priority||0);
-  document.getElementById("scheduleModalTitle").textContent=row?"تعديل جدولة":"إضافة جدولة";
+  document.getElementById("scheduleModalTitle").textContent=row?t("editSchedule"):t("addSchedule");
   openModal("scheduleModal");
 }
 function loadSchedulePlaylists(){
@@ -4696,16 +5259,16 @@ function loadSchedulePlaylists(){
   const select=document.getElementById("schedulePlaylist");
   if(!select)return;
   const list=playlists.filter(p=>Number(p.screen_id)===screenId);
-  select.innerHTML=list.map(p=>`<option value="${p.id}">${escapeHtml(p.name||"قائمة محتوى")}</option>`).join("");
+  select.innerHTML=list.map(p=>`<option value="${p.id}">${escapeHtml(p.name||t("playlistFallback"))}</option>`).join("");
   const id=document.getElementById("scheduleModalId")?.value;
   const row=id?schedules.find(x=>String(x.id)===String(id)):null;
   if(row&&list.some(p=>String(p.id)===String(row.playlist_id))) select.value=String(row.playlist_id);
 }
 function renderSchedules(){
   const box=document.getElementById("schedulesTable"); if(!box)return;
-  if(!schedules.length){box.innerHTML=`<div class="empty-state"><div class="empty-icon">◷</div><strong>لا توجد جدولات</strong><span>أضف جدولة لتحديد المحتوى الذي يظهر على الشاشة في وقت معين.</span></div>`;return;}
+  if(!schedules.length){box.innerHTML=`<div class="empty-state"><div class="empty-icon">◷</div><strong>${escapeHtml(t("noSchedules"))}</strong><span>${escapeHtml(t("noSchedulesDesc"))}</span></div>`;return;}
   const rows=[...schedules].sort((a,b)=>Number(b.priority||0)-Number(a.priority||0));
-  box.innerHTML=`<table><thead><tr><th>الشاشة</th><th>المحتوى</th><th>الفترة</th><th>الأولوية</th><th>الحالة</th><th>الإجراءات</th></tr></thead><tbody>${rows.map(r=>{const sc=screens.find(x=>Number(x.id)===Number(r.screen_id));const pl=playlists.find(x=>String(x.id)===String(r.playlist_id));return `<tr><td>${escapeHtml(sc?.name||"-")}</td><td>${escapeHtml(pl?.name||"-")}</td><td>${escapeHtml(formatScheduleRange(r))}</td><td>${Number(r.priority||0)}</td><td><span class="badge ${r.enabled===false?"badge-danger":"badge-success"}">${r.enabled===false?"غير نشطة":"نشطة"}</span></td><td><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn btn-sm" onclick="openScheduleModal('${r.id}')">تعديل</button><button class="btn btn-sm" onclick="toggleSchedule('${r.id}')">${r.enabled===false?"تشغيل":"إيقاف"}</button><button class="btn btn-sm btn-danger" onclick="deleteSchedule('${r.id}')">حذف</button></div></td></tr>`;}).join("")}</tbody></table>`;
+  box.innerHTML=`<table><thead><tr><th>${escapeHtml(t("scheduleTableScreen"))}</th><th>${escapeHtml(t("scheduleTableContent"))}</th><th>${escapeHtml(t("scheduleTablePeriod"))}</th><th>${escapeHtml(t("scheduleTablePriority"))}</th><th>${escapeHtml(t("scheduleTableStatus"))}</th><th>${escapeHtml(t("scheduleTableActions"))}</th></tr></thead><tbody>${rows.map(r=>{const sc=screens.find(x=>Number(x.id)===Number(r.screen_id));const pl=playlists.find(x=>String(x.id)===String(r.playlist_id));return `<tr><td>${escapeHtml(sc?.name||"-")}</td><td>${escapeHtml(pl?.name||"-")}</td><td>${escapeHtml(formatScheduleRange(r))}</td><td>${Number(r.priority||0)}</td><td><span class="badge ${r.enabled===false?"badge-danger":"badge-success"}">${r.enabled===false?t("inactiveStatus"):t("activeStatus")}</span></td><td><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn btn-sm" onclick="openScheduleModal('${r.id}')">${escapeHtml(t("edit"))}</button><button class="btn btn-sm" onclick="toggleSchedule('${r.id}')">${r.enabled===false?t("turnOn"):t("turnOff")}</button><button class="btn btn-sm btn-danger" onclick="deleteSchedule('${r.id}')">${escapeHtml(t("delete"))}</button></div></td></tr>`;}).join("")}</tbody></table>`;
 }
 async function saveSchedule(){
   const id=document.getElementById("scheduleModalId").value;
@@ -4717,9 +5280,9 @@ async function saveSchedule(){
   const endTime=document.getElementById("scheduleEndTime").value||"23:59";
   const priority=Number(document.getElementById("schedulePriority").value||0);
   if(!screenId||!playlistId||!startDate||!endDate){toast(t("required"),"warning");return;}
-  if(endDate<startDate){toast("تاريخ النهاية يجب أن يكون بعد تاريخ البداية","warning");return;}
+  if(endDate<startDate){toast(t("endDateAfterStart"),"warning");return;}
   const playlist=playlists.find(p=>Number(p.id)===playlistId||String(p.id)===String(playlistId));
-  if(!playlist||Number(playlist.screen_id)!==screenId){toast("قائمة المحتوى لا تتبع الشاشة المحددة","warning");return;}
+  if(!playlist||Number(playlist.screen_id)!==screenId){toast(t("playlistWrongScreen"),"warning");return;}
   const payload={screen_id:screenId,playlist_id:playlistId,start_date:startDate,end_date:endDate,start_time:startTime,end_time:endTime,priority,enabled:true};
   try{
     let result;
@@ -5308,13 +5871,13 @@ function closeImagePreview(){
 }
 function copyScreenUrl(id){
  const url=getScreenUrl(id);
- if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(url).then(()=>toast("تم نسخ رابط الشاشة"));return;}
- const i=document.createElement("input");i.value=url;document.body.appendChild(i);i.select();try{document.execCommand("copy");toast("تم نسخ رابط الشاشة");}finally{i.remove();}
+ if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(url).then(()=>toast(t("copied")));return;}
+ const i=document.createElement("input");i.value=url;document.body.appendChild(i);i.select();try{document.execCommand("copy");toast(t("copied"));}finally{i.remove();}
 }
 async function toggleScreenEnabled(id){
  const screen=screens.find(x=>Number(x.id)===Number(id));if(!screen)return;
  const next=screen.enabled===false; const {error}=await supabaseClient.from("screens").update({enabled:next}).eq("id",id);
- if(error){toast(error.message||t("error"),"error");return;} screen.enabled=next;renderScreens();renderDashboardScreens();toast(next?"تم تشغيل الشاشة":"تم إيقاف الشاشة");
+ if(error){toast(error.message||t("error"),"error");return;} screen.enabled=next;renderScreens();renderDashboardScreens();toast(next?t("turnOn"):t("turnOff"));
 }
 
 /* =========================================================
@@ -5385,6 +5948,76 @@ function applyTheme(){
 }
 
 /* =========================================================
+   ADMIN PIN LOCK
+========================================================= */
+const ADMIN_PIN_SESSION_KEY = "innovationAdminUnlocked";
+
+function isAdminUnlocked(){
+  return sessionStorage.getItem(ADMIN_PIN_SESSION_KEY) === "1";
+}
+
+function showPinLock(){
+  document.body.classList.add("pin-locked");
+  document.getElementById("pinLock")?.style.setProperty("display","flex");
+  setTimeout(()=>document.getElementById("adminPinInput")?.focus(),50);
+}
+
+function hidePinLock(){
+  document.body.classList.remove("pin-locked");
+  document.getElementById("pinLock")?.style.setProperty("display","none");
+}
+
+async function verifyAdminPin(event){
+  event?.preventDefault();
+  const input=document.getElementById("adminPinInput");
+  const errorEl=document.getElementById("pinError");
+  const button=document.querySelector("#pinForm .pin-submit");
+  const pin=(input?.value||"").trim();
+  if(!pin){
+    if(errorEl) errorEl.textContent=t("pinEmpty");
+    input?.focus();
+    return false;
+  }
+  if(button) button.disabled=true;
+  if(errorEl) errorEl.textContent="";
+  try{
+    const {data,error}=await supabaseClient.rpc("verify_admin_pin",{input_pin:pin});
+    if(error) throw error;
+
+    // Supabase may return the scalar boolean directly or wrapped depending on the response shape.
+    const pinVerified =
+      data === true ||
+      data === "true" ||
+      data?.verify_admin_pin === true ||
+      data?.verify_admin_pin === "true";
+
+    if(pinVerified){
+      sessionStorage.setItem(ADMIN_PIN_SESSION_KEY,"1");
+      if(input) input.value="";
+      hidePinLock();
+      await loadAll();
+      setupRealtime();
+      return false;
+    }
+    if(errorEl) errorEl.textContent=t("pinWrong");
+    if(input){input.value="";input.focus();}
+  }catch(err){
+    console.error("PIN verification error:",err);
+    if(errorEl) errorEl.textContent=t("pinConnectionError");
+  }finally{
+    if(button) button.disabled=false;
+  }
+  return false;
+}
+
+function lockAdminPanel(){
+  sessionStorage.removeItem(ADMIN_PIN_SESSION_KEY);
+  realtimeChannels.forEach(c=>{try{supabaseClient.removeChannel(c);}catch(e){}});
+  realtimeChannels=[];
+  showPinLock();
+}
+
+/* =========================================================
    INITIALIZATION
 ========================================================= */
 document.addEventListener(
@@ -5394,14 +6027,19 @@ document.addEventListener(
     applyTranslations();
     updateConnectionUI();
     setupUploadZone();
-    await loadAll();
-    setupRealtime();
+    if(isAdminUnlocked()){
+      hidePinLock();
+      await loadAll();
+      setupRealtime();
+    }else{
+      showPinLock();
+    }
   }
 );
 </script>
 <div class="modal-backdrop" id="imagePreviewModal" onclick="if(event.target===this)closeImagePreview()">
   <div class="modal" style="max-width:100vw;width:100vw;height:100vh;background:#000">
-    <div class="modal-header"><strong>معاينة</strong><button class="icon-btn" onclick="closeImagePreview()">×</button></div>
+    <div class="modal-header"><strong data-i18n="preview">معاينة</strong><button class="icon-btn" onclick="closeImagePreview()">×</button></div>
     <div style="display:flex;align-items:center;justify-content:center;width:100%;height:calc(100vh - 64px);padding:0">
       <img id="imagePreviewImage" alt="" style="max-width:100%;max-height:100%;object-fit:contain;display:none">
       <video id="imagePreviewVideo" controls autoplay style="max-width:100%;max-height:100%;display:none"></video>
