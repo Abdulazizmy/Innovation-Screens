@@ -4306,18 +4306,13 @@ function renderScreens(){
             <div class="screen-actions">
               <button class="btn btn-sm" onclick="openScreenUrl(${Number(screen.id)})">${escapeHtml(t("open"))}</button>
               <button class="btn btn-sm" onclick="copyScreenUrl(${Number(screen.id)})">نسخ الرابط</button>
+              <button class="btn btn-sm btn-primary" onclick="openScreenContent(${Number(screen.id)})">إدارة المحتوى</button>
               <button class="btn btn-sm ${screen.enabled === false ? "btn-primary" : ""}" onclick="toggleScreenEnabled(${Number(screen.id)})">${screen.enabled === false ? "تشغيل" : "إيقاف"}</button>
               <button
                 class="btn btn-sm"
                 onclick="openScreenModal(${Number(screen.id)})"
               >
                 ${escapeHtml(t("edit"))}
-              </button>
-              <button
-                class="btn btn-sm btn-danger"
-                onclick="deleteScreen(${Number(screen.id)})"
-              >
-                ${escapeHtml(t("delete"))}
               </button>
             </div>
           </div>
@@ -4500,41 +4495,11 @@ async function saveScreen(){
     );
   }
 }
-async function deleteScreen(id){
-  if(
-    !confirm(
-      t("confirmDelete")
-    )
-  ){
-    return;
-  }
-  try{
-    const result =
-      await supabaseClient
-        .from("screens")
-        .delete()
-        .eq("id",id);
-    if(result.error){
-      throw result.error;
-    }
-    toast(
-      t("screenDeleted")
-    );
-    await loadAll();
-  }catch(error){
-    console.error(error);
-    toast(
-      error.message ||
-      t("error"),
-      "error"
-    );
-  }
-}
 /* =========================================================
    CONTENT / PLAYLISTS
 ========================================================= */
 function getPlaylistForScreen(id){return playlists.find(p=>Number(p.screen_id)===Number(id))||null;}
-function getItemsForPlaylist(id){return playlistItems.filter(i=>Number(i.playlist_id)===Number(id)).sort((a,b)=>(Number(a.position)||0)-(Number(b.position)||0));}
+function getItemsForPlaylist(id){return playlistItems.filter(i=>String(i.playlist_id)===String(id) && i.enabled!==false).sort((a,b)=>(Number(a.position)||0)-(Number(b.position)||0));}
 function renderContentPage(){
  if(!selectedContentScreenId&&screens.length)selectedContentScreenId=Number(screens[0].id);
  selectedPlaylist=selectedContentScreenId?getPlaylistForScreen(selectedContentScreenId):null;
@@ -4552,9 +4517,32 @@ function loadPlaylistSettingsUI(){
 }
 function toggleRepeat(){document.getElementById("repeatSwitch").classList.toggle("active");}
 function renderPlaylistItems(){
- const box=document.getElementById("playlistItems");if(!box)return;const items=selectedPlaylist?getItemsForPlaylist(selectedPlaylist.id):[];
- if(!items.length){box.innerHTML=`<div class="empty-state"><div class="empty-icon">☷</div><strong>لا يوجد محتوى لهذه الشاشة</strong><span>أضف الصور أو الفيديوهات من مكتبة الوسائط، وستظهر هنا مباشرة بالترتيب.</span></div>`;return;}
- box.innerHTML=`<div class="content-summary"><div><strong>محتوى الشاشة: ${escapeHtml(selectedPlaylist?.name||"")}</strong><span style="display:block;margin-top:4px">${items.length} عنصر · الرقم الأعلى يظهر أولًا</span></div><button class="btn btn-sm" onclick="openMediaPicker()">+ إضافة محتوى</button></div>`+items.map((item,index)=>{const m=item.media||media.find(x=>String(x.id)===String(item.media_id))||{};const d=item.duration==null?(selectedPlaylist.default_duration??0):Number(item.duration);return `<div class="playlist-item"><div class="playlist-number">${index+1}</div><div class="item-thumb">${m.type==="image"?`<img src="${escapeHtml(m.file_url||"")}" alt="">`:`<video src="${escapeHtml(m.file_url||"")}" muted playsinline></video>`}<span class="thumb-type">${m.type==="image"?"صورة":"فيديو"}</span></div><div class="item-info"><strong>${escapeHtml(m.name||"ملف")}</strong><span class="item-position">${index===0?"سيظهر أولًا · ":"ترتيب رقم "+(index+1)+" · "}${m.type==="image"?(d===0?"ثابت":"مدة "+d+" ثانية"):"مدة الفيديو الأصلية"}</span></div><div class="item-controls">${m.type==="image"?`<label style="font-size:12px;display:flex;align-items:center;gap:4px"><input type="checkbox" ${d===0?"checked":""} onchange="setItemStatic('${item.id}',this.checked)"> ثابت</label>${d!==0?`<input class="form-input" title="مدة الصورة بالثواني" style="width:78px" type="number" min="1" max="3600" value="${d}" onchange="updatePlaylistItem('${item.id}',{duration:Math.max(1,Number(this.value)||1)})">`:""}`:""}<button class="btn btn-sm" title="جعله أول عنصر" onclick="movePlaylistItemTo('${item.id}',0)" ${index===0?"disabled":""}>الأول</button><button class="btn btn-sm" title="تقديم" onclick="movePlaylistItem('${item.id}',-1)" ${index===0?"disabled":""}>↑</button><button class="btn btn-sm" title="تأخير" onclick="movePlaylistItem('${item.id}',1)" ${index===items.length-1?"disabled":""}>↓</button><button class="btn btn-sm btn-danger" onclick="removePlaylistItem('${item.id}')">حذف</button></div></div>`;}).join("");
+  const box=document.getElementById("playlistItems");
+  if(!box)return;
+  const items=selectedPlaylist?getItemsForPlaylist(selectedPlaylist.id).filter(i=>i.enabled!==false):[];
+  const addButton=`<button class="btn btn-sm btn-primary" onclick="openMediaPicker()">+ إضافة من المكتبة</button>`;
+  if(!selectedPlaylist){
+    box.innerHTML=`<div class="empty-state"><div class="empty-icon">☷</div><strong>لا توجد قائمة محتوى لهذه الشاشة</strong><span>سيتم إنشاء قائمة عند إضافة أول محتوى.</span><div style="margin-top:14px">${addButton}</div></div>`;
+    return;
+  }
+  const summary=`<div class="content-summary"><div><strong>محتوى الشاشة: ${escapeHtml(selectedPlaylist.name||"")}</strong><span style="display:block;margin-top:4px">${items.length} عنصر · يمكنك حذف المحتوى من الشاشة فقط، وسيبقى في مكتبة الوسائط.</span></div>${addButton}</div>`;
+  if(!items.length){
+    box.innerHTML=summary+`<div class="empty-state"><div class="empty-icon">☷</div><strong>لا يوجد محتوى لهذه الشاشة</strong><span>أضف الصور أو الفيديوهات من مكتبة الوسائط.</span></div>`;
+    return;
+  }
+  box.innerHTML=summary+items.map((item,index)=>{
+    const m=item.media||media.find(x=>String(x.id)===String(item.media_id))||{};
+    return `<div class="playlist-item">
+      <div class="playlist-number">${index+1}</div>
+      <div class="item-thumb">${m.type==="image"?`<img src="${escapeHtml(m.file_url||"")}" alt="">`:`<video src="${escapeHtml(m.file_url||"")}" muted playsinline></video>`}<span class="thumb-type">${m.type==="image"?"صورة":"فيديو"}</span></div>
+      <div class="item-info"><strong>${escapeHtml(m.name||"ملف")}</strong><span class="item-position">${index===0?"سيظهر أولًا · ":"ترتيب رقم "+(index+1)+" · "}${m.type==="image"?"صورة ثابتة":"فيديو"}</span></div>
+      <div class="item-controls"><button class="btn btn-sm" title="جعله أول عنصر" onclick="movePlaylistItemTo('${item.id}',0)" ${index===0?"disabled":""}>الأول</button><button class="btn btn-sm" title="تقديم" onclick="movePlaylistItem('${item.id}',-1)" ${index===0?"disabled":""}>↑</button><button class="btn btn-sm" title="تأخير" onclick="movePlaylistItem('${item.id}',1)" ${index===items.length-1?"disabled":""}>↓</button><button type="button" class="btn btn-sm btn-danger content-delete-btn" title="حذف هذا المحتوى من الشاشة فقط" onclick="event.stopPropagation(); removePlaylistItem('${item.id}')">🗑 حذف المحتوى من الشاشة</button></div>
+    </div>`;
+  }).join("");
+}
+function openScreenContent(id){
+  selectedContentScreenId=Number(id);
+  navigate("content");
 }
 async function savePlaylistSettings(){
  if(!selectedPlaylist)return;const payload={name:document.getElementById("playlistName").value.trim()||selectedPlaylist.name,default_duration:0,default_transition:document.getElementById("playlistTransition").value,fit_mode:document.getElementById("playlistFit").value,repeat_all:document.getElementById("repeatSwitch").classList.contains("active")};
@@ -4562,7 +4550,44 @@ async function savePlaylistSettings(){
 }
 async function updatePlaylistItem(id,patch){const {data,error}=await supabaseClient.from("playlist_items").update(patch).eq("id",id).select(`*,media:media_id(*)`).single();if(error){toast(error.message||t("error"),"error");return;}playlistItems=playlistItems.map(i=>String(i.id)===String(id)?data:i);if(selectedPlaylist&&selectedContentScreenId) await autoPublishPlaylistForScreen(selectedContentScreenId,selectedPlaylist.id);renderPlaylistItems();}
 function setItemStatic(id,v){updatePlaylistItem(id,{duration:v?0:(selectedPlaylist?.default_duration??0)});}
-async function removePlaylistItem(id){if(!confirm("حذف هذا المحتوى من الشاشة؟"))return;const {error}=await supabaseClient.from("playlist_items").delete().eq("id",id);if(error){toast(error.message||t("error"),"error");return;}playlistItems=playlistItems.filter(i=>String(i.id)!==String(id));await normalizePlaylistPositions();if(selectedPlaylist&&selectedContentScreenId) await autoPublishPlaylistForScreen(selectedContentScreenId,selectedPlaylist.id);renderPlaylistItems();toast("تم حذف المحتوى وتحديث الشاشة تلقائيًا");}
+async function removePlaylistItem(id){
+  if(!selectedPlaylist){toast("اختر شاشة أولاً","warning");return;}
+  const item=playlistItems.find(i=>String(i.id)===String(id) && String(i.playlist_id)===String(selectedPlaylist.id));
+  if(!item){toast("تعذر العثور على المحتوى داخل هذه الشاشة","error");return;}
+  if(!confirm("حذف هذا المحتوى من الشاشة فقط؟\n\nالملف سيبقى محفوظًا في مكتبة الوسائط."))return;
+
+  // مهم: نحذف العلاقة من playlist_items فقط، ولا نحذف media.
+  const {error}=await supabaseClient
+    .from("playlist_items")
+    .delete()
+    .eq("id",id)
+    .eq("playlist_id",selectedPlaylist.id);
+
+  if(error){
+    console.error("delete playlist item error",error);
+    toast(error.message||"تعذر حذف المحتوى من الشاشة","error");
+    return;
+  }
+
+  // أعد قراءة محتوى القائمة من قاعدة البيانات حتى تكون الواجهة مطابقة فعليًا للبيانات.
+  const {data:freshItems,error:reloadError}=await supabaseClient
+    .from("playlist_items")
+    .select(`*,media:media_id(*)`)
+    .eq("playlist_id",selectedPlaylist.id)
+    .order("position");
+  if(reloadError){
+    console.error("reload playlist items error",reloadError);
+    toast("تم الحذف، لكن تعذر تحديث القائمة مباشرة. أعد فتح الصفحة.","warning");
+    return;
+  }
+
+  playlistItems=playlistItems.filter(i=>String(i.id)!==String(id));
+  playlistItems=playlistItems.filter(i=>String(i.playlist_id)!==String(selectedPlaylist.id)).concat(freshItems||[]);
+  await normalizePlaylistPositions();
+  if(selectedContentScreenId) await autoPublishPlaylistForScreen(selectedContentScreenId,selectedPlaylist.id);
+  renderPlaylistItems();
+  toast("تم حذف المحتوى من الشاشة فقط، وبقي في مكتبة الوسائط");
+}
 async function normalizePlaylistPositions(){if(!selectedPlaylist)return;const a=getItemsForPlaylist(selectedPlaylist.id);for(let i=0;i<a.length;i++){a[i].position=i;await supabaseClient.from("playlist_items").update({position:i}).eq("id",a[i].id);}}
 async function movePlaylistItem(id,dir){const a=getItemsForPlaylist(selectedPlaylist.id),i=a.findIndex(x=>String(x.id)===String(id)),j=i+dir;if(i<0||j<0||j>=a.length)return;await swapPlaylistPositions(a[i],a[j]);}
 async function movePlaylistItemTo(id,target){const a=getItemsForPlaylist(selectedPlaylist.id),from=a.findIndex(x=>String(x.id)===String(id));if(from<0||target<0||target>=a.length||from===target)return;const item=a.splice(from,1)[0];a.splice(target,0,item);for(let n=0;n<a.length;n++){a[n].position=n;const r=await supabaseClient.from("playlist_items").update({position:n}).eq("id",a[n].id);if(r.error){toast(r.error.message||t("error"),"error");return;}}playlistItems=playlistItems.map(x=>{const n=a.findIndex(y=>String(y.id)===String(x.id));return n<0?x:{...x,position:n};});if(selectedContentScreenId)await autoPublishPlaylistForScreen(selectedContentScreenId,selectedPlaylist.id);renderPlaylistItems();toast("تم تغيير ترتيب المحتوى وتحديث الشاشة");}
@@ -4581,25 +4606,26 @@ function renderMediaPicker(){
 function togglePickerMedia(id){const k=String(id);selectedPickerMedia.has(k)?selectedPickerMedia.delete(k):selectedPickerMedia.add(k);renderMediaPicker();}
 async function confirmMediaPicker(){
   const ids=[...selectedPickerMedia];
-  if(!ids.length){
-    toast("حدد محتوى واحدًا على الأقل","warning");
-    return;
-  }
-  if(!selectedContentScreenId){
-    toast("اختر شاشة أولاً","warning");
-    return;
-  }
+  if(!ids.length){toast("حدد محتوى واحدًا على الأقل","warning");return;}
+  if(!selectedContentScreenId){toast("اختر شاشة أولاً","warning");return;}
 
-  // احصل على قائمة الشاشة الحالية من الذاكرة أو من قاعدة البيانات مباشرة.
   let playlist=getPlaylistForScreen(selectedContentScreenId);
   if(!playlist){
-    const {data,error}=await supabaseClient.from("playlists").select("*").eq("screen_id",selectedContentScreenId).maybeSingle();
-    if(error){toast(error.message||t("error"),"error");return;}
+    const screen=screens.find(x=>Number(x.id)===Number(selectedContentScreenId));
+    if(!screen){toast("الشاشة غير موجودة","error");return;}
+    const {data,error}=await supabaseClient.from("playlists").insert({
+      screen_id:screen.id,
+      name:`محتوى ${screen.name||"الشاشة"}`,
+      repeat_all:true,
+      default_duration:0,
+      default_transition:"fade",
+      fit_mode:"contain",
+      enabled:true,
+      published:false
+    }).select().single();
+    if(error){toast(error.message||"تعذر إنشاء قائمة المحتوى","error");return;}
     playlist=data;
-  }
-  if(!playlist){
-    toast("لا توجد قائمة محتوى لهذه الشاشة","error");
-    return;
+    playlists.push(data);
   }
   selectedPlaylist=playlist;
 
@@ -4608,27 +4634,12 @@ async function confirmMediaPicker(){
   for(const id of ids){
     const m=media.find(x=>String(x.id)===String(id));
     if(!m)continue;
-    const payload={
-      playlist_id:playlist.id,
-      media_id:m.id,
-      position:start+added,
-      duration:m.type==="image"?0:null,
-      transition:playlist.default_transition||"fade",
-      enabled:true
-    };
-    const {data,error}=await supabaseClient.from("playlist_items").insert(payload).select("*").single();
-    if(error){
-      console.error("playlist item insert error",error,payload);
-      toast(error.message||"تعذر إضافة المحتوى","error");
-      continue;
-    }
-    playlistItems.push({...data,media:m});
-    added++;
+    const payload={playlist_id:playlist.id,media_id:m.id,position:start+added,duration:m.type==="image"?0:null,transition:playlist.default_transition||"fade",enabled:true};
+    const {data,error}=await supabaseClient.from("playlist_items").insert(payload).select(`*,media:media_id(*)`).single();
+    if(error){console.error("playlist item insert error",error,payload);toast(error.message||"تعذر إضافة المحتوى","error");continue;}
+    playlistItems.push(data);added++;
   }
-
   if(added){
-    const {data:freshItems,error:freshError}=await supabaseClient.from("playlist_items").select(`*, media:media_id(*)`).eq("playlist_id",playlist.id).order("position");
-    if(!freshError) playlistItems=playlistItems.filter(i=>Number(i.playlist_id)!==Number(playlist.id)).concat(freshItems||[]);
     await autoPublishPlaylistForScreen(selectedContentScreenId,playlist.id);
   }
   selectedPickerMedia.clear();
@@ -4643,12 +4654,12 @@ async function autoPublishPlaylistForScreen(screenId,playlistId){
     const {data,error}=await supabaseClient.from("playlists").update({published:true,published_at:now}).eq("id",playlistId).select().single();
     if(error) throw error;
     await supabaseClient.from("screen_publish_state").upsert({screen_id:screenId,published_playlist_id:playlistId,version:Date.now(),published_at:now},{onConflict:"screen_id"});
-    playlists=playlists.map(p=>Number(p.id)===Number(playlistId)?data:Number(p.screen_id)===Number(screenId)?{...p,published:false}:p);
-    if(selectedPlaylist&&Number(selectedPlaylist.id)===Number(playlistId)) selectedPlaylist=data;
+    playlists=playlists.map(p=>String(p.id)===String(playlistId)?data:Number(p.screen_id)===Number(screenId)?{...p,published:false}:p);
+    if(selectedPlaylist&&String(selectedPlaylist.id)===String(playlistId)) selectedPlaylist=data;
     return true;
   }catch(e){console.error("auto publish error",e);toast(e.message||"تعذر تحديث الشاشة","error");return false;}
 }
-async function publishCurrentPlaylist(){if(!selectedPlaylist||!selectedContentScreenId){toast("اختر شاشة أولاً","warning");return;}await supabaseClient.from("playlists").update({published:false}).eq("screen_id",selectedContentScreenId);const {data,error}=await supabaseClient.from("playlists").update({published:true,published_at:new Date().toISOString()}).eq("id",selectedPlaylist.id).select().single();if(error){toast(error.message||t("error"),"error");return;}selectedPlaylist=data;playlists=playlists.map(p=>Number(p.id)===Number(data.id)?data:Number(p.screen_id)===Number(selectedContentScreenId)?{...p,published:false}:p);await supabaseClient.from("screen_publish_state").upsert({screen_id:selectedContentScreenId,published_playlist_id:selectedPlaylist.id,version:Date.now(),published_at:new Date().toISOString()},{onConflict:"screen_id"});toast("تم نشر المحتوى للشاشة");updateDashboardStats();}
+async function publishCurrentPlaylist(){if(!selectedPlaylist||!selectedContentScreenId){toast("اختر شاشة أولاً","warning");return;}await supabaseClient.from("playlists").update({published:false}).eq("screen_id",selectedContentScreenId);const {data,error}=await supabaseClient.from("playlists").update({published:true,published_at:new Date().toISOString()}).eq("id",selectedPlaylist.id).select().single();if(error){toast(error.message||t("error"),"error");return;}selectedPlaylist=data;playlists=playlists.map(p=>String(p.id)===String(data.id)?data:Number(p.screen_id)===Number(selectedContentScreenId)?{...p,published:false}:p);await supabaseClient.from("screen_publish_state").upsert({screen_id:selectedContentScreenId,published_playlist_id:selectedPlaylist.id,version:Date.now(),published_at:new Date().toISOString()},{onConflict:"screen_id"});toast("تم نشر المحتوى للشاشة");updateDashboardStats();}
 
 /* =========================================================
    SCHEDULING
@@ -4690,7 +4701,7 @@ function renderSchedules(){
   const box=document.getElementById("schedulesTable"); if(!box)return;
   if(!schedules.length){box.innerHTML=`<div class="empty-state"><div class="empty-icon">◷</div><strong>لا توجد جدولات</strong><span>أضف جدولة لتحديد المحتوى الذي يظهر على الشاشة في وقت معين.</span></div>`;return;}
   const rows=[...schedules].sort((a,b)=>Number(b.priority||0)-Number(a.priority||0));
-  box.innerHTML=`<table><thead><tr><th>الشاشة</th><th>المحتوى</th><th>الفترة</th><th>الأولوية</th><th>الحالة</th><th>الإجراءات</th></tr></thead><tbody>${rows.map(r=>{const sc=screens.find(x=>Number(x.id)===Number(r.screen_id));const pl=playlists.find(x=>Number(x.id)===Number(r.playlist_id));return `<tr><td>${escapeHtml(sc?.name||"-")}</td><td>${escapeHtml(pl?.name||"-")}</td><td>${escapeHtml(formatScheduleRange(r))}</td><td>${Number(r.priority||0)}</td><td><span class="badge ${r.enabled===false?"badge-danger":"badge-success"}">${r.enabled===false?"غير نشطة":"نشطة"}</span></td><td><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn btn-sm" onclick="openScheduleModal('${r.id}')">تعديل</button><button class="btn btn-sm" onclick="toggleSchedule('${r.id}')">${r.enabled===false?"تشغيل":"إيقاف"}</button><button class="btn btn-sm btn-danger" onclick="deleteSchedule('${r.id}')">حذف</button></div></td></tr>`;}).join("")}</tbody></table>`;
+  box.innerHTML=`<table><thead><tr><th>الشاشة</th><th>المحتوى</th><th>الفترة</th><th>الأولوية</th><th>الحالة</th><th>الإجراءات</th></tr></thead><tbody>${rows.map(r=>{const sc=screens.find(x=>Number(x.id)===Number(r.screen_id));const pl=playlists.find(x=>String(x.id)===String(r.playlist_id));return `<tr><td>${escapeHtml(sc?.name||"-")}</td><td>${escapeHtml(pl?.name||"-")}</td><td>${escapeHtml(formatScheduleRange(r))}</td><td>${Number(r.priority||0)}</td><td><span class="badge ${r.enabled===false?"badge-danger":"badge-success"}">${r.enabled===false?"غير نشطة":"نشطة"}</span></td><td><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn btn-sm" onclick="openScheduleModal('${r.id}')">تعديل</button><button class="btn btn-sm" onclick="toggleSchedule('${r.id}')">${r.enabled===false?"تشغيل":"إيقاف"}</button><button class="btn btn-sm btn-danger" onclick="deleteSchedule('${r.id}')">حذف</button></div></td></tr>`;}).join("")}</tbody></table>`;
 }
 async function saveSchedule(){
   const id=document.getElementById("scheduleModalId").value;
