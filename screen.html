@@ -6,7 +6,7 @@
 <title>Innovation Screen</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;font-family:Arial,sans-serif}body{position:relative}.stage{position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center}.media{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:none;image-rendering:auto}.media.full{object-fit:cover}.media.contain{object-fit:contain}.media.cover{object-fit:cover}.media.background{object-fit:cover}.overlay{position:absolute;inset:0;background:rgba(0,0,0,.12);display:none;pointer-events:none}.message{position:absolute;inset:0;display:none;align-items:center;justify-content:center;text-align:center;color:#fff;background:#08070d;padding:30px}.message-box{max-width:700px}.message h1{font-size:38px;margin:0 0 12px}.message p{font-size:18px;color:#aaa;margin:0}.spinner{width:34px;height:34px;border:3px solid #333;border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;margin:auto}@keyframes spin{to{transform:rotate(360deg)}}#screenInfo{position:fixed;bottom:8px;left:8px;z-index:20;color:#777;font-size:10px;opacity:.35;direction:ltr}.offline{position:fixed;right:15px;bottom:15px;z-index:30;padding:7px 10px;border-radius:8px;background:#401b21;color:#ffdfe2;font-size:12px;display:none}.paused{position:fixed;top:15px;right:15px;z-index:30;padding:7px 10px;border-radius:8px;background:#201d2c;color:#fff;font-size:12px;display:none}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;font-family:Arial,sans-serif}body{position:relative}.stage{position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center}.media{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:none;image-rendering:auto}.media.full{object-fit:cover}.media.contain{object-fit:contain}.media.cover{object-fit:cover}.media.background{object-fit:cover}.overlay{position:absolute;inset:0;background:rgba(0,0,0,.12);display:none;pointer-events:none}.message{position:absolute;inset:0;display:none;align-items:center;justify-content:center;text-align:center;color:#fff;background:#08070d;padding:30px}.message-box{max-width:700px}.message h1{font-size:38px;margin:0 0 12px}.message p{font-size:18px;color:#aaa;margin:0}.spinner{width:34px;height:34px;border:3px solid #333;border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;margin:auto}@keyframes spin{to{transform:rotate(360deg)}}#screenInfo{position:fixed;bottom:8px;left:8px;z-index:20;color:#777;font-size:10px;opacity:.35;direction:ltr}.offline{position:fixed;right:15px;bottom:15px;z-index:30;padding:7px 10px;border-radius:8px;background:#401b21;color:#ffdfe2;font-size:12px;display:none}.paused{position:fixed;top:15px;right:15px;z-index:30;padding:7px 10px;border-radius:8px;background:#201d2c;color:#fff;font-size:12px;display:none}.countdown{display:none!important}
 </style>
 </head>
 <body>
@@ -16,6 +16,7 @@
   <div id="overlay" class="overlay"></div>
   <div id="maintenance" class="message"><div class="message-box"><h1>هذه الشاشة غير مفعلة</h1><p>يرجى تفعيل الشاشة من لوحة التحكم.</p></div></div>
   <div id="offline" class="offline">لا يوجد اتصال بالخادم</div>
+  <div id="countdown" class="countdown"></div>
   <div id="loading" class="message" style="display:flex"><div><div class="spinner"></div></div></div>
   <div id="screenInfo"></div>
 </div>
@@ -33,11 +34,12 @@ const maintenanceEl=document.getElementById("maintenance");
 const offlineEl=document.getElementById("offline");
 const loadingEl=document.getElementById("loading");
 const screenInfoEl=document.getElementById("screenInfo");
-let screen=null,currentItems=[],currentIndex=0,timer=null,paused=false,lastContentHash="",realtimeChannel=null,heartbeatTimer=null,firstLoad=true,syncTimer=null,syncInProgress=false;
+const countdownEl=document.getElementById("countdown");
+let screen=null,currentItems=[],currentIndex=0,timer=null,countdownTimer=null,paused=false,lastContentHash="",realtimeChannel=null,heartbeatTimer=null,firstLoad=true,syncTimer=null,syncInProgress=false;
 let activePlaylist=null;
 const CACHE_KEY="innovationSignageScreenCache_v4_"+SCREEN_ID;
 function show(el,on=true){el.style.display=on?(el===imageEl||el===videoEl?"block":"flex"):"none"}
-function clearTimer(){if(timer){clearTimeout(timer);timer=null}}
+function clearTimer(){if(timer){clearTimeout(timer);timer=null}if(countdownTimer){clearInterval(countdownTimer);countdownTimer=null}countdownEl.style.display="none";countdownEl.textContent=""}
 function setFit(mode){[imageEl,videoEl].forEach(e=>{e.classList.remove("cover","background","full","contain");if(mode==="cover"||mode==="fill")e.classList.add("full");else e.classList.add("contain")})}
 function stopMedia(){clearTimer();videoEl.pause();videoEl.removeAttribute("src");imageEl.removeAttribute("src");show(imageEl,false);show(videoEl,false)}
 function showMessage(text,sub=""){loadingEl.style.display="none";maintenanceEl.querySelector("h1").textContent=text;maintenanceEl.querySelector("p").textContent=sub;show(maintenanceEl,true);stopMedia()}
@@ -72,8 +74,9 @@ function playCurrent(){
  show(imageEl,false);show(videoEl,false);overlayEl.style.display="none";videoEl.onended=null;videoEl.onerror=null;
  if(type==="image"){
    imageEl.src=m.file_url;show(imageEl,true);
-   const duration=item.duration!==null&&item.duration!==undefined?Number(item.duration):0;
-   if(duration>0)timer=setTimeout(nextItem,duration*1000);
+   const duration=item.duration!==null&&item.duration!==undefined&&Number(item.duration)>0?Number(item.duration):(Number(activePlaylist?.default_duration)>0?Number(activePlaylist.default_duration):10);
+   // العد التنازلي يعمل داخليًا لتحديد وقت الانتقال، لكنه لا يظهر على الشاشة.
+   timer=setTimeout(nextItem,duration*1000);
  }else{
    videoEl.src=m.file_url;videoEl.currentTime=0;show(videoEl,true);
    videoEl.onended=()=>{if(playlistRepeat())nextItem();};videoEl.onerror=()=>{nextItem()};
