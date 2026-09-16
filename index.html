@@ -31,6 +31,25 @@
   --topbar:72px;
   --radius:14px;
 }
+body.theme-light{
+  --bg:#f4f5f8;
+  --bg2:#eef0f4;
+  --panel:#ffffff;
+  --panel2:#f7f8fa;
+  --panel3:#eef0f4;
+  --border:#dfe2e8;
+  --border2:#d3d7df;
+  --text:#1d1b22;
+  --text2:#4f4b57;
+  --muted:#77727f;
+}
+body.theme-light .sidebar{background:linear-gradient(180deg,#ffffff 0%,#f5f6f9 100%)}
+body.theme-light .topbar{background:rgba(255,255,255,.92)}
+body.theme-light .card,body.theme-light .screen-card,body.theme-light .settings-section{box-shadow:0 2px 10px rgba(20,20,40,.04)}
+body.theme-light .media-picker-item,body.theme-light .picker-item{background:#fff;color:var(--text)}
+body.theme-light .media-picker-thumb,body.theme-light .item-thumb{background:#f0f1f4}
+body.theme-light .screen-preview{background:#eef0f4}
+
 html,
 body{
   margin:0;
@@ -852,6 +871,10 @@ html[dir="ltr"] .search-icon{
   text-align:center;
   font-size:16px;
 }
+.item-thumb{width:96px;height:58px;flex-shrink:0;background:#09070e;border-radius:7px;overflow:hidden;display:flex;align-items:center;justify-content:center;border:0}
+.item-thumb img,.item-thumb video{width:100%;height:100%;display:block;object-fit:contain;background:#09070e}
+.item-info{flex:1;min-width:0}.item-info strong{display:block;color:#fff;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.item-info span{display:block;color:var(--muted);font-size:9px;margin-top:4px}
+.item-controls{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
 .playlist-thumb{
   width:90px;
   height:55px;
@@ -1365,6 +1388,24 @@ html[dir="ltr"] .toast-container{
 .picker-item:hover{
   border-color:#514665;
 }
+.media-picker-item{
+  appearance:none;
+  -webkit-appearance:none;
+  border:1px solid var(--border);
+  border-radius:9px;
+  overflow:hidden;
+  background:#100d17;
+  color:var(--text);
+  cursor:pointer;
+  transition:.16s;
+  padding:0;
+  text-align:right;
+}
+.media-picker-item:hover{border-color:#514665;background:#15111f}
+.media-picker-item.selected{border-color:var(--primary);box-shadow:0 0 0 1px var(--primary)}
+.media-picker-thumb{height:145px;background:#09070e;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.media-picker-thumb img,.media-picker-thumb video{width:100%;height:100%;object-fit:contain;background:#09070e;display:block}
+.media-picker-item span{display:block;padding:7px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px;color:var(--text)}
 .picker-item.selected{
   border-color:var(--primary);
   box-shadow:
@@ -1398,6 +1439,34 @@ html[dir="ltr"] .toast-container{
   font-size:8px;
   margin-top:3px;
 }
+.image-only-preview{
+  background:rgba(0,0,0,.96)!important;
+}
+.image-only-preview .modal{
+  width:100vw!important;
+  max-width:none!important;
+  height:100vh!important;
+  max-height:none!important;
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  padding:0!important;
+}
+.image-only-preview .modal-header{display:none!important}
+.image-only-preview .modal > div:last-child{
+  min-height:100vh!important;
+  height:100vh!important;
+  padding:0!important;
+}
+.image-only-preview #imagePreviewImage{
+  max-width:100vw!important;
+  max-height:100vh!important;
+  width:auto!important;
+  height:auto!important;
+  object-fit:contain!important;
+}
+
 /* =========================
    RESPONSIVE
 ========================= */
@@ -1564,6 +1633,15 @@ html[dir="ltr"] .toast-container{
     font-size:21px;
   }
 }
+
+/* =========================
+   SCROLLBAR
+========================= */
+*{scrollbar-width:thin;scrollbar-color:#3b3348 #0c0910}
+*::-webkit-scrollbar{width:7px;height:7px}
+*::-webkit-scrollbar-track{background:#0c0910}
+*::-webkit-scrollbar-thumb{background:#3b3348;border-radius:999px;border:1px solid #17131e}
+*::-webkit-scrollbar-thumb:hover{background:#514665}
 </style>
 </head>
 <body>
@@ -1776,15 +1854,7 @@ html[dir="ltr"] .toast-container{
           </p>
         </div>
         <div class="page-header-actions">
-          <button
-            class="btn btn-primary"
-            onclick="navigate('media');setTimeout(openMediaModal,100)"
-          >
-            <span>＋</span>
-            <span data-i18n="uploadMedia">
-              إضافة وسائط
-            </span>
-          </button>
+          
         </div>
       </div>
       <div class="stats-grid">
@@ -2370,16 +2440,13 @@ html[dir="ltr"] .toast-container{
             </div>
             <div class="settings-row">
               <div class="settings-row-info">
-                <strong data-i18n="theme">
-                  المظهر
-                </strong>
-                <span data-i18n="themeDesc">
-                  الواجهة الداكنة مفعلة.
-                </span>
+                <strong data-i18n="theme">المظهر</strong>
+                <span data-i18n="themeDesc">اختر مظهر لوحة التحكم.</span>
               </div>
-              <span class="badge badge-info">
-                Dark
-              </span>
+              <div class="lang-switch">
+                <button class="lang-btn" id="themeDarkBtn" onclick="setTheme('dark')">داكن</button>
+                <button class="lang-btn" id="themeLightBtn" onclick="setTheme('light')">طبيعي</button>
+              </div>
             </div>
           </div>
         </div>
@@ -2474,25 +2541,28 @@ html[dir="ltr"] .toast-container{
             type="text"
           >
         </div>
-        <div class="form-group">
-          <label data-i18n="width">
-            العرض
-          </label>
-          <input
-            class="form-input"
-            id="screenWidth"
-            type="number"
-          >
+        <div class="form-group full">
+          <label>مقاس الشاشة</label>
+          <select class="form-select" id="screenPreset" onchange="applyScreenPreset()">
+            <option value="1920x1080">1920 × 1080 — أفقي Full HD</option>
+            <option value="1080x1920">1080 × 1920 — عمودي Full HD</option>
+            <option value="1280x720">1280 × 720 — أفقي HD</option>
+            <option value="720x1280">720 × 1280 — عمودي HD</option>
+            <option value="1366x768">1366 × 768 — شاشة كمبيوتر</option>
+            <option value="768x1366">768 × 1366 — عمودي</option>
+            <option value="3840x2160">3840 × 2160 — أفقي 4K</option>
+            <option value="2160x3840">2160 × 3840 — عمودي 4K</option>
+            <option value="1080x1080">1080 × 1080 — مربع</option>
+            <option value="custom">مقاس مخصص</option>
+          </select>
         </div>
         <div class="form-group">
-          <label data-i18n="height">
-            الارتفاع
-          </label>
-          <input
-            class="form-input"
-            id="screenHeight"
-            type="number"
-          >
+          <label data-i18n="width">العرض</label>
+          <input class="form-input" id="screenWidth" type="number" min="1" max="10000" onchange="syncScreenPresetFromInputs()">
+        </div>
+        <div class="form-group">
+          <label data-i18n="height">الارتفاع</label>
+          <input class="form-input" id="screenHeight" type="number" min="1" max="10000" onchange="syncScreenPresetFromInputs()">
         </div>
         <div class="form-group full">
           <label data-i18n="orientation">
@@ -2687,7 +2757,7 @@ html[dir="ltr"] .toast-container{
       </button>
       <button
         class="btn btn-primary"
-        onclick="addSelectedMediaToPlaylist()"
+        onclick="confirmMediaPicker()"
         data-i18n="addSelected"
       >
         إضافة المحدد
@@ -2704,7 +2774,7 @@ html[dir="ltr"] .toast-container{
 >
   <div class="modal">
     <div class="modal-header">
-      <strong data-i18n="addSchedule">
+      <strong id="scheduleModalTitle" data-i18n="addSchedule">
         إضافة جدولة
       </strong>
       <button
@@ -2715,6 +2785,7 @@ html[dir="ltr"] .toast-container{
       </button>
     </div>
     <div class="modal-body">
+      <input type="hidden" id="scheduleModalId">
       <div class="form-grid">
         <div class="form-group">
           <label data-i18n="screen">
@@ -3940,7 +4011,7 @@ function renderDashboardScreens(){
     return;
   }
   const recent =
-    screens.slice(0,6);
+    screens;
   container.innerHTML = `
     <div
       style="
@@ -4316,10 +4387,8 @@ function openScreenModal(id = null){
       "screenHeight"
     ).value =
       screen.height || "";
-    document.getElementById(
-      "screenOrientation"
-    ).value =
-      screen.orientation || "landscape";
+    document.getElementById("screenOrientation").value = screen.orientation || "landscape";
+    syncScreenPresetFromInputs();
   }else{
     document.getElementById(
       "screenModalTitle"
@@ -4343,14 +4412,31 @@ function openScreenModal(id = null){
       "screenHeight"
     ).value =
       "1080";
-    document.getElementById(
-      "screenOrientation"
-    ).value =
-      "landscape";
+    document.getElementById("screenOrientation").value = "landscape";
+    document.getElementById("screenPreset").value = "1920x1080";
   }
   openModal(
     "screenModal"
   );
+}
+function applyScreenPreset(){
+  const value=document.getElementById("screenPreset")?.value||"custom";
+  if(value==="custom") return;
+  const parts=value.split("x").map(Number);
+  if(parts.length!==2) return;
+  document.getElementById("screenWidth").value=parts[0];
+  document.getElementById("screenHeight").value=parts[1];
+  const orientation=parts[0]===parts[1]?"square":(parts[0]>parts[1]?"landscape":"portrait");
+  document.getElementById("screenOrientation").value=orientation;
+}
+function syncScreenPresetFromInputs(){
+  const w=Number(document.getElementById("screenWidth")?.value);
+  const h=Number(document.getElementById("screenHeight")?.value);
+  const preset=document.getElementById("screenPreset");
+  if(!preset)return;
+  const value=`${w}x${h}`;
+  preset.value=[...preset.options].some(o=>o.value===value)?value:"custom";
+  if(w&&h) document.getElementById("screenOrientation").value=w===h?"square":(w>h?"landscape":"portrait");
 }
 async function saveScreen(){
   const id =
@@ -4506,6 +4592,81 @@ function togglePickerMedia(id){const k=String(id);selectedPickerMedia.has(k)?sel
 async function confirmMediaPicker(){const ids=[...selectedPickerMedia];if(!ids.length)return;if(replacingPlaylistItemId){const m=media.find(x=>String(x.id)===ids[0]);const old=playlistItems.find(x=>String(x.id)===String(replacingPlaylistItemId));const d=m.type==="image"?(old?.duration??selectedPlaylist.default_duration??10):null;await updatePlaylistItem(replacingPlaylistItemId,{media_id:m.id,duration:d});replacingPlaylistItemId=null;closeModal("mediaPickerModal");return;}
  const start=getItemsForPlaylist(selectedPlaylist.id).length;for(let i=0;i<ids.length;i++){const m=media.find(x=>String(x.id)===ids[i]);if(!m)continue;const {data,error}=await supabaseClient.from("playlist_items").insert({playlist_id:selectedPlaylist.id,media_id:m.id,position:start+i,duration:m.type==="image"?(selectedPlaylist.default_duration??10):null,transition:selectedPlaylist.default_transition||"fade",enabled:true}).select(`*,media:media_id(*)`).single();if(!error)playlistItems.push(data);}selectedPickerMedia.clear();closeModal("mediaPickerModal");renderPlaylistItems();}
 async function publishCurrentPlaylist(){if(!selectedPlaylist||!selectedContentScreenId){toast("اختر شاشة أولاً","warning");return;}await supabaseClient.from("playlists").update({published:false}).eq("screen_id",selectedContentScreenId);const {data,error}=await supabaseClient.from("playlists").update({published:true,published_at:new Date().toISOString()}).eq("id",selectedPlaylist.id).select().single();if(error){toast(error.message||t("error"),"error");return;}selectedPlaylist=data;playlists=playlists.map(p=>Number(p.id)===Number(data.id)?data:Number(p.screen_id)===Number(selectedContentScreenId)?{...p,published:false}:p);await supabaseClient.from("screen_publish_state").upsert({screen_id:selectedContentScreenId,published_playlist_id:selectedPlaylist.id,version:Date.now(),published_at:new Date().toISOString()},{onConflict:"screen_id"});toast("تم نشر المحتوى للشاشة");updateDashboardStats();}
+
+/* =========================================================
+   SCHEDULING
+========================================================= */
+function formatScheduleRange(row){
+  const d1=row.start_date||"";
+  const d2=row.end_date||d1;
+  const t1=row.start_time||"00:00";
+  const t2=row.end_time||"23:59";
+  return `${d1} ${t1} → ${d2} ${t2}`;
+}
+function openScheduleModal(id=null){
+  document.getElementById("scheduleModalId").value=id||"";
+  const row=id?schedules.find(x=>String(x.id)===String(id)):null;
+  const select=document.getElementById("scheduleScreen");
+  select.innerHTML=screens.map(x=>`<option value="${x.id}">${escapeHtml(x.name)}</option>`).join("");
+  if(!screens.length){toast("أضف شاشة أولاً","warning");return;}
+  select.value=String(row?.screen_id||screens[0].id);
+  loadSchedulePlaylists();
+  document.getElementById("scheduleStartDate").value=row?.start_date||new Date().toISOString().slice(0,10);
+  document.getElementById("scheduleEndDate").value=row?.end_date||row?.start_date||new Date().toISOString().slice(0,10);
+  document.getElementById("scheduleStartTime").value=(row?.start_time||"00:00").slice(0,5);
+  document.getElementById("scheduleEndTime").value=(row?.end_time||"23:59").slice(0,5);
+  document.getElementById("schedulePriority").value=Number(row?.priority||0);
+  document.getElementById("scheduleModalTitle").textContent=row?"تعديل جدولة":"إضافة جدولة";
+  openModal("scheduleModal");
+}
+function loadSchedulePlaylists(){
+  const screenId=Number(document.getElementById("scheduleScreen")?.value);
+  const select=document.getElementById("schedulePlaylist");
+  if(!select)return;
+  const list=playlists.filter(p=>Number(p.screen_id)===screenId);
+  select.innerHTML=list.map(p=>`<option value="${p.id}">${escapeHtml(p.name||"قائمة محتوى")}</option>`).join("");
+  const id=document.getElementById("scheduleModalId")?.value;
+  const row=id?schedules.find(x=>String(x.id)===String(id)):null;
+  if(row&&list.some(p=>String(p.id)===String(row.playlist_id))) select.value=String(row.playlist_id);
+}
+function renderSchedules(){
+  const box=document.getElementById("schedulesTable"); if(!box)return;
+  if(!schedules.length){box.innerHTML=`<div class="empty-state"><div class="empty-icon">◷</div><strong>لا توجد جدولات</strong><span>أضف جدولة لتحديد المحتوى الذي يظهر على الشاشة في وقت معين.</span></div>`;return;}
+  const rows=[...schedules].sort((a,b)=>Number(b.priority||0)-Number(a.priority||0));
+  box.innerHTML=`<table><thead><tr><th>الشاشة</th><th>المحتوى</th><th>الفترة</th><th>الأولوية</th><th>الحالة</th><th>الإجراءات</th></tr></thead><tbody>${rows.map(r=>{const sc=screens.find(x=>Number(x.id)===Number(r.screen_id));const pl=playlists.find(x=>Number(x.id)===Number(r.playlist_id));return `<tr><td>${escapeHtml(sc?.name||"-")}</td><td>${escapeHtml(pl?.name||"-")}</td><td>${escapeHtml(formatScheduleRange(r))}</td><td>${Number(r.priority||0)}</td><td><span class="badge ${r.enabled===false?"badge-danger":"badge-success"}">${r.enabled===false?"غير نشطة":"نشطة"}</span></td><td><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn btn-sm" onclick="openScheduleModal('${r.id}')">تعديل</button><button class="btn btn-sm" onclick="toggleSchedule('${r.id}')">${r.enabled===false?"تشغيل":"إيقاف"}</button><button class="btn btn-sm btn-danger" onclick="deleteSchedule('${r.id}')">حذف</button></div></td></tr>`;}).join("")}</tbody></table>`;
+}
+async function saveSchedule(){
+  const id=document.getElementById("scheduleModalId").value;
+  const screenId=Number(document.getElementById("scheduleScreen").value);
+  const playlistId=document.getElementById("schedulePlaylist").value;
+  const startDate=document.getElementById("scheduleStartDate").value;
+  const endDate=document.getElementById("scheduleEndDate").value||startDate;
+  const startTime=document.getElementById("scheduleStartTime").value||"00:00";
+  const endTime=document.getElementById("scheduleEndTime").value||"23:59";
+  const priority=Number(document.getElementById("schedulePriority").value||0);
+  if(!screenId||!playlistId||!startDate||!endDate){toast(t("required"),"warning");return;}
+  if(endDate<startDate){toast("تاريخ النهاية يجب أن يكون بعد تاريخ البداية","warning");return;}
+  const playlist=playlists.find(p=>Number(p.id)===playlistId||String(p.id)===String(playlistId));
+  if(!playlist||Number(playlist.screen_id)!==screenId){toast("قائمة المحتوى لا تتبع الشاشة المحددة","warning");return;}
+  const payload={screen_id:screenId,playlist_id:playlistId,start_date:startDate,end_date:endDate,start_time:startTime,end_time:endTime,priority,enabled:true};
+  try{
+    let result;
+    if(id) result=await supabaseClient.from("schedules").update(payload).eq("id",id).select().single();
+    else result=await supabaseClient.from("schedules").insert(payload).select().single();
+    if(result.error)throw result.error;
+    closeModal("scheduleModal"); toast(t("scheduleSaved")); await loadAll();
+  }catch(error){console.error(error);toast(error.message||t("error"),"error");}
+}
+async function toggleSchedule(id){
+  const row=schedules.find(x=>String(x.id)===String(id));if(!row)return;
+  const {error}=await supabaseClient.from("schedules").update({enabled:row.enabled===false}).eq("id",id);
+  if(error){toast(error.message||t("error"),"error");return;} await loadAll();
+}
+async function deleteSchedule(id){
+  if(!confirm(t("confirmDelete")))return;
+  const {error}=await supabaseClient.from("schedules").delete().eq("id",id);
+  if(error){toast(error.message||t("error"),"error");return;} toast(t("scheduleDeleted"));await loadAll();
+}
 
 /* =========================================================
    MEDIA LIBRARY
@@ -5051,12 +5212,28 @@ function previewMedia(url,type){
   if(!url)return;
   const img=document.getElementById("imagePreviewImage");
   const video=document.getElementById("imagePreviewVideo");
-  img.style.display="none"; video.style.display="none";
-  video.pause(); video.removeAttribute("src");
-  if(type==="image"){img.src=url;img.style.display="block";}else{video.src=url;video.style.display="block";}
+  img.style.display="none";
+  video.style.display="none";
+  video.pause();
+  video.removeAttribute("src");
+  if(type==="image"){
+    img.src=url;
+    img.style.display="block";
+    document.getElementById("imagePreviewModal").classList.add("image-only-preview");
+  }else{
+    video.src=url;
+    video.style.display="block";
+    document.getElementById("imagePreviewModal").classList.remove("image-only-preview");
+  }
   openModal("imagePreviewModal");
 }
-function closeImagePreview(){const v=document.getElementById("imagePreviewVideo");if(v){v.pause();v.removeAttribute("src");}closeModal("imagePreviewModal");}
+function closeImagePreview(){
+  const v=document.getElementById("imagePreviewVideo");
+  const modal=document.getElementById("imagePreviewModal");
+  if(v){v.pause();v.removeAttribute("src");}
+  modal.classList.remove("image-only-preview");
+  closeModal("imagePreviewModal");
+}
 function copyScreenUrl(id){
  const url=getScreenUrl(id);
  if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(url).then(()=>toast("تم نسخ رابط الشاشة"));return;}
@@ -5123,12 +5300,25 @@ function setupUploadZone(){
 }
 function setupRealtime(){try{const c=supabaseClient.channel("innovation-admin-live");c.on("postgres_changes",{event:"*",schema:"public",table:"screens"},()=>loadAll());c.on("postgres_changes",{event:"*",schema:"public",table:"playlists"},()=>loadAll());c.on("postgres_changes",{event:"*",schema:"public",table:"playlist_items"},()=>loadAll());c.subscribe();realtimeChannels=[c];}catch(e){console.warn(e);}}
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeImagePreview();});
+function setTheme(theme){
+  if(theme!=="dark" && theme!=="light") return;
+  localStorage.setItem("innovationTheme",theme);
+  document.body.classList.toggle("theme-light",theme==="light");
+  document.getElementById("themeDarkBtn")?.classList.toggle("active",theme==="dark");
+  document.getElementById("themeLightBtn")?.classList.toggle("active",theme==="light");
+}
+function applyTheme(){
+  const theme=localStorage.getItem("innovationTheme")||"dark";
+  setTheme(theme);
+}
+
 /* =========================================================
    INITIALIZATION
 ========================================================= */
 document.addEventListener(
   "DOMContentLoaded",
   async () => {
+    applyTheme();
     applyTranslations();
     updateConnectionUI();
     setupUploadZone();
