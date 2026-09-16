@@ -6,129 +6,7 @@
 <title>Innovation Screen</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;font-family:Arial,sans-serif}body{position:relative}.stage{position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center}.media{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:none}.media.cover{object-fit:cover}.media.background{object-fit:cover}.overlay{position:absolute;inset:0;background:rgba(0,0,0,.12);display:none;pointer-events:none}.message{position:absolute;inset:0;display:none;align-items:center;justify-content:center;text-align:center;color:#fff;background:#08070d;padding:30px}.message-box{max-width:700px}.message h1{font-size:38px;margin:0 0 12px}.message p{font-size:18px;color:#aaa;margin:0}.spinner{width:34px;height:34px;border:3px solid #333;border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;margin:auto}@keyframes spin{to{transform:rotate(360deg)}}#screenInfo{position:fixed;bottom:8px;left:8px;z-index:20;color:#777;font-size:10px;opacity:.35;direction:ltr}.offline{position:fixed;right:15px;bottom:15px;z-index:30;padding:7px 10px;border-radius:8px;background:#401b21;color:#ffdfe2;font-size:12px;display:none}.paused{position:fixed;top:15px;right:15px;z-index:30;padding:7px 10px;border-radius:8px;background:#201d2c;color:#fff;font-size:12px;display:none}
-</style>
-</head>
-<body>
-<div class="stage">
-  <img id="image" class="media" alt="">
-  <video id="video" class="media" playsinline preload="auto"></video>
-  <div id="overlay" class="overlay"></div>
-  <div id="maintenance" class="message"><div class="message-box"><h1>هذه الشاشة غير مفعلة</h1><p>يرجى تفعيل الشاشة من لوحة التحكم.</p></div></div>
-  <div id="offline" class="offline">لا يوجد اتصال بالخادم</div>
-  <div id="loading" class="message" style="display:flex"><div><div class="spinner"></div></div></div>
-  <div id="screenInfo"></div>
-</div>
-<script>const SUPABASE_URL="https://gkdqttzjwgyfyjbrcbdp.supabase.co";
-const SUPABASE_KEY="sb_publishable_QRPg8bjUXtSxRtwBmCguug_cq8ZjbVv";
-const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-const SCREEN_ID=Number(new URLSearchParams(location.search).get("id")||0);
-const imageEl=document.getElementById("image"),videoEl=document.getElementById("video"),overlayEl=document.getElementById("overlay"),maintenanceEl=document.getElementById("maintenance"),offlineEl=document.getElementById("offline"),loadingEl=document.getElementById("loading"),screenInfoEl=document.getElementById("screenInfo");
-let screen=null,currentItems=[],currentIndex=0,timer=null,paused=false,lastContentHash="",realtimeChannel=null,heartbeatTimer=null,syncTimer=null,requestTimer=null,playlist=null;
-const CACHE_KEY="innovationSignageScreenCache_v6_"+SCREEN_ID;
-function show(el,on=true){el.style.display=on?(el===imageEl||el===videoEl?"block":"flex"):"none"}
-function clearTimer(){if(timer){clearTimeout(timer);timer=null}}
-function setFit(mode){[imageEl,videoEl].forEach(e=>{e.classList.remove("cover","background");if(mode==="cover")e.classList.add("cover");if(mode==="background")e.classList.add("background")})}
-function stopMedia(){clearTimer();videoEl.pause();videoEl.removeAttribute("src");imageEl.removeAttribute("src");show(imageEl,false);show(videoEl,false)}
-function showMessage(text,sub=""){maintenanceEl.querySelector("h1").textContent=text;maintenanceEl.querySelector("p").textContent=sub;show(maintenanceEl,true);stopMedia();show(loadingEl,false)}
-function hideLoading(){show(loadingEl,false)}
-async function loadScreen(){
- if(!SCREEN_ID){throw new Error("رقم الشاشة غير موجود في الرابط");}
- const {data,error}=await supabaseClient.from("screens").select("*").eq("id",SCREEN_ID).maybeSingle();
- if(error)throw error;
- screen=data||null;screenInfoEl.textContent=`screen ${SCREEN_ID} · ${screen?.name||""}`;return screen;
-}
-function checkScreen(){if(!screen){showMessage("الشاشة غير موجودة","تحقق من رقم الشاشة في الرابط.");return false}if(screen.enabled===false||screen.maintenance_mode===true){showMessage("هذه الشاشة غير مفعلة","يرجى تفعيل الشاشة من لوحة التحكم.");return false}show(maintenanceEl,false);return true}
-async function findPlaylist(){
- let playlistId=null;
- const state=await supabaseClient.from("screen_publish_state").select("published_playlist_id,version,published_at").eq("screen_id",SCREEN_ID).maybeSingle();
- if(!state.error&&state.data?.published_playlist_id) playlistId=state.data.published_playlist_id;
- // مهم: إذا لم يوجد publish state، استخدم قائمة الشاشة نفسها حتى لا تظهر الشاشة سوداء.
- if(!playlistId){
-   const p=await supabaseClient.from("playlists").select("*").eq("screen_id",SCREEN_ID).order("created_at",{ascending:true}).limit(1).maybeSingle();
-   if(!p.error&&p.data) playlistId=p.data.id;
- }
- if(playlistId){
-   const {data:p,error:pe}=await supabaseClient.from("playlists").select("*").eq("id",playlistId).maybeSingle();
-   if(pe)throw pe;
-   if(p)return p;
- }
- // إذا كانت حالة النشر قديمة أو تشير لقائمة محذوفة، نأخذ قائمة الشاشة نفسها.
- const fallback=await supabaseClient.from("playlists").select("*").eq("screen_id",SCREEN_ID).order("created_at",{ascending:true}).limit(1).maybeSingle();
- if(fallback.error)throw fallback.error;
- return fallback.data||null;
-}
-async function loadContent(){
- playlist=await findPlaylist();
- if(!playlist){return {items:[],hash:"empty",playlist:null};}
- const {data:items,error:ie}=await supabaseClient.from("playlist_items").select("*,media:media_id(*)").eq("playlist_id",playlist.id).eq("enabled",true).order("position",{ascending:true});
- if(ie)throw ie;
- const clean=(items||[]).filter(x=>x.media&&x.media.enabled!==false&&x.media.file_url);
- const hash=JSON.stringify({playlist:playlist.id,updated:playlist.updated_at,published:playlist.published_at,items:clean.map(x=>({id:x.id,media:x.media_id,pos:x.position,d:x.duration,t:x.transition,u:x.media.file_url}))});
- return {items:clean,hash,playlist};
-}
-function saveCache(payload){try{localStorage.setItem(CACHE_KEY,JSON.stringify(payload))}catch(e){}}
-function readCache(){try{return JSON.parse(localStorage.getItem(CACHE_KEY)||"null")}catch(e){return null}}
-function applyItems(items,p){
- currentItems=items||[];currentIndex=0;setFit(p?.fit_mode||"contain");hideLoading();
- if(!currentItems.length){stopMedia();showMessage("لا يوجد محتوى لهذه الشاشة","أضف محتوى من لوحة التحكم.");return;}
- show(maintenanceEl,false);playCurrent();
-}
-function playCurrent(){
- clearTimer();if(!currentItems.length)return;if(currentIndex>=currentItems.length)currentIndex=0;
- const item=currentItems[currentIndex],m=item.media||{};show(imageEl,false);show(videoEl,false);overlayEl.style.display="none";videoEl.onended=null;videoEl.onerror=null;
- if(m.type==="image"){
-   imageEl.src=m.file_url;imageEl.onload=()=>hideLoading();imageEl.onerror=()=>nextItem();show(imageEl,true);
-   const duration=item.duration===null||item.duration===undefined?10:Number(item.duration);
-   // 0 = ثابت، لا ينتقل تلقائياً.
-   if(duration>0)timer=setTimeout(nextItem,duration*1000);
- }else{
-   videoEl.src=m.file_url;videoEl.currentTime=0;show(videoEl,true);hideLoading();
-   videoEl.onended=()=>nextItem();videoEl.onerror=()=>nextItem();videoEl.play().catch(()=>{videoEl.muted=true;videoEl.play().catch(()=>{})});
- }
-}
-function nextItem(){if(paused||!currentItems.length)return;currentIndex=(currentIndex+1)%currentItems.length;playCurrent()}
-async function syncFromSupabase(){
- if(syncTimer)return;syncTimer=setTimeout(async()=>{syncTimer=null;await doSync()},100);
-}
-async function doSync(){
- try{
-   await loadScreen();
-   if(!checkScreen())return;
-   const result=await loadContent();
-   offlineEl.style.display="none";
-   if(result.hash!==lastContentHash||!currentItems.length){lastContentHash=result.hash;playlist=result.playlist;applyItems(result.items,result.playlist);saveCache({screen,items:result.items,playlist:result.playlist,hash:result.hash});}
-   sendHeartbeat();
- }catch(e){
-   console.error("screen sync",e);offlineEl.style.display="block";
-   const c=readCache();
-   if(c&&(!currentItems.length||lastContentHash!==c.hash)){
-     screen=c.screen||screen;playlist=c.playlist||playlist;lastContentHash=c.hash||"";if(checkScreen())applyItems(c.items||[],c.playlist||null);
-   }else if(!currentItems.length){hideLoading();showMessage("تعذر الاتصال بالخادم","سيتم المحاولة تلقائياً مرة أخرى.");}
- }
-}
-async function sendHeartbeat(){try{const now=new Date().toISOString();await supabaseClient.from("screen_heartbeats").upsert({screen_id:SCREEN_ID,last_seen_at:now,updated_at:now},{onConflict:"screen_id"});await supabaseClient.from("screens").update({last_seen_at:now}).eq("id",SCREEN_ID)}catch(e){}}
-function startHeartbeat(){sendHeartbeat();heartbeatTimer=setInterval(sendHeartbeat,30000)}
-function startRealtime(){
- realtimeChannel=supabaseClient.channel("screen-live-"+SCREEN_ID)
- .on("postgres_changes",{event:"*",schema:"public",table:"screens",filter:`id=eq.${SCREEN_ID}`},()=>syncFromSupabase())
- .on("postgres_changes",{event:"*",schema:"public",table:"screen_publish_state",filter:`screen_id=eq.${SCREEN_ID}`},()=>syncFromSupabase())
- .on("postgres_changes",{event:"*",schema:"public",table:"playlists",filter:`screen_id=eq.${SCREEN_ID}`},()=>syncFromSupabase())
- .on("postgres_changes",{event:"*",schema:"public",table:"playlist_items"},()=>syncFromSupabase())
- .on("postgres_changes",{event:"*",schema:"public",table:"media"},()=>syncFromSupabase())
- .subscribe();
-}
-document.addEventListener("keydown",e=>{if(e.key==="ArrowRight"||e.key==="ArrowDown")nextItem();if(e.key==="ArrowLeft"||e.key==="ArrowUp"){if(currentItems.length){currentIndex=(currentIndex-1+currentItems.length)%currentItems.length;playCurrent()}}if(e.key===" "){e.preventDefault();paused=!paused;if(paused){clearTimer();videoEl.pause()}else playCurrent()}if(e.key.toLowerCase()==="f")document.documentElement.requestFullscreen?.()});
-document.addEventListener("visibilitychange",()=>{if(!document.hidden)syncFromSupabase()});
-window.addEventListener("online",()=>{offlineEl.style.display="none";syncFromSupabase()});
-(async function init(){
- show(loadingEl,true);
- const c=readCache();
- if(c&&c.screen){screen=c.screen;playlist=c.playlist||null;currentItems=c.items||[];lastContentHash=c.hash||"";if(checkScreen())applyItems(currentItems,playlist);}
- await doSync();startHeartbeat();startRealtime();setInterval(doSync,10000);
-})();</script>
-<style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;font-family:Arial,sans-serif}body{position:relative}.stage{position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center}.media{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:none}.media.cover{object-fit:cover}.media.background{object-fit:cover}.overlay{position:absolute;inset:0;background:rgba(0,0,0,.12);display:none;pointer-events:none}.message{position:absolute;inset:0;display:none;align-items:center;justify-content:center;text-align:center;color:#fff;background:#08070d;padding:30px}.message-box{max-width:700px}.message h1{font-size:38px;margin:0 0 12px}.message p{font-size:18px;color:#aaa;margin:0}.spinner{width:34px;height:34px;border:3px solid #333;border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;margin:auto}@keyframes spin{to{transform:rotate(360deg)}}#screenInfo{position:fixed;bottom:8px;left:8px;z-index:20;color:#777;font-size:10px;opacity:.35;direction:ltr}.offline{position:fixed;right:15px;bottom:15px;z-index:30;padding:7px 10px;border-radius:8px;background:#401b21;color:#ffdfe2;font-size:12px;display:none}.paused{position:fixed;top:15px;right:15px;z-index:30;padding:7px 10px;border-radius:8px;background:#201d2c;color:#fff;font-size:12px;display:none}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;font-family:Arial,sans-serif}body{position:relative}.stage{position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center}.media{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:none;image-rendering:auto}.media.full{object-fit:cover}.media.contain{object-fit:contain}.media.cover{object-fit:cover}.media.background{object-fit:cover}.overlay{position:absolute;inset:0;background:rgba(0,0,0,.12);display:none;pointer-events:none}.message{position:absolute;inset:0;display:none;align-items:center;justify-content:center;text-align:center;color:#fff;background:#08070d;padding:30px}.message-box{max-width:700px}.message h1{font-size:38px;margin:0 0 12px}.message p{font-size:18px;color:#aaa;margin:0}.spinner{width:34px;height:34px;border:3px solid #333;border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;margin:auto}@keyframes spin{to{transform:rotate(360deg)}}#screenInfo{position:fixed;bottom:8px;left:8px;z-index:20;color:#777;font-size:10px;opacity:.35;direction:ltr}.offline{position:fixed;right:15px;bottom:15px;z-index:30;padding:7px 10px;border-radius:8px;background:#401b21;color:#ffdfe2;font-size:12px;display:none}.paused{position:fixed;top:15px;right:15px;z-index:30;padding:7px 10px;border-radius:8px;background:#201d2c;color:#fff;font-size:12px;display:none}
 </style>
 </head>
 <body>
@@ -155,27 +33,36 @@ const maintenanceEl=document.getElementById("maintenance");
 const offlineEl=document.getElementById("offline");
 const loadingEl=document.getElementById("loading");
 const screenInfoEl=document.getElementById("screenInfo");
-let screen=null,currentItems=[],currentIndex=0,timer=null,paused=false,lastContentHash="",realtimeChannel=null,heartbeatTimer=null,firstLoad=true;
+let screen=null,currentItems=[],currentIndex=0,timer=null,paused=false,lastContentHash="",realtimeChannel=null,heartbeatTimer=null,firstLoad=true,syncTimer=null,syncInProgress=false;
+let activePlaylist=null;
 const CACHE_KEY="innovationSignageScreenCache_v4_"+SCREEN_ID;
 function show(el,on=true){el.style.display=on?(el===imageEl||el===videoEl?"block":"flex"):"none"}
 function clearTimer(){if(timer){clearTimeout(timer);timer=null}}
-function setFit(mode){[imageEl,videoEl].forEach(e=>{e.classList.remove("cover","background");if(mode==="cover")e.classList.add("cover");if(mode==="background")e.classList.add("background")})}
+function setFit(mode){[imageEl,videoEl].forEach(e=>{e.classList.remove("cover","background","full","contain");if(mode==="cover"||mode==="fill")e.classList.add("full");else e.classList.add("contain")})}
 function stopMedia(){clearTimer();videoEl.pause();videoEl.removeAttribute("src");imageEl.removeAttribute("src");show(imageEl,false);show(videoEl,false)}
-function showMessage(text,sub=""){maintenanceEl.querySelector("h1").textContent=text;maintenanceEl.querySelector("p").textContent=sub;show(maintenanceEl,true);stopMedia()}
+function showMessage(text,sub=""){loadingEl.style.display="none";maintenanceEl.querySelector("h1").textContent=text;maintenanceEl.querySelector("p").textContent=sub;show(maintenanceEl,true);stopMedia()}
 async function loadScreen(){const {data,error}=await supabaseClient.from("screens").select("*").eq("id",SCREEN_ID).maybeSingle();if(error)throw error;screen=data;screenInfoEl.textContent=`screen ${SCREEN_ID} · ${screen?.name||""}`;return data}
 function checkScreen(){if(!screen){showMessage("الشاشة غير موجودة","تحقق من رقم الشاشة في الرابط.");return false}if(screen.enabled===false||screen.maintenance_mode===true){showMessage("هذه الشاشة غير مفعلة","يرجى تفعيل الشاشة من لوحة التحكم.");return false}show(maintenanceEl,false);return true}
 async function loadPublishedContent(){
+ const now=new Date();
+ const today=now.toLocaleDateString("en-CA",{timeZone:"Asia/Riyadh"});
+ const time=now.toLocaleTimeString("en-GB",{timeZone:"Asia/Riyadh",hour12:false,hour:"2-digit",minute:"2-digit"});
  let playlistId=null;
- const state=await supabaseClient.from("screen_publish_state").select("published_playlist_id,version,published_at").eq("screen_id",SCREEN_ID).maybeSingle();
- if(!state.error&&state.data?.published_playlist_id)playlistId=state.data.published_playlist_id;
- if(!playlistId){const p=await supabaseClient.from("playlists").select("id").eq("screen_id",SCREEN_ID).eq("published",true).order("id",{ascending:false}).limit(1).maybeSingle();if(!p.error&&p.data)playlistId=p.data.id}
- if(!playlistId){currentItems=[];return {items:[],hash:"empty",playlist:null}}
+ const {data:scheduleRows,error:se}=await supabaseClient.from("schedules").select("*").eq("screen_id",SCREEN_ID).eq("enabled",true);
+ if(!se){
+  const active=(scheduleRows||[]).filter(r=>{const sd=String(r.start_date||"");const ed=String(r.end_date||r.start_date||"");if(today<sd||today>ed)return false;const st=String(r.start_time||"00:00").slice(0,5);const et=String(r.end_time||"23:59").slice(0,5);return st<=et?(time>=st&&time<=et):(time>=st||time<=et);}).sort((a,b)=>Number(b.priority||0)-Number(a.priority||0));
+  if(active.length)playlistId=active[0].playlist_id;
+ }
+ if(!playlistId){const state=await supabaseClient.from("screen_publish_state").select("published_playlist_id,version,published_at").eq("screen_id",SCREEN_ID).maybeSingle();if(!state.error&&state.data?.published_playlist_id)playlistId=state.data.published_playlist_id;}
+ if(!playlistId){const p=await supabaseClient.from("playlists").select("id").eq("screen_id",SCREEN_ID).eq("published",true).order("id",{ascending:false}).limit(1).maybeSingle();if(!p.error&&p.data)playlistId=p.data.id;}
+ if(!playlistId){currentItems=[];activePlaylist=null;return {items:[],hash:"empty",playlist:null}}
  const {data:playlist,error:pe}=await supabaseClient.from("playlists").select("*").eq("id",playlistId).maybeSingle();if(pe)throw pe;
  const {data:items,error:ie}=await supabaseClient.from("playlist_items").select("*,media:media_id(*)").eq("playlist_id",playlistId).eq("enabled",true).order("position");if(ie)throw ie;
  const clean=(items||[]).filter(x=>x.media&&x.media.enabled!==false&&x.media.file_url);
  const hash=JSON.stringify({playlist:playlist?.id,updated:playlist?.updated_at,published:playlist?.published_at,items:clean.map(x=>({id:x.id,media:x.media_id,pos:x.position,d:x.duration,t:x.transition,u:x.media?.file_url}))});
- return {items:clean,hash,playlist};
+ activePlaylist=playlist;return {items:clean,hash,playlist};
 }
+
 function saveCache(payload){try{localStorage.setItem(CACHE_KEY,JSON.stringify(payload))}catch(e){}}
 function readCache(){try{const x=JSON.parse(localStorage.getItem(CACHE_KEY)||"null");return x}catch(e){return null}}
 function applyItems(items,playlist){currentItems=items||[];currentIndex=0;setFit(playlist?.fit_mode||"contain");if(!currentItems.length){stopMedia();return}playCurrent()}
@@ -185,7 +72,7 @@ function playCurrent(){
  show(imageEl,false);show(videoEl,false);overlayEl.style.display="none";videoEl.onended=null;videoEl.onerror=null;
  if(type==="image"){
    imageEl.src=m.file_url;show(imageEl,true);
-   const duration=item.duration!==null&&item.duration!==undefined?Number(item.duration):10;
+   const duration=item.duration!==null&&item.duration!==undefined?Number(item.duration):0;
    if(duration>0)timer=setTimeout(nextItem,duration*1000);
  }else{
    videoEl.src=m.file_url;videoEl.currentTime=0;show(videoEl,true);
@@ -193,9 +80,11 @@ function playCurrent(){
    videoEl.play().catch(()=>{});
  }
 }
-function playlistRepeat(){return true}
+function playlistRepeat(){return activePlaylist?.repeat_all!==false}
 function nextItem(){clearTimer();if(!currentItems.length)return;currentIndex++;if(currentIndex>=currentItems.length){currentIndex=0}playCurrent()}
 async function syncFromSupabase(){
+ if(syncInProgress)return;
+ syncInProgress=true;
  try{
   await loadScreen();
   if(!checkScreen())return;
@@ -203,7 +92,9 @@ async function syncFromSupabase(){
   offlineEl.style.display="none";
   if(firstLoad||result.hash!==lastContentHash){lastContentHash=result.hash;applyItems(result.items,result.playlist);saveCache({screen,items:result.items,playlist:result.playlist,hash:result.hash});firstLoad=false}
   sendHeartbeat();
- }catch(e){console.error(e);offlineEl.style.display="block";if(firstLoad){const c=readCache();if(c){screen=c.screen;currentItems=c.items||[];lastContentHash=c.hash||"";checkScreen();applyItems(c.items,c.playlist);firstLoad=false}}}
+  loadingEl.style.display="none";
+ }catch(e){console.error(e);offlineEl.style.display="block";loadingEl.style.display="none";if(firstLoad){const c=readCache();if(c){screen=c.screen;currentItems=c.items||[];lastContentHash=c.hash||"";if(checkScreen()){applyItems(c.items,c.playlist);firstLoad=false}}else{showMessage("تعذر تحميل الشاشة","تحقق من الاتصال بالخادم ورقم الشاشة ثم أعد فتح الرابط.")}}}
+ finally{syncInProgress=false;}
 }
 async function sendHeartbeat(){try{await supabaseClient.from("screen_heartbeats").upsert({screen_id:SCREEN_ID,last_seen_at:new Date().toISOString(),updated_at:new Date().toISOString()},{onConflict:"screen_id"});await supabaseClient.from("screens").update({last_seen_at:new Date().toISOString()}).eq("id",SCREEN_ID)}catch(e){}}
 function startHeartbeat(){sendHeartbeat();heartbeatTimer=setInterval(sendHeartbeat,30000)}
@@ -215,10 +106,11 @@ function startRealtime(){
  .on("postgres_changes",{event:"*",schema:"public",table:"playlist_items"},()=>syncFromSupabase())
  .on("postgres_changes",{event:"*",schema:"public",table:"media"},()=>syncFromSupabase())
  .subscribe();
+ realtimeChannel.on?.("system",{},()=>{});
 }
 document.addEventListener("keydown",e=>{if(e.key==="ArrowRight"||e.key==="ArrowDown")nextItem();if(e.key==="ArrowLeft"||e.key==="ArrowUp"){currentIndex=Math.max(0,currentIndex-1);playCurrent()}if(e.key===" "){paused=!paused;if(paused){clearTimer();videoEl.pause()}else{playCurrent()}}if(e.key.toLowerCase()==="f"){document.documentElement.requestFullscreen?.()}});
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)syncFromSupabase()});
-(async function init(){const c=readCache();if(c){screen=c.screen;currentItems=c.items||[];lastContentHash=c.hash||"";if(checkScreen()){applyItems(c.items,c.playlist);firstLoad=false}}try{await syncFromSupabase()}catch(e){}startHeartbeat();startRealtime();setInterval(syncFromSupabase,30000)})();
+(async function init(){const c=readCache();if(c){screen=c.screen;currentItems=c.items||[];lastContentHash=c.hash||"";if(checkScreen()){applyItems(c.items,c.playlist);firstLoad=false;loadingEl.style.display="none"}}syncTimer=setTimeout(()=>syncFromSupabase(),150);startHeartbeat();startRealtime();setInterval(syncFromSupabase,30000)})();
 </script>
 </body>
 </html>
