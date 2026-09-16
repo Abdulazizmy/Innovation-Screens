@@ -1403,6 +1403,8 @@ html[dir="ltr"] .toast-container{
 }
 .media-picker-item:hover{border-color:#514665;background:#15111f}
 .media-picker-item.selected{border-color:var(--primary);box-shadow:0 0 0 1px var(--primary)}
+.media-picker-thumb,.item-thumb,.media-thumb{border:0!important;outline:0!important;box-shadow:none!important}
+.media-picker-thumb img,.media-picker-thumb video,.item-thumb img,.item-thumb video,.media-thumb img,.media-thumb video{border:0!important;outline:0!important;box-shadow:none!important}
 .media-picker-thumb{height:145px;background:#09070e;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .media-picker-thumb img,.media-picker-thumb video{width:100%;height:100%;object-fit:contain;background:#09070e;display:block}
 .media-picker-item span{display:block;padding:7px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px;color:var(--text)}
@@ -3800,16 +3802,7 @@ function formatDate(date){
   }
 }
 function getScreenUrl(id){
-  const url =
-    new URL(
-      "screen.html",
-      location.href
-    );
-  url.searchParams.set(
-    "id",
-    id
-  );
-  return url.href;
+  return `https://abdulazizmy.github.io/Innovation-Screens/screen.html?id=${encodeURIComponent(id)}`;
 }
 /* =========================================================
    DATA LOADING
@@ -4550,6 +4543,36 @@ async function deleteScreen(id){
   }
 }
 /* =========================================================
+   AUTO PUBLISH / SCREEN-SPECIFIC CONTENT
+========================================================= */
+async function touchPublishedScreen(screenId, playlistId){
+  if(!screenId || !playlistId) return;
+  const now=new Date().toISOString();
+  // كل قائمة مرتبطة بشاشة واحدة، ولا نغيّر أي شاشة أخرى.
+  const {data,error}=await supabaseClient.from("screen_publish_state")
+    .upsert({screen_id:Number(screenId),published_playlist_id:playlistId,version:Date.now(),published_at:now},{onConflict:"screen_id"})
+    .select().maybeSingle();
+  if(error) console.warn("publish state update:",error);
+  const {error:pe}=await supabaseClient.from("playlists")
+    .update({published:false}).eq("screen_id",Number(screenId)).neq("id",playlistId);
+  if(pe) console.warn("playlist unpublish:",pe);
+  const {data:pd,error:pde}=await supabaseClient.from("playlists")
+    .update({published:true,published_at:now}).eq("id",playlistId).select().maybeSingle();
+  if(!pde && pd){
+    playlists=playlists.map(x=>Number(x.screen_id)===Number(screenId)?{...x,published:Number(x.id)===Number(playlistId),published_at:pd.published_at}:x);
+    if(selectedPlaylist && Number(selectedPlaylist.id)===Number(playlistId)) selectedPlaylist=pd;
+  }
+}
+async function autoPublishSelectedScreen(){
+  if(selectedContentScreenId && selectedPlaylist) await touchPublishedScreen(selectedContentScreenId,selectedPlaylist.id);
+}
+
+function openContentForSelectedScreen(){
+  if(!selectedContentScreenId && screens.length) selectedContentScreenId=Number(screens[0].id);
+  renderContentPage();
+}
+
+/* =========================================================
    CONTENT / PLAYLISTS
 ========================================================= */
 function getPlaylistForScreen(id){return playlists.find(p=>Number(p.screen_id)===Number(id))||null;}
@@ -4573,24 +4596,119 @@ function toggleRepeat(){document.getElementById("repeatSwitch").classList.toggle
 function renderPlaylistItems(){
  const box=document.getElementById("playlistItems");if(!box)return;const items=selectedPlaylist?getItemsForPlaylist(selectedPlaylist.id):[];
  if(!items.length){box.innerHTML=`<div class="empty-state"><div class="empty-icon">☷</div><strong>لا يوجد محتوى</strong><span>أضف ملفات من مكتبة الوسائط لهذه الشاشة.</span></div>`;return;}
- box.innerHTML=items.map((item,index)=>{const m=item.media||media.find(x=>String(x.id)===String(item.media_id))||{};const d=item.duration==null?(selectedPlaylist.default_duration??10):Number(item.duration);return `<div class="playlist-item"><div class="drag-handle">☷</div><div class="item-thumb">${m.type==="image"?`<img src="${escapeHtml(m.file_url||"")}">`:`<video src="${escapeHtml(m.file_url||"")}" muted></video>`}</div><div class="item-info"><strong>${escapeHtml(m.name||"ملف")}</strong><span>${m.type==="image"?(d===0?"صورة · ثابت":`صورة · ${d} ثانية`):"فيديو · مدة الفيديو الأصلية"}</span></div><div class="item-controls">${m.type==="image"?`<label style="font-size:12px"><input type="checkbox" ${d===0?"checked":""} onchange="setItemStatic('${item.id}',this.checked)"> ثابت</label>${d!==0?`<input class="form-input" style="width:85px" type="number" min="1" max="3600" value="${d}" onchange="updatePlaylistItem('${item.id}',{duration:Number(this.value)||1})">`:""}`:""}<button class="btn btn-sm" onclick="movePlaylistItem('${item.id}',-1)" ${index===0?"disabled":""}>↑</button><button class="btn btn-sm" onclick="movePlaylistItem('${item.id}',1)" ${index===items.length-1?"disabled":""}>↓</button><button class="btn btn-sm" onclick="replacePlaylistItem('${item.id}')">استبدال</button><button class="btn btn-sm btn-danger" onclick="removePlaylistItem('${item.id}')">حذف</button></div></div>`;}).join("");
+ box.innerHTML=items.map((item,index)=>{const m=item.media||media.find(x=>String(x.id)===String(item.media_id))||{};const d=item.duration==null?(selectedPlaylist.default_duration??10):Number(item.duration);return `<div class="playlist-item"><div class="drag-handle">☷</div><div class="item-thumb">${m.type==="image"?`<img src="${escapeHtml(m.file_url||"")}">`:`<video src="${escapeHtml(m.file_url||"")}" muted></video>`}</div><div class="item-info"><strong>${escapeHtml(m.name||"ملف")}</strong><span>${m.type==="image"?(d===0?"صورة · ثابت":`صورة · ${d} ثانية`):"فيديو · مدة الفيديو الأصلية"}</span></div><div class="item-controls">${m.type==="image"?`<label style="font-size:12px"><input type="checkbox" ${d===0?"checked":""} onchange="setItemStatic('${item.id}',this.checked)"> ثابت</label>${d!==0?`<input class="form-input" style="width:85px" type="number" min="1" max="3600" value="${d}" onchange="updatePlaylistItem('${item.id}',{duration:Number(this.value)||1})">`:""}`:""}<button class="btn btn-sm" onclick="movePlaylistItem('${item.id}',-1)" ${index===0?"disabled":""}>↑</button><button class="btn btn-sm" onclick="movePlaylistItem('${item.id}',1)" ${index===items.length-1?"disabled":""}>↓</button><button class="btn btn-sm" onclick="movePlaylistItem('${item.id}',-999)" ${index===0?"disabled":""}>الأول</button><button class="btn btn-sm" onclick="replacePlaylistItem('${item.id}')">استبدال</button><button class="btn btn-sm btn-danger" onclick="removePlaylistItem('${item.id}')">حذف</button></div></div>`;}).join("");
 }
 async function savePlaylistSettings(){
  if(!selectedPlaylist)return;const duration=Math.max(0,Math.min(3600,Number(document.getElementById("playlistDuration").value)||0));const payload={name:document.getElementById("playlistName").value.trim()||selectedPlaylist.name,default_duration:duration,default_transition:document.getElementById("playlistTransition").value,fit_mode:document.getElementById("playlistFit").value,repeat_all:document.getElementById("repeatSwitch").classList.contains("active")};
- const {data,error}=await supabaseClient.from("playlists").update(payload).eq("id",selectedPlaylist.id).select().single();if(error){toast(error.message||t("error"),"error");return;}selectedPlaylist=data;playlists=playlists.map(p=>p.id===data.id?data:p);toast("تم حفظ إعدادات المحتوى");renderPlaylistItems();
+ const {data,error}=await supabaseClient.from("playlists").update(payload).eq("id",selectedPlaylist.id).select().single();if(error){toast(error.message||t("error"),"error");return;}selectedPlaylist=data;playlists=playlists.map(p=>p.id===data.id?data:p);await autoPublishSelectedScreen();toast("تم حفظ إعدادات المحتوى");renderPlaylistItems();
 }
-async function updatePlaylistItem(id,patch){const {data,error}=await supabaseClient.from("playlist_items").update(patch).eq("id",id).select(`*,media:media_id(*)`).single();if(error){toast(error.message||t("error"),"error");return;}playlistItems=playlistItems.map(i=>String(i.id)===String(id)?data:i);renderPlaylistItems();}
+async function updatePlaylistItem(id,patch){const {data,error}=await supabaseClient.from("playlist_items").update(patch).eq("id",id).select(`*,media:media_id(*)`).single();if(error){toast(error.message||t("error"),"error");return;}playlistItems=playlistItems.map(i=>String(i.id)===String(id)?data:i);await autoPublishSelectedScreen();renderPlaylistItems();}
 function setItemStatic(id,v){updatePlaylistItem(id,{duration:v?0:(selectedPlaylist?.default_duration??10)});}
-async function removePlaylistItem(id){if(!confirm("حذف هذا المحتوى من الشاشة؟"))return;const {error}=await supabaseClient.from("playlist_items").delete().eq("id",id);if(error){toast(error.message||t("error"),"error");return;}playlistItems=playlistItems.filter(i=>String(i.id)!==String(id));await normalizePlaylistPositions();renderPlaylistItems();}
+async function removePlaylistItem(id){if(!confirm("حذف هذا المحتوى من الشاشة؟"))return;const {error}=await supabaseClient.from("playlist_items").delete().eq("id",id);if(error){toast(error.message||t("error"),"error");return;}playlistItems=playlistItems.filter(i=>String(i.id)!==String(id));await normalizePlaylistPositions();await autoPublishSelectedScreen();renderPlaylistItems();}
 async function normalizePlaylistPositions(){if(!selectedPlaylist)return;const a=getItemsForPlaylist(selectedPlaylist.id);for(let i=0;i<a.length;i++){a[i].position=i;await supabaseClient.from("playlist_items").update({position:i}).eq("id",a[i].id);}}
-async function movePlaylistItem(id,dir){const a=getItemsForPlaylist(selectedPlaylist.id),i=a.findIndex(x=>String(x.id)===String(id)),j=i+dir;if(i<0||j<0||j>=a.length)return;await supabaseClient.from("playlist_items").update({position:j}).eq("id",a[i].id);await supabaseClient.from("playlist_items").update({position:i}).eq("id",a[j].id);a[i].position=j;a[j].position=i;renderPlaylistItems();}
+async function movePlaylistItem(id,dir){
+  const a=getItemsForPlaylist(selectedPlaylist.id);
+  const i=a.findIndex(x=>String(x.id)===String(id));
+  if(i<0)return;
+  let j=dir===-999?0:i+dir;
+  j=Math.max(0,Math.min(a.length-1,j));
+  if(i===j)return;
+  const moved=a.splice(i,1)[0];
+  a.splice(j,0,moved);
+  for(let k=0;k<a.length;k++){
+    const row=a[k];
+    const {error}=await supabaseClient.from("playlist_items").update({position:k}).eq("id",row.id);
+    if(error){toast(error.message||t("error"),"error");return;}
+    row.position=k;
+  }
+  playlistItems=playlistItems.map(x=>{const r=a.find(y=>String(y.id)===String(x.id));return r?r:x;});
+  await autoPublishSelectedScreen();
+  renderPlaylistItems();
+}
 let replacingPlaylistItemId=null;
 function replacePlaylistItem(id){replacingPlaylistItemId=id;openMediaPicker();}
 function openMediaPicker(){if(!selectedPlaylist){toast("اختر شاشة أولاً","warning");return;}selectedPickerMedia.clear();renderMediaPicker();openModal("mediaPickerModal");}
-function renderMediaPicker(){const g=document.getElementById("mediaPickerGrid");if(!g)return;g.innerHTML=media.map(m=>`<button type="button" class="media-picker-item ${selectedPickerMedia.has(String(m.id))?"selected":""}" onclick="togglePickerMedia('${m.id}')"><div class="media-picker-thumb">${m.type==="image"?`<img src="${escapeHtml(m.file_url)}">`:`<video src="${escapeHtml(m.file_url)}" muted></video>`}</div><span>${escapeHtml(m.name)}</span></button>`).join("")||`<div class="empty-state">لا توجد وسائط.</div>`;}
+function renderMediaPicker(){
+  const g=document.getElementById("mediaPickerGrid");
+  if(!g)return;
+  const q=(document.getElementById("pickerSearch")?.value||"").trim().toLowerCase();
+  const list=media.filter(m=>!q||String(m.name||"").toLowerCase().includes(q));
+  g.innerHTML=list.map(m=>`<button type="button" class="media-picker-item ${selectedPickerMedia.has(String(m.id))?"selected":""}" onclick="togglePickerMedia('${m.id}')">
+    <div class="media-picker-thumb">${m.type==="image"?`<img src="${escapeHtml(m.file_url||"")}" alt="">`:`<video src="${escapeHtml(m.file_url||"")}" muted playsinline preload="metadata"></video>`}</div>
+    <span>${escapeHtml(m.name||"ملف")}</span>
+  </button>`).join("")||`<div class="empty-state">لا توجد وسائط.</div>`;
+}
 function togglePickerMedia(id){const k=String(id);selectedPickerMedia.has(k)?selectedPickerMedia.delete(k):selectedPickerMedia.add(k);renderMediaPicker();}
-async function confirmMediaPicker(){const ids=[...selectedPickerMedia];if(!ids.length)return;if(replacingPlaylistItemId){const m=media.find(x=>String(x.id)===ids[0]);const old=playlistItems.find(x=>String(x.id)===String(replacingPlaylistItemId));const d=m.type==="image"?(old?.duration??selectedPlaylist.default_duration??10):null;await updatePlaylistItem(replacingPlaylistItemId,{media_id:m.id,duration:d});replacingPlaylistItemId=null;closeModal("mediaPickerModal");return;}
- const start=getItemsForPlaylist(selectedPlaylist.id).length;for(let i=0;i<ids.length;i++){const m=media.find(x=>String(x.id)===ids[i]);if(!m)continue;const {data,error}=await supabaseClient.from("playlist_items").insert({playlist_id:selectedPlaylist.id,media_id:m.id,position:start+i,duration:m.type==="image"?(selectedPlaylist.default_duration??10):null,transition:selectedPlaylist.default_transition||"fade",enabled:true}).select(`*,media:media_id(*)`).single();if(!error)playlistItems.push(data);}selectedPickerMedia.clear();closeModal("mediaPickerModal");renderPlaylistItems();}
+async function confirmMediaPicker(){
+  const ids=[...selectedPickerMedia];
+  if(!ids.length){
+    toast("حدد محتوى واحدًا على الأقل","warning");
+    return;
+  }
+  if(!selectedContentScreenId){
+    toast("اختر شاشة أولاً","warning");
+    return;
+  }
+
+  // احصل على قائمة الشاشة الحالية من الذاكرة أو من قاعدة البيانات مباشرة.
+  let playlist=getPlaylistForScreen(selectedContentScreenId);
+  if(!playlist){
+    const {data,error}=await supabaseClient.from("playlists").select("*").eq("screen_id",selectedContentScreenId).maybeSingle();
+    if(error){toast(error.message||t("error"),"error");return;}
+    playlist=data;
+  }
+  if(!playlist){
+    toast("لا توجد قائمة محتوى لهذه الشاشة","error");
+    return;
+  }
+  selectedPlaylist=playlist;
+
+  if(replacingPlaylistItemId){
+    const m=media.find(x=>String(x.id)===String(ids[0]));
+    if(!m){toast("لم يتم العثور على الوسيط","error");return;}
+    const old=playlistItems.find(x=>String(x.id)===String(replacingPlaylistItemId));
+    const d=m.type==="image"?(old?.duration??playlist.default_duration??10):null;
+    const {data,error}=await supabaseClient.from("playlist_items").update({media_id:m.id,duration:d}).eq("id",replacingPlaylistItemId).select("*").single();
+    if(error){toast(error.message||t("error"),"error");return;}
+    playlistItems=playlistItems.map(i=>String(i.id)===String(replacingPlaylistItemId)?{...i,...data,media:m}:i);
+    await autoPublishSelectedScreen();
+    replacingPlaylistItemId=null;
+    selectedPickerMedia.clear();
+    closeModal("mediaPickerModal");
+    renderPlaylistItems();
+    toast("تم استبدال المحتوى");
+    return;
+  }
+
+  let start=getItemsForPlaylist(playlist.id).length;
+  let added=0;
+  for(const id of ids){
+    const m=media.find(x=>String(x.id)===String(id));
+    if(!m)continue;
+    const payload={
+      playlist_id:playlist.id,
+      media_id:m.id,
+      position:start+added,
+      duration:m.type==="image"?(playlist.default_duration==null?10:Number(playlist.default_duration)):null,
+      transition:playlist.default_transition||"fade",
+      enabled:true
+    };
+    const {data,error}=await supabaseClient.from("playlist_items").insert(payload).select("*").single();
+    if(error){
+      console.error("playlist item insert error",error,payload);
+      toast(error.message||"تعذر إضافة المحتوى","error");
+      continue;
+    }
+    playlistItems.push({...data,media:m});
+    added++;
+  }
+
+  selectedPickerMedia.clear();
+  closeModal("mediaPickerModal");
+  await autoPublishSelectedScreen();
+  renderPlaylistItems();
+  if(added) toast(`تمت إضافة ${added} محتوى إلى قائمة الشاشة`);
+}
 async function publishCurrentPlaylist(){if(!selectedPlaylist||!selectedContentScreenId){toast("اختر شاشة أولاً","warning");return;}await supabaseClient.from("playlists").update({published:false}).eq("screen_id",selectedContentScreenId);const {data,error}=await supabaseClient.from("playlists").update({published:true,published_at:new Date().toISOString()}).eq("id",selectedPlaylist.id).select().single();if(error){toast(error.message||t("error"),"error");return;}selectedPlaylist=data;playlists=playlists.map(p=>Number(p.id)===Number(data.id)?data:Number(p.screen_id)===Number(selectedContentScreenId)?{...p,published:false}:p);await supabaseClient.from("screen_publish_state").upsert({screen_id:selectedContentScreenId,published_playlist_id:selectedPlaylist.id,version:Date.now(),published_at:new Date().toISOString()},{onConflict:"screen_id"});toast("تم نشر المحتوى للشاشة");updateDashboardStats();}
 
 /* =========================================================
@@ -5328,11 +5446,11 @@ document.addEventListener(
 );
 </script>
 <div class="modal-backdrop" id="imagePreviewModal" onclick="if(event.target===this)closeImagePreview()">
-  <div class="modal" style="max-width:92vw;width:1100px;background:#050408">
+  <div class="modal" style="max-width:100vw;width:100vw;height:100vh;background:#000">
     <div class="modal-header"><strong>معاينة</strong><button class="icon-btn" onclick="closeImagePreview()">×</button></div>
-    <div style="display:flex;align-items:center;justify-content:center;min-height:60vh;padding:12px">
-      <img id="imagePreviewImage" alt="" style="max-width:100%;max-height:70vh;object-fit:contain;display:none">
-      <video id="imagePreviewVideo" controls autoplay style="max-width:100%;max-height:70vh;display:none"></video>
+    <div style="display:flex;align-items:center;justify-content:center;width:100%;height:calc(100vh - 64px);padding:0">
+      <img id="imagePreviewImage" alt="" style="max-width:100%;max-height:100%;object-fit:contain;display:none">
+      <video id="imagePreviewVideo" controls autoplay style="max-width:100%;max-height:100%;display:none"></video>
     </div>
   </div>
 </div>
