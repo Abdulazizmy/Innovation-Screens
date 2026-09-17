@@ -6,7 +6,7 @@
 <title>Innovation Screen</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;font-family:Arial,sans-serif}body{position:relative}.stage{position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center}.media{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:none;image-rendering:auto}.media.full{object-fit:cover}.media.contain{object-fit:contain}.media.cover{object-fit:cover}.media.background{object-fit:cover}.overlay{display:none!important}.message{display:none!important}.message-box{max-width:700px}.message h1{font-size:38px;margin:0 0 12px}.message p{font-size:18px;color:#aaa;margin:0}.spinner{width:34px;height:34px;border:3px solid #333;border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;margin:auto}@keyframes spin{to{transform:rotate(360deg)}}#screenInfo{display:none!important}.offline{display:none!important}.paused{display:none!important}.countdown{display:none!important}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;font-family:Arial,sans-serif}body{position:relative}.stage{position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center}.media{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:none;image-rendering:auto}.media.full{object-fit:cover}.media.contain{object-fit:contain}.media.cover{object-fit:cover}.media.background{object-fit:cover}.overlay{display:none!important}.message{display:none!important}.message-box{max-width:700px}.message h1{font-size:38px;margin:0 0 12px}.message p{font-size:18px;color:#aaa;margin:0}.spinner{width:34px;height:34px;border:3px solid #333;border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;margin:auto}@keyframes spin{to{transform:rotate(360deg)}}offline{display:none!important}.paused{display:none!important}.countdown{display:none!important}
 
 /* ===== Innovation Screens Player Brand Colors ===== */
 :root{--brand:#2A206A;--brand2:#7C32C9;--cyan:#00ABAF;--green:#1CC182}
@@ -26,8 +26,7 @@
   <div id="offline" class="offline">لا يوجد اتصال بالخادم</div>
   <div id="countdown" class="countdown"></div>
   <div id="loading" class="message" style="display:flex"><div><div class="spinner"></div></div></div>
-  <div id="screenInfo"></div>
-</div>
+  </div>
 <script>
 const SUPABASE_URL="https://gkdqttzjwgyfyjbrcbdp.supabase.co";
 const SUPABASE_KEY="sb_publishable_QRPg8bjUXtSxRtwBmCguug_cq8ZjbVv";
@@ -41,7 +40,6 @@ const overlayEl=document.getElementById("overlay");
 const maintenanceEl=document.getElementById("maintenance");
 const offlineEl=document.getElementById("offline");
 const loadingEl=document.getElementById("loading");
-const screenInfoEl=document.getElementById("screenInfo");
 const countdownEl=document.getElementById("countdown");
 let screen=null,currentItems=[],currentIndex=0,timer=null,countdownTimer=null,paused=false,lastContentHash="",realtimeChannel=null,heartbeatTimer=null,firstLoad=true,syncTimer=null,syncInProgress=false;
 let activePlaylist=null;
