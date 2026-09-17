@@ -1344,6 +1344,12 @@ html[dir="ltr"] .switch.active::after{
 .modal-body{
   padding:18px;
 }
+.copy-option-row{display:flex;align-items:center;gap:9px;padding:10px 12px;border:1px solid var(--border-color,#e5e7eb);border-radius:10px;cursor:pointer;transition:.15s}
+.copy-option-row:hover{background:rgba(42,32,106,.04)}
+.copy-option-row input{width:17px;height:17px;accent-color:#2A206A}
+.copy-target-option{display:flex;align-items:center;gap:10px;padding:11px 12px;border:1px solid var(--border-color,#e5e7eb);border-radius:10px;cursor:pointer;min-height:48px}
+.copy-target-option:hover{background:rgba(42,32,106,.04)}
+.copy-target-option input{width:17px;height:17px;accent-color:#2A206A}
 .modal-footer{
   padding:13px 18px;
   border-top:1px solid var(--border);
@@ -2421,15 +2427,26 @@ body.theme-light .app{background:radial-gradient(circle at 88% -8%,rgba(124,50,2
               >
                 قائمة المحتوى
               </span>
-              <button
-                class="btn btn-sm btn-primary"
-                onclick="openMediaPicker()"
-              >
-                ＋
-                <span data-i18n="addFromLibrary">
-                  إضافة من المكتبة
-                </span>
-              </button>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-start">
+                <button
+                  class="btn btn-sm btn-primary"
+                  onclick="openMediaPicker()"
+                >
+                  ＋
+                  <span data-i18n="addFromLibrary">
+                    إضافة من المكتبة
+                  </span>
+                </button>
+                <button
+                  class="btn btn-sm"
+                  onclick="openCopyContentModal()"
+                >
+                  📋
+                  <span data-i18n="copyContent">
+                    نسخ المحتوى
+                  </span>
+                </button>
+              </div>
             </div>
             <div class="card-body">
               <div class="playlist-toolbar">
@@ -3026,6 +3043,91 @@ body.theme-light .app{background:radial-gradient(circle at 88% -8%,rgba(124,50,2
   </div>
 </div>
 <!-- =====================================================
+     COPY CONTENT MODAL
+====================================================== -->
+<div
+  class="modal-backdrop"
+  id="copyContentModal"
+>
+  <div
+    class="modal"
+    style="width:min(720px,100%)"
+  >
+    <div class="modal-header">
+      <strong data-i18n="copyContentTitle">
+        نسخ محتوى الشاشة
+      </strong>
+      <button
+        class="icon-btn"
+        onclick="closeModal('copyContentModal')"
+      >
+        ×
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="card" style="margin:0 0 14px;border:1px solid var(--border-color,#e5e7eb);box-shadow:none">
+        <div class="card-body" style="padding:14px">
+          <div style="font-size:13px;color:var(--text-muted,#6b7280);margin-bottom:5px" data-i18n="copyFromLabel">
+            من
+          </div>
+          <strong id="copyContentSourceName">-</strong>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label data-i18n="copyToLabel">
+          إلى
+        </label>
+        <div
+          id="copyContentTargets"
+          style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:9px;max-height:280px;overflow:auto;padding:2px"
+        ></div>
+      </div>
+
+      <div class="form-group" style="margin-top:16px">
+        <label data-i18n="copyOptionsLabel">
+          خيارات النسخ
+        </label>
+        <div style="display:grid;gap:9px">
+          <label class="copy-option-row">
+            <input type="checkbox" id="copyItemsOption" checked>
+            <span data-i18n="copyItemsOption">المحتوى والترتيب</span>
+          </label>
+          <label class="copy-option-row">
+            <input type="checkbox" id="copyDurationsOption" checked>
+            <span data-i18n="copyDurationsOption">مدد عرض الصور</span>
+          </label>
+          <label class="copy-option-row">
+            <input type="checkbox" id="copySettingsOption" checked>
+            <span data-i18n="copySettingsOption">إعدادات المحتوى والتدوير</span>
+          </label>
+        </div>
+      </div>
+
+      <div style="font-size:12px;color:var(--text-muted,#6b7280);line-height:1.7;margin-top:12px" data-i18n="copyContentNote">
+        سيتم نسخ المحتوى إلى الشاشات المحددة بشكل مستقل، ولن يتأثر محتوى الشاشة الأصلية.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button
+        class="btn"
+        onclick="closeModal('copyContentModal')"
+        data-i18n="cancel"
+      >
+        إلغاء
+      </button>
+      <button
+        class="btn btn-primary"
+        onclick="confirmCopyContent()"
+        data-i18n="copyContentConfirm"
+      >
+        نسخ المحتوى
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================
      SCHEDULE MODAL
 ====================================================== -->
 <div
@@ -3261,6 +3363,36 @@ const I18N = {
       "إضافة جدولة",
     addFromLibrary:
       "إضافة من المكتبة",
+    copyContent:
+      "نسخ المحتوى",
+    copyContentTitle:
+      "نسخ محتوى الشاشة",
+    copyFromLabel:
+      "من",
+    copyToLabel:
+      "إلى",
+    copyOptionsLabel:
+      "خيارات النسخ",
+    copyItemsOption:
+      "المحتوى والترتيب",
+    copyDurationsOption:
+      "مدد عرض الصور",
+    copySettingsOption:
+      "إعدادات المحتوى والتدوير",
+    copyContentNote:
+      "سيتم نسخ المحتوى إلى الشاشات المحددة بشكل مستقل، ولن يتأثر محتوى الشاشة الأصلية.",
+    copyContentConfirm:
+      "نسخ المحتوى",
+    copyContentSelectTarget:
+      "حدد شاشة واحدة على الأقل",
+    copyContentSameScreen:
+      "لا يمكن نسخ المحتوى إلى الشاشة الأصلية",
+    copyContentNoPlaylist:
+      "لا يوجد محتوى لنسخه في الشاشة الحالية",
+    copyContentSuccess:
+      "تم نسخ المحتوى إلى {count} شاشة بنجاح",
+    copyContentError:
+      "تعذر نسخ المحتوى",
     manageLibrary:
       "إدارة المكتبة",
     publish:
@@ -3700,6 +3832,36 @@ const I18N = {
       "Add Schedule",
     addFromLibrary:
       "Add from Library",
+    copyContent:
+      "Copy Content",
+    copyContentTitle:
+      "Copy Screen Content",
+    copyFromLabel:
+      "From",
+    copyToLabel:
+      "To",
+    copyOptionsLabel:
+      "Copy Options",
+    copyItemsOption:
+      "Content and order",
+    copyDurationsOption:
+      "Image durations",
+    copySettingsOption:
+      "Content and rotation settings",
+    copyContentNote:
+      "The content will be copied independently to the selected screens. The original screen will not be changed.",
+    copyContentConfirm:
+      "Copy Content",
+    copyContentSelectTarget:
+      "Select at least one target screen",
+    copyContentSameScreen:
+      "The content cannot be copied to the source screen",
+    copyContentNoPlaylist:
+      "There is no content to copy on the current screen",
+    copyContentSuccess:
+      "Content copied to {count} screen(s) successfully",
+    copyContentError:
+      "Could not copy the content",
     manageLibrary:
       "Manage Library",
     publish:
@@ -5184,6 +5346,125 @@ async function normalizePlaylistPositions(){if(!selectedPlaylist)return;const a=
 async function movePlaylistItem(id,dir){const a=getItemsForPlaylist(selectedPlaylist.id),i=a.findIndex(x=>String(x.id)===String(id)),j=i+dir;if(i<0||j<0||j>=a.length)return;await swapPlaylistPositions(a[i],a[j]);}
 async function movePlaylistItemTo(id,target){const a=getItemsForPlaylist(selectedPlaylist.id),from=a.findIndex(x=>String(x.id)===String(id));if(from<0||target<0||target>=a.length||from===target)return;const item=a.splice(from,1)[0];a.splice(target,0,item);for(let n=0;n<a.length;n++){a[n].position=n;const r=await supabaseClient.from("playlist_items").update({position:n}).eq("id",a[n].id);if(r.error){toast(r.error.message||t("error"),"error");return;}}playlistItems=playlistItems.map(x=>{const n=a.findIndex(y=>String(y.id)===String(x.id));return n<0?x:{...x,position:n};});if(selectedContentScreenId)await autoPublishPlaylistForScreen(selectedContentScreenId,selectedPlaylist.id);renderPlaylistItems();toast(t("orderUpdated"));}
 async function swapPlaylistPositions(a,b){const pa=a.position,pb=b.position;let r=await supabaseClient.from("playlist_items").update({position:-999999}).eq("id",a.id);if(r.error){toast(r.error.message||t("error"),"error");return;}r=await supabaseClient.from("playlist_items").update({position:pa}).eq("id",b.id);if(r.error){toast(r.error.message||t("error"),"error");return;}r=await supabaseClient.from("playlist_items").update({position:pb}).eq("id",a.id);if(r.error){toast(r.error.message||t("error"),"error");return;}a.position=pb;b.position=pa;if(selectedContentScreenId)await autoPublishPlaylistForScreen(selectedContentScreenId,selectedPlaylist.id);renderPlaylistItems();}
+function openCopyContentModal(){
+  if(!selectedPlaylist||!selectedContentScreenId){toast(t("chooseScreenFirst"),"warning");return;}
+  const items=getItemsForPlaylist(selectedPlaylist.id);
+  if(!items.length){toast(t("copyContentNoPlaylist"),"warning");return;}
+
+  const source=screens.find(x=>Number(x.id)===Number(selectedContentScreenId));
+  document.getElementById("copyContentSourceName").textContent=source?.name||selectedPlaylist.name||"-";
+
+  const box=document.getElementById("copyContentTargets");
+  const targets=screens.filter(x=>Number(x.id)!==Number(selectedContentScreenId));
+  box.innerHTML=targets.length?targets.map(x=>`<label class="copy-target-option">
+    <input type="checkbox" class="copy-target-checkbox" value="${x.id}">
+    <span>${escapeHtml(x.name||t("screen"))}${x.enabled===false?` — ${escapeHtml(t("screenStoppedOption"))}`:""}</span>
+  </label>`).join(""): `<div class="empty-state" style="grid-column:1/-1;padding:20px"><span>${escapeHtml(t("noScreens"))}</span></div>`;
+
+  document.getElementById("copyItemsOption").checked=true;
+  document.getElementById("copyDurationsOption").checked=true;
+  document.getElementById("copySettingsOption").checked=true;
+  openModal("copyContentModal");
+}
+
+async function ensurePlaylistForScreenCopy(screenId){
+  let playlist=getPlaylistForScreen(screenId);
+  if(playlist)return playlist;
+  const screen=screens.find(x=>Number(x.id)===Number(screenId));
+  if(!screen)throw new Error(t("screenNotFound"));
+  const {data,error}=await supabaseClient.from("playlists").insert({
+    screen_id:screen.id,
+    name:`${t("contentFor")} ${screen.name||t("screen")}`,
+    repeat_all:true,
+    default_duration:10,
+    default_transition:"fade",
+    fit_mode:"contain",
+    enabled:true,
+    published:false
+  }).select().single();
+  if(error)throw error;
+  playlists.push(data);
+  return data;
+}
+
+async function confirmCopyContent(){
+  if(!selectedPlaylist||!selectedContentScreenId){toast(t("chooseScreenFirst"),"warning");return;}
+
+  const targetIds=[...document.querySelectorAll(".copy-target-checkbox:checked")].map(x=>Number(x.value));
+  if(!targetIds.length){toast(t("copyContentSelectTarget"),"warning");return;}
+  if(targetIds.includes(Number(selectedContentScreenId))){toast(t("copyContentSameScreen"),"warning");return;}
+
+  const sourceItems=getItemsForPlaylist(selectedPlaylist.id);
+  if(!sourceItems.length){toast(t("copyContentNoPlaylist"),"warning");return;}
+
+  const copyItems=document.getElementById("copyItemsOption").checked;
+  const copyDurations=document.getElementById("copyDurationsOption").checked;
+  const copySettings=document.getElementById("copySettingsOption").checked;
+  if(!copyItems&&!copyDurations&&!copySettings){toast(t("copyItemsOption"),"warning");return;}
+
+  const btn=document.querySelector('#copyContentModal .modal-footer .btn-primary');
+  if(btn){btn.disabled=true;btn.dataset.originalText=btn.textContent;btn.textContent=t("copyContentConfirm")+"...";}
+
+  let copiedCount=0;
+  try{
+    for(const screenId of targetIds){
+      const targetPlaylist=await ensurePlaylistForScreenCopy(screenId);
+
+      if(copyItems){
+        const {error:deleteError}=await supabaseClient.from("playlist_items").delete().eq("playlist_id",targetPlaylist.id);
+        if(deleteError)throw deleteError;
+
+        const rows=sourceItems.map((item,index)=>({
+          playlist_id:targetPlaylist.id,
+          media_id:item.media_id,
+          position:index,
+          duration:copyDurations?(item.duration??null):null,
+          transition:item.transition||selectedPlaylist.default_transition||"fade",
+          enabled:item.enabled!==false
+        }));
+
+        const {error:insertError}=await supabaseClient.from("playlist_items").insert(rows);
+        if(insertError)throw insertError;
+      }else if(copyDurations){
+        // إذا اختار المستخدم المدد فقط، نحاول مطابقة المحتوى الموجود حسب ترتيب العناصر.
+        const {data:targetItems,error:targetItemsError}=await supabaseClient.from("playlist_items").select("*").eq("playlist_id",targetPlaylist.id).order("position");
+        if(targetItemsError)throw targetItemsError;
+        for(let i=0;i<Math.min(sourceItems.length,targetItems.length);i++){
+          const r=await supabaseClient.from("playlist_items").update({duration:sourceItems[i].duration??null}).eq("id",targetItems[i].id);
+          if(r.error)throw r.error;
+        }
+      }
+
+      if(copySettings){
+        const payload={
+          default_duration:selectedPlaylist.default_duration,
+          default_transition:selectedPlaylist.default_transition,
+          fit_mode:selectedPlaylist.fit_mode,
+          repeat_all:selectedPlaylist.repeat_all,
+          auto_rotate:selectedPlaylist.auto_rotate
+        };
+        const {data,error}=await supabaseClient.from("playlists").update(payload).eq("id",targetPlaylist.id).select().single();
+        if(error)throw error;
+        playlists=playlists.map(p=>String(p.id)===String(data.id)?data:p);
+      }
+
+      const published=await autoPublishPlaylistForScreen(screenId,targetPlaylist.id);
+      if(!published)throw new Error(t("screenUpdateError"));
+      copiedCount++;
+    }
+
+    closeModal("copyContentModal");
+    await loadAll();
+    renderContentPage();
+    toast(t("copyContentSuccess").replace("{count}",copiedCount));
+  }catch(error){
+    console.error("copy content error",error);
+    toast(error?.message||t("copyContentError"),"error");
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent=btn.dataset.originalText||t("copyContentConfirm");}
+  }
+}
+
 function openMediaPicker(){if(!selectedPlaylist){toast(t("chooseScreenFirst"),"warning");return;}selectedPickerMedia.clear();renderMediaPicker();openModal("mediaPickerModal");}
 function renderMediaPicker(){
   const g=document.getElementById("mediaPickerGrid");
