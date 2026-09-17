@@ -2571,6 +2571,21 @@ body.theme-light .app{background:radial-gradient(circle at 88% -8%,rgba(124,50,2
                     onclick="toggleRepeat()"
                   ></button>
                 </div>
+                <div class="switch-row">
+                  <div class="switch-label">
+                    <strong data-i18n="autoRotate">
+                      التنقل بين الصور
+                    </strong>
+                    <span data-i18n="autoRotateDesc">
+                      عند القفل يثبت العرض على أول محتوى
+                    </span>
+                  </div>
+                  <button
+                    class="switch active"
+                    id="autoRotateSwitch"
+                    onclick="toggleAutoRotate()"
+                  ></button>
+                </div>
                 <button
                   class="btn btn-primary"
                   onclick="savePlaylistSettings()"
@@ -3280,6 +3295,10 @@ const I18N = {
       "تكرار القائمة",
     repeatAllDesc:
       "إعادة تشغيل المحتوى بعد انتهائه",
+    autoRotate:
+      "التنقل بين الصور",
+    autoRotateDesc:
+      "عند القفل يثبت العرض على أول محتوى",
     saveSettings:
       "حفظ الإعدادات",
     noContent:
@@ -3715,6 +3734,10 @@ const I18N = {
       "Repeat Playlist",
     repeatAllDesc:
       "Restart content after it finishes",
+    autoRotate:
+      "Auto-rotate content",
+    autoRotateDesc:
+      "When locked, the first content stays on screen",
     saveSettings:
       "Save Settings",
     noContent:
@@ -5081,8 +5104,10 @@ function loadPlaylistSettingsUI(){
 
  document.getElementById("playlistTransition").value=p.default_transition||"fade";document.getElementById("playlistFit").value=p.fit_mode||"contain";document.getElementById("playlistDuration").value=Number(p.default_duration)>0?Number(p.default_duration):10;
  document.getElementById("repeatSwitch").classList.toggle("active",p.repeat_all!==false);
+ document.getElementById("autoRotateSwitch").classList.toggle("active",p.auto_rotate!==false);
 }
 function toggleRepeat(){document.getElementById("repeatSwitch").classList.toggle("active");}
+function toggleAutoRotate(){document.getElementById("autoRotateSwitch").classList.toggle("active");}
 function renderPlaylistItems(){
   const box=document.getElementById("playlistItems");
   if(!box)return;
@@ -5112,7 +5137,7 @@ function openScreenContent(id){
   navigate("content");
 }
 async function savePlaylistSettings(){
- if(!selectedPlaylist)return;const duration=Math.max(1,Number(document.getElementById("playlistDuration").value)||10);const payload={name:document.getElementById("playlistName").value.trim()||selectedPlaylist.name,default_duration:duration,default_transition:document.getElementById("playlistTransition").value,fit_mode:document.getElementById("playlistFit").value,repeat_all:document.getElementById("repeatSwitch").classList.contains("active")};
+ if(!selectedPlaylist)return;const duration=Math.max(1,Number(document.getElementById("playlistDuration").value)||10);const payload={name:document.getElementById("playlistName").value.trim()||selectedPlaylist.name,default_duration:duration,default_transition:document.getElementById("playlistTransition").value,fit_mode:document.getElementById("playlistFit").value,repeat_all:document.getElementById("repeatSwitch").classList.contains("active"),auto_rotate:document.getElementById("autoRotateSwitch").classList.contains("active")};
  const {data,error}=await supabaseClient.from("playlists").update(payload).eq("id",selectedPlaylist.id).select().single();if(error){toast(error.message||t("error"),"error");return;}selectedPlaylist=data;playlists=playlists.map(p=>p.id===data.id?data:p);toast(t("contentSettingsSaved"));renderPlaylistItems();
 }
 async function updatePlaylistItem(id,patch){const {data,error}=await supabaseClient.from("playlist_items").update(patch).eq("id",id).select(`*,media:media_id(*)`).single();if(error){toast(error.message||t("error"),"error");return;}playlistItems=playlistItems.map(i=>String(i.id)===String(id)?data:i);if(selectedPlaylist&&selectedContentScreenId) await autoPublishPlaylistForScreen(selectedContentScreenId,selectedPlaylist.id);renderPlaylistItems();}
