@@ -67,7 +67,7 @@ async function loadPublishedContent(){
  const {data:playlist,error:pe}=await supabaseClient.from("playlists").select("*").eq("id",playlistId).maybeSingle();if(pe)throw pe;
  const {data:items,error:ie}=await supabaseClient.from("playlist_items").select("*,media:media_id(*)").eq("playlist_id",playlistId).eq("enabled",true).order("position");if(ie)throw ie;
  const clean=(items||[]).filter(x=>x.media&&x.media.enabled!==false&&x.media.file_url);
- const hash=JSON.stringify({playlist:playlist?.id,updated:playlist?.updated_at,published:playlist?.published_at,items:clean.map(x=>({id:x.id,media:x.media_id,pos:x.position,d:x.duration,t:x.transition,u:x.media?.file_url}))});
+ const hash=JSON.stringify({playlist:playlist?.id,updated:playlist?.updated_at,published:playlist?.published_at,items:clean.map(x=>({id:x.id,media:x.media_id,pos:x.position,d:x.duration,t:x.transition,u:x.media?.file_url})),auto_rotate:playlist?.auto_rotate!==false});
  activePlaylist=playlist;return {items:clean,hash,playlist};
 }
 
@@ -77,15 +77,16 @@ function applyItems(items,playlist){currentItems=items||[];currentIndex=0;setFit
 function playCurrent(){
  clearTimer();if(!currentItems.length)return;if(currentIndex>=currentItems.length)currentIndex=0;
  const item=currentItems[currentIndex],m=item.media||{};const type=m.type;
+ const rotate=activePlaylist?.auto_rotate!==false;
  show(imageEl,false);show(videoEl,false);overlayEl.style.display="none";videoEl.onended=null;videoEl.onerror=null;
  if(type==="image"){
    imageEl.src=m.file_url;show(imageEl,true);
    const duration=item.duration!==null&&item.duration!==undefined&&Number(item.duration)>0?Number(item.duration):(Number(activePlaylist?.default_duration)>0?Number(activePlaylist.default_duration):10);
    // العد التنازلي يعمل داخليًا لتحديد وقت الانتقال، لكنه لا يظهر على الشاشة.
-   timer=setTimeout(nextItem,duration*1000);
+   if(rotate) timer=setTimeout(nextItem,duration*1000);
  }else{
    videoEl.src=m.file_url;videoEl.currentTime=0;show(videoEl,true);
-   videoEl.onended=()=>{if(playlistRepeat())nextItem();};videoEl.onerror=()=>{nextItem()};
+   videoEl.onended=()=>{if(rotate&&playlistRepeat())nextItem();};videoEl.onerror=()=>{if(rotate)nextItem()};
    videoEl.play().catch(()=>{});
  }
 }
