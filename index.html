@@ -5992,46 +5992,204 @@ function hidePinLock(){
   document.getElementById("pinLock")?.style.setProperty("display","none");
 }
 
+let pinLockCountdownTimer = null;
+
+function formatPinLockTime(seconds){
+  seconds = Math.max(0, Number(seconds) || 0);
+  const minutes = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${String(minutes).padStart(2,"0")}:${String(secs).padStart(2,"0")}`;
+}
+
+function startPinLockCountdown(seconds){
+  const errorEl = document.getElementById("pinError");
+  const input = document.getElementById("adminPinInput");
+  const button = document.querySelector("#pinForm .pin-submit");
+
+  if(pinLockCountdownTimer){
+    clearInterval(pinLockCountdownTimer);
+    pinLockCountdownTimer = null;
+  }
+
+  let remaining = Math.max(0, Number(seconds) || 0);
+
+  if(input) input.disabled = true;
+  if(button) button.disabled = true;
+
+  const updateCountdown = () => {
+    if(remaining <= 0){
+      clearInterval(pinLockCountdownTimer);
+      pinLockCountdownTimer = null;
+
+      if(input) input.disabled = false;
+      if(button) button.disabled = false;
+
+      if(errorEl){
+        errorEl.textContent = "انتهى الحظر. يمكنك المحاولة مرة أخرى.";
+        errorEl.style.color = "#1CC182";
+      }
+
+      input?.focus();
+      return;
+    }
+
+    if(errorEl){
+      errorEl.style.color = "#ef6262";
+      errorEl.textContent =
+        `🔒 المحاولة محظورة حاليًا. حاول مرة أخرى بعد ${formatPinLockTime(remaining)}.`;
+    }
+
+    remaining--;
+  };
+
+  updateCountdown();
+  pinLockCountdownTimer = setInterval(updateCountdown, 1000);
+}
+
 async function verifyAdminPin(event){
   event?.preventDefault();
-  const input=document.getElementById("adminPinInput");
-  const errorEl=document.getElementById("pinError");
-  const button=document.querySelector("#pinForm .pin-submit");
-  const pin=(input?.value||"").trim();
+
+  const input = document.getElementById("adminPinInput");
+  const errorEl = document.getElementById("pinError");
+  const button = document.querySelector("#pinForm .pin-submit");
+  const pin = (input?.value || "").trim();
+
   if(!pin){
-    if(errorEl) errorEl.textContent=t("pinEmpty");
+    if(errorEl){
+      errorEl.style.color = "#ef6262";
+      errorEl.textContent = t("pinEmpty");
+    }
     input?.focus();
     return false;
   }
-  if(button) button.disabled=true;
-  if(errorEl) errorEl.textContent="";
+
+  if(button) button.disabled = true;
+
+  if(errorEl){
+    errorEl.textContent = "";
+    errorEl.style.color = "#ef6262";
+  }
+
   try{
-    const {data,error}=await supabaseClient.rpc("verify_admin_pin",{input_pin:pin});
+    const {data,error} = await supabaseClient.rpc(
+      "verify_admin_pin",
+      {input_pin:pin}
+    );
+
     if(error) throw error;
 
-    // Supabase may return the scalar boolean directly or wrapped depending on the response shape.
-    const pinVerified =
-      data === true ||
-      data === "true" ||
-      data?.verify_admin_pin === true ||
-      data?.verify_admin_pin === "true";
+    const result =
+      typeof data === "string"
+        ? JSON.parse(data)
+        : data;
 
-    if(pinVerified){
+    if(result?.success === true){
       sessionStorage.setItem(ADMIN_PIN_SESSION_KEY,"1");
-      if(input) input.value="";
+
+      if(input){
+        input.value = "";
+        input.disabled = false;
+      }
+
       hidePinLock();
       await loadAll();
       setupRealtime();
       return false;
     }
-    if(errorEl) errorEl.textContent=t("pinWrong");
-    if(input){input.value="";input.focus();}
+
+    if(result?.reason === "locked"){
+      if(input) input.value = "";
+      startPinLockCountdown(result.remaining_seconds);
+      return false;
+    }
+
+    if(result?.reason === "last_attempt"){
+      if(errorEl){
+        errorEl.style.color = "#f3b84b";
+        errorEl.textContent =
+          "⚠️ هذه آخر محاولة متاحة. إذا كان رمز الدخول خاطئًا، سيتم حظر المحاولة لمدة 5 دقائق.";
+      }
+
+      if(input){
+        input.value = "";
+        input.disabled = false;
+        input.focus();
+      }
+
+      if(button) button.disabled = false;
+      return false;
+    }
+
+    if(result?.reason === "invalid_pin"){
+      const remainingAttempts = Number(result.attempts_remaining || 0);
+
+      if(errorEl){
+        errorEl.style.color = "#ef6262";
+
+        if(remainingAttempts === 1){
+          errorEl.textContent =
+            "⚠️ هذه آخر محاولة متاحة. إذا كان رمز الدخول خاطئًا، سيتم حظر المحاولة لمدة 5 دقائق.";
+        }else{
+          errorEl.textContent =
+            `❌ رمز الدخول غير صحيح. متبقي ${remainingAttempts} محاولات.`;
+        }
+      }
+
+      if(input){
+        input.value = "";
+        input.disabled = false;
+        input.focus();
+      }
+
+      if(button) button.disabled = false;
+      return false;
+    }
+
+    if(result?.reason === "pin_not_configured"){
+      if(errorEl){
+        errorEl.style.color = "#ef6262";
+        errorEl.textContent = "تعذر التحقق من رمز الدخول.";
+      }
+
+      if(input){
+        input.value = "";
+        input.disabled = false;
+        input.focus();
+      }
+
+      if(button) button.disabled = false;
+      return false;
+    }
+
+    if(errorEl){
+      errorEl.style.color = "#ef6262";
+      errorEl.textContent = t("pinWrong");
+    }
+
+    if(input){
+      input.value = "";
+      input.disabled = false;
+      input.focus();
+    }
+
   }catch(err){
     console.error("PIN verification error:",err);
-    if(errorEl) errorEl.textContent=t("pinConnectionError");
+
+    if(errorEl){
+      errorEl.style.color = "#ef6262";
+      errorEl.textContent = t("pinConnectionError");
+    }
+
+    if(input) input.disabled = false;
   }finally{
-    if(button) button.disabled=false;
+    const locked =
+      document.getElementById("adminPinInput")?.disabled === true;
+
+    if(button && !locked){
+      button.disabled = false;
+    }
   }
+
   return false;
 }
 
@@ -6073,6 +6231,3 @@ document.addEventListener(
 </div>
 </body>
 </html>
-/* =========================================================
-  111
-========================================================= */
