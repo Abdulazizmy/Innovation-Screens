@@ -5,13 +5,14 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <title>Innovation Screen</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="design-renderer.js"></script>
 <style>
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;font-family:Arial,sans-serif}body{position:relative}.stage{position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center}.media{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:none;image-rendering:auto}.media.full{object-fit:cover}.media.contain{object-fit:contain}.media.cover{object-fit:cover}.media.background{object-fit:cover}.overlay{display:none!important}.message{display:none!important}.message-box{max-width:700px}.message h1{font-size:38px;margin:0 0 12px}.message p{font-size:18px;color:#aaa;margin:0}.spinner{width:34px;height:34px;border:3px solid #333;border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;margin:auto}@keyframes spin{to{transform:rotate(360deg)}}offline{display:none!important}.paused{display:none!important}.countdown{display:none!important}
 
 /* ===== Innovation Screens Player Brand Colors ===== */
-:root{--brand:#2A206A;--brand2:#7C32C9;--cyan:#00ABAF;--green:#1CC182}
+:root{--brand:#2A206A;--brand2:#852CD0;--cyan:#1D9AF2;--green:#1CC182}
 .message{background:linear-gradient(145deg,#090714,#17102b) !important}
-.spinner{border-color:#34265a !important;border-top-color:#00ABAF !important}
+.spinner{border-color:#34265a !important;border-top-color:#1D9AF2 !important}
 .offline{background:rgba(124,50,201,.20) !important;color:#eadcff !important;border:1px solid rgba(124,50,201,.45)}
 .paused{background:rgba(42,32,106,.55) !important;border:1px solid rgba(0,171,175,.35)}
 
@@ -22,6 +23,9 @@
   <img id="image" class="media" alt="">
   <video id="video" class="media" playsinline preload="auto"></video>
   <div id="overlay" class="overlay"></div>
+  <div id="designStage" style="position:absolute;inset:0;display:none;background:#000;align-items:center;justify-content:center">
+    <div id="designFrame" style="position:relative"></div>
+  </div>
   <div id="maintenance" class="message"><div class="message-box"><h1>هذه الشاشة غير مفعلة</h1><p>يرجى تفعيل الشاشة من لوحة التحكم.</p></div></div>
   <div id="offline" class="offline">لا يوجد اتصال بالخادم</div>
   <div id="countdown" class="countdown"></div>
@@ -41,6 +45,38 @@ const maintenanceEl=document.getElementById("maintenance");
 const offlineEl=document.getElementById("offline");
 const loadingEl=document.getElementById("loading");
 const countdownEl=document.getElementById("countdown");
+const designStageEl=document.getElementById("designStage");
+const designFrameEl=document.getElementById("designFrame");
+let currentDesign=null,designMountHandle=null;
+async function loadPublishedDesign(){
+ try{
+  const {data,error}=await supabaseClient.from("screen_designs").select("*").eq("screen_id",SCREEN_ID).eq("status","published").maybeSingle();
+  if(error) return null;
+  return data||null;
+ }catch(e){ return null; }
+}
+function sizeDesignFrame(){
+ if(!currentDesign) return;
+ const cw=currentDesign.canvas_width,ch=currentDesign.canvas_height;
+ const scale=Math.min(window.innerWidth/cw,window.innerHeight/ch);
+ designFrameEl.style.width=Math.round(cw*scale)+"px";
+ designFrameEl.style.height=Math.round(ch*scale)+"px";
+}
+function mountDesign(design){
+ currentDesign=design;
+ stopMedia();
+ show(maintenanceEl,false);
+ designStageEl.style.display="flex";
+ sizeDesignFrame();
+ if(designMountHandle) designMountHandle.destroy();
+ designMountHandle=DesignRenderer.mount(designFrameEl,design,{interactive:false});
+}
+function unmountDesign(){
+ if(designMountHandle){ designMountHandle.destroy(); designMountHandle=null; }
+ currentDesign=null;
+ designStageEl.style.display="none";
+}
+window.addEventListener("resize",sizeDesignFrame);
 let screen=null,currentItems=[],currentIndex=0,timer=null,countdownTimer=null,paused=false,lastContentHash="",realtimeChannel=null,heartbeatTimer=null,firstLoad=true,syncTimer=null,syncInProgress=false;
 let activePlaylist=null;
 const CACHE_KEY="innovationSignageScreenCache_v4_"+SCREEN_ID;
@@ -98,12 +134,27 @@ async function syncFromSupabase(){
  try{
   await loadScreen();
   if(!checkScreen())return;
+  const design=await loadPublishedDesign();
+  if(design){
+   const designHash="design:"+design.id+":"+(design.updated_at||"");
+   offlineEl.style.display="none";
+   if(firstLoad||designHash!==lastContentHash){
+    lastContentHash=designHash;
+    mountDesign(design);
+    saveCache({screen,design,hash:designHash,mode:"design"});
+    firstLoad=false;
+   }
+   sendHeartbeat();
+   loadingEl.style.display="none";
+   return;
+  }
+  if(currentDesign) unmountDesign();
   const result=await loadPublishedContent();
   offlineEl.style.display="none";
-  if(firstLoad||result.hash!==lastContentHash){lastContentHash=result.hash;applyItems(result.items,result.playlist);saveCache({screen,items:result.items,playlist:result.playlist,hash:result.hash});firstLoad=false}
+  if(firstLoad||result.hash!==lastContentHash){lastContentHash=result.hash;applyItems(result.items,result.playlist);saveCache({screen,items:result.items,playlist:result.playlist,hash:result.hash,mode:"playlist"});firstLoad=false}
   sendHeartbeat();
   loadingEl.style.display="none";
- }catch(e){console.error(e);offlineEl.style.display="block";loadingEl.style.display="none";if(firstLoad){const c=readCache();if(c){screen=c.screen;currentItems=c.items||[];lastContentHash=c.hash||"";if(checkScreen()){applyItems(c.items,c.playlist);firstLoad=false}}else{showMessage("تعذر تحميل الشاشة","تحقق من الاتصال بالخادم ورقم الشاشة ثم أعد فتح الرابط.")}}}
+ }catch(e){console.error(e);offlineEl.style.display="block";loadingEl.style.display="none";if(firstLoad){const c=readCache();if(c){screen=c.screen;lastContentHash=c.hash||"";if(checkScreen()){if(c.mode==="design"&&c.design){mountDesign(c.design)}else{currentItems=c.items||[];applyItems(c.items,c.playlist)}firstLoad=false}}else{showMessage("تعذر تحميل الشاشة","تحقق من الاتصال بالخادم ورقم الشاشة ثم أعد فتح الرابط.")}}}
  finally{syncInProgress=false;}
 }
 async function sendHeartbeat(){try{await supabaseClient.from("screen_heartbeats").upsert({screen_id:SCREEN_ID,last_seen_at:new Date().toISOString(),updated_at:new Date().toISOString()},{onConflict:"screen_id"});await supabaseClient.from("screens").update({last_seen_at:new Date().toISOString()}).eq("id",SCREEN_ID)}catch(e){}}
@@ -115,6 +166,7 @@ function startRealtime(){
  .on("postgres_changes",{event:"*",schema:"public",table:"playlists",filter:`screen_id=eq.${SCREEN_ID}`},()=>syncFromSupabase())
  .on("postgres_changes",{event:"*",schema:"public",table:"playlist_items"},()=>syncFromSupabase())
  .on("postgres_changes",{event:"*",schema:"public",table:"media"},()=>syncFromSupabase())
+ .on("postgres_changes",{event:"*",schema:"public",table:"screen_designs",filter:`screen_id=eq.${SCREEN_ID}`},()=>syncFromSupabase())
  .subscribe();
  realtimeChannel.on?.("system",{},()=>{});
 }
