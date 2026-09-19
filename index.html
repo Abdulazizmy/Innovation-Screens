@@ -2805,6 +2805,7 @@ body.theme-light .app{background:var(--bg)}
             <button class="btn btn-sm" onclick="Designer.openPreview()">▶ معاينة</button>
             <button class="btn btn-sm" onclick="Designer.saveDesign(false)">💾 حفظ</button>
             <button class="btn btn-sm btn-primary" onclick="Designer.saveDesign(true)">🚀 نشر على الشاشة</button>
+            <button class="btn btn-sm btn-danger" onclick="Designer.unpublish()">↩️ إلغاء النشر (ارجع لقوائم التشغيل)</button>
           </div>
         </div>
         <div class="designer-body">
@@ -7637,6 +7638,24 @@ const Designer = (function(){
       `);
     }
   }
+  async function unpublish(){
+    if(!state.design || !state.design.screen_id) return;
+    if(!confirm("هذا يوقف عرض التصميم على الشاشة، وترجع الشاشة تعرض قوائم التشغيل (الصور/الفيديو) القديمة بدلها. متابعة؟")) return;
+    try{
+      const {error} = await supabaseClient
+        .from("screen_designs")
+        .update({status:"draft"})
+        .eq("screen_id", state.design.screen_id)
+        .eq("status", "published");
+      if(error) throw error;
+      if(state.design.status === "published") state.design.status = "draft";
+      toast("↩️ تم إلغاء النشر — الشاشة راجعة لقوائم التشغيل");
+    }catch(e){
+      console.error(e);
+      const detail = (e && (e.message || e.details || e.hint)) || "خطأ غير معروف";
+      toast("تعذر إلغاء النشر: " + detail, "danger");
+    }
+  }
 
   /* responsive canvas frame on window resize */
   window.addEventListener("resize", ()=>{
@@ -7661,7 +7680,7 @@ const Designer = (function(){
     openTemplates, applyTemplate, openSuggest, buildSuggestions, pickSuggestion,
     saveAsTemplate, applyCustomTemplate, deleteCustomTemplate,
     closeModal: closeDesignerModal, runAI, openPreview,
-    saveDesign,
+    saveDesign, unpublish,
   };
 })();
 </script>
