@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Innovation Screens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="design-renderer.js"></script>
 <style>
@@ -31,6 +34,10 @@
   --sidebar:270px;
   --topbar:72px;
   --radius:14px;
+  --radius-sm:6px;
+  --radius-lg:16px;
+  --font-ui:"IBM Plex Sans Arabic","Segoe UI",Tahoma,Arial,sans-serif;
+  --font-mono:"IBM Plex Mono","Consolas",monospace;
 }
 body.theme-light{
   --bg:#f4f5f8;
@@ -70,66 +77,70 @@ body.pin-locked .toast-container{
   align-items:center;
   justify-content:center;
   padding:24px;
-  background:
-    radial-gradient(circle at 50% 15%, rgba(124,50,201,.18), transparent 34%),
-    #0b0912;
+  background:#0a0910;
 }
 .pin-lock-card{
-  width:min(420px,100%);
-  padding:34px;
-  border:1px solid #382f48;
-  border-radius:20px;
-  background:#15111f;
-  box-shadow:0 24px 80px rgba(0,0,0,.45);
+  width:min(400px,100%);
+  padding:36px 32px;
+  border:1px solid var(--border,#242032);
+  border-top:2px solid var(--primary2,#852CD0);
+  border-radius:var(--radius-sm,6px);
+  background:#13111c;
   text-align:center;
 }
 .pin-lock-icon{
-  width:58px;
-  height:58px;
-  margin:0 auto 18px;
+  width:46px;
+  height:46px;
+  margin:0 auto 20px;
   display:grid;
   place-items:center;
-  border-radius:16px;
-  background:linear-gradient(135deg,#2A206A,#852CD0);
-  font-size:25px;
+  border-radius:var(--radius-sm,6px);
+  background:transparent;
+  border:1px solid var(--border2,#332c46);
+  color:var(--primary2,#852CD0);
 }
+.pin-lock-icon svg{width:22px;height:22px}
 .pin-lock-card h1{
   margin:0 0 8px;
   color:#f4f1fa;
-  font-size:23px;
+  font-size:19px;
+  font-weight:600;
 }
 .pin-lock-card p{
-  margin:0 0 22px;
-  color:#a9a2b6;
-  font-size:14px;
+  margin:0 0 24px;
+  color:#8b8598;
+  font-size:13px;
   line-height:1.7;
 }
 .pin-input{
   width:100%;
   height:50px;
-  border:1px solid #382f48;
-  border-radius:12px;
-  background:#0f0c17;
+  border:1px solid var(--border2,#332c46);
+  border-radius:var(--radius-sm,6px);
+  background:#0f0d17;
   color:#f4f1fa;
   text-align:center;
+  font-family:var(--font-mono,monospace);
   font-size:20px;
-  letter-spacing:6px;
+  letter-spacing:8px;
   outline:none;
 }
 .pin-input:focus{
   border-color:#852CD0;
-  box-shadow:0 0 0 3px rgba(124,50,201,.14);
+  box-shadow:0 0 0 3px rgba(133,44,208,.14);
 }
 .pin-submit{
   width:100%;
-  height:48px;
+  height:46px;
   margin-top:12px;
-  border:0;
-  border-radius:12px;
-  background:linear-gradient(135deg,#2A206A,#852CD0);
+  border:1px solid var(--primary2,#852CD0);
+  border-radius:var(--radius-sm,6px);
+  background:var(--primary2,#852CD0);
   color:#fff;
-  font-weight:700;
+  font-weight:600;
+  font-size:13px;
 }
+.pin-submit:hover{ background:#7328b8; }
 .pin-submit:disabled{
   opacity:.6;
   cursor:not-allowed;
@@ -181,11 +192,7 @@ body{
   min-height:100%;
   background:var(--bg);
   color:var(--text);
-  font-family:
-    Arial,
-    "Segoe UI",
-    Tahoma,
-    sans-serif;
+  font-family:var(--font-ui);
 }
 body{
   overflow-x:hidden;
@@ -355,6 +362,10 @@ html[dir="rtl"] .nav-item.active{
   color:inherit;
   opacity:.9;
   flex-shrink:0;
+}
+.nav-icon svg{
+  width:18px;
+  height:18px;
 }
 .nav-label{
   flex:1;
@@ -606,21 +617,12 @@ html[dir="ltr"] .main{
 .stat-card{
   background:var(--panel);
   border:1px solid var(--border);
-  border-radius:var(--radius);
+  border-radius:var(--radius-sm);
   padding:18px;
   min-height:125px;
   position:relative;
   overflow:hidden;
-}
-.stat-card::after{
-  content:"";
-  position:absolute;
-  width:80px;
-  height:80px;
-  border-radius:50%;
-  background:rgba(124,50,201,.10);
-  top:-35px;
-  left:-25px;
+  border-top:2px solid var(--border2);
 }
 .stat-top{
   display:flex;
@@ -631,28 +633,33 @@ html[dir="ltr"] .main{
 .stat-label{
   color:var(--muted);
   font-size:11px;
+  letter-spacing:.2px;
 }
 .stat-icon{
-  width:34px;
-  height:34px;
-  border-radius:9px;
+  width:32px;
+  height:32px;
+  border-radius:var(--radius-sm);
   display:flex;
   align-items:center;
   justify-content:center;
-  background:rgba(109,93,252,.1);
-  color:#9b91ff;
+  background:transparent;
+  border:1px solid var(--border2);
+  color:var(--text2);
 }
 .stat-value{
-  font-size:29px;
+  font-family:var(--font-mono);
+  font-size:30px;
   line-height:1;
-  font-weight:700;
+  font-weight:600;
   color:#fff;
-  margin-top:18px;
+  margin-top:20px;
+  letter-spacing:-.5px;
 }
 .stat-sub{
   color:var(--muted);
   font-size:10px;
-  margin-top:8px;
+  margin-top:9px;
+  font-family:var(--font-mono);
 }
 /* =========================
    GRID
@@ -1775,15 +1782,19 @@ html[dir="ltr"] .toast-container{
 *::-webkit-scrollbar-thumb{background:#3b3348;border-radius:999px;border:1px solid #17131e}
 *::-webkit-scrollbar-thumb:hover{background:#514665}
 
-/* ===== Innovation Screens Brand Color Refresh ===== */
+/* =========================================================
+   INNOVATION SCREENS — VISUAL LANGUAGE
+   لغة بصرية بمفهوم "غرفة تحكم البث": حدود دقيقة، لون واحد
+   للتأكيد، بلا توهّج ولا تدرجات زخرفية، أرقام بخط تقني.
+========================================================= */
 :root{
-  --bg:#090714;
-  --bg2:#100b1d;
-  --panel:#151025;
-  --panel2:#1b1430;
-  --panel3:#241a3d;
-  --border:#34265a;
-  --border2:#4a3474;
+  --bg:#0a0910;
+  --bg2:#0f0d17;
+  --panel:#13111c;
+  --panel2:#181523;
+  --panel3:#1d1a29;
+  --border:#242032;
+  --border2:#332c46;
   --primary:#2A206A;
   --primary2:#852CD0;
   --primary-dark:#211851;
@@ -1793,97 +1804,114 @@ html[dir="ltr"] .toast-container{
   --danger:#ef6262;
 }
 body.theme-light{
-  --bg:#f7f5fb;
-  --bg2:#f0edf7;
+  --bg:#f6f5f9;
+  --bg2:#efeef4;
   --panel:#ffffff;
-  --panel2:#faf8fd;
-  --panel3:#f1edf8;
-  --border:#ddd5eb;
-  --border2:#c9b9df;
+  --panel2:#faf9fc;
+  --panel3:#f1eff6;
+  --border:#e2e0ea;
+  --border2:#cfccd9;
   --primary:#2A206A;
   --primary2:#852CD0;
   --primary-dark:#211851;
   --success:#1CC182;
   --info:#1D9AF2;
 }
-.app{
-  background:
-    radial-gradient(circle at 88% -8%, rgba(124,50,201,.24), transparent 28%),
-    radial-gradient(circle at 5% 105%, rgba(0,171,175,.10), transparent 25%),
-    var(--bg);
-}
+/* one deliberate accent moment: a thin brand rule along the sidebar edge — nothing else glows */
+.app{ background:var(--bg); }
 .sidebar{
-  background:linear-gradient(180deg,#17102b 0%,#100b1d 100%) !important;
-  border-left-color:#34265a !important;
+  background:var(--bg2) !important;
+  border-left-color:var(--border) !important;
+  position:relative;
 }
+html[dir="rtl"] .sidebar::before,
+html[dir="ltr"] .sidebar::before{
+  content:"";
+  position:absolute;
+  top:0; bottom:0; width:2px;
+  background:linear-gradient(180deg,var(--primary2),var(--primary) 60%,transparent);
+}
+html[dir="rtl"] .sidebar::before{ right:-1px; }
+html[dir="ltr"] .sidebar::before{ left:-1px; }
 .sidebar .nav-item.active,
 .sidebar .menu-item.active{
-  background:linear-gradient(135deg,rgba(42,32,106,.95),rgba(124,50,201,.78)) !important;
-  border-color:rgba(124,50,201,.55) !important;
-  box-shadow:0 8px 22px rgba(42,32,106,.28);
+  background:var(--panel2) !important;
+  border-color:transparent !important;
+  color:#fff !important;
+  box-shadow:none;
 }
+html[dir="rtl"] .sidebar .nav-item.active{ box-shadow:inset -3px 0 0 var(--primary2); }
+html[dir="ltr"] .sidebar .nav-item.active{ box-shadow:inset 3px 0 0 var(--primary2); }
 .topbar{
-  background:rgba(15,10,27,.90) !important;
-  border-bottom-color:#34265a !important;
-  backdrop-filter:blur(14px);
+  background:var(--bg2) !important;
+  border-bottom-color:var(--border) !important;
+  backdrop-filter:none;
 }
+/* buttons: flat fills, no gradient, no glow — a border-color shift on hover instead */
 .btn.primary,
 .btn-primary,
 button.primary{
-  background:linear-gradient(135deg,#2A206A,#852CD0) !important;
-  border-color:#852CD0 !important;
-  box-shadow:0 6px 18px rgba(124,50,201,.22);
+  background:var(--primary2) !important;
+  border-color:var(--primary2) !important;
+  box-shadow:none !important;
 }
 .btn.primary:hover,
 .btn-primary:hover,
 button.primary:hover{
-  filter:brightness(1.10);
+  background:#7328b8 !important;
+  filter:none;
 }
-.badge.success,.status.success,.tag.success{background:rgba(28,193,130,.14) !important;color:#62e0ad !important;border-color:rgba(28,193,130,.30) !important}
-.badge.info,.status.info,.tag.info{background:rgba(0,171,175,.14) !important;color:#58dadd !important;border-color:rgba(0,171,175,.30) !important}
+.badge.success,.status.success,.tag.success{background:rgba(28,193,130,.12) !important;color:#5fd7a2 !important;border-color:rgba(28,193,130,.32) !important}
+.badge.info,.status.info,.tag.info{background:rgba(29,154,242,.12) !important;color:#6cb8f2 !important;border-color:rgba(29,154,242,.32) !important}
 .stat-card,
 .card,
 .screen-card,
 .settings-section,
 .media-card,
 .schedule-card{
-  border-color:#34265a !important;
+  border-color:var(--border) !important;
+  box-shadow:none !important;
 }
 .stat-card:hover,
 .card:hover,
 .screen-card:hover,
 .media-card:hover,
 .schedule-card:hover{
-  border-color:#852CD0 !important;
-  box-shadow:0 12px 30px rgba(42,32,106,.18) !important;
+  border-color:var(--border2) !important;
+  box-shadow:none !important;
+  transform:none !important;
 }
 .screen-preview{
-  background:linear-gradient(145deg,#17112a,#241a3d) !important;
-  border-color:#34265a !important;
+  background:var(--bg2) !important;
+  border-color:var(--border) !important;
 }
 input:focus,select:focus,textarea:focus{
-  border-color:#1D9AF2 !important;
-  box-shadow:0 0 0 3px rgba(0,171,175,.12) !important;
+  border-color:var(--primary2) !important;
+  box-shadow:0 0 0 3px rgba(133,44,208,.14) !important;
 }
 .switch input:checked + .slider,
 input[type="checkbox"]:checked{
-  accent-color:#1CC182;
+  accent-color:var(--primary2);
 }
 .filter-btn.active,
 .tab.active,
 .segment.active{
-  background:rgba(124,50,201,.18) !important;
-  border-color:#852CD0 !important;
-  color:#d8b8ff !important;
+  background:var(--panel3) !important;
+  border-color:var(--primary2) !important;
+  color:#fff !important;
 }
-.progress-bar,.progress-fill{background:linear-gradient(90deg,#2A206A,#852CD0,#1D9AF2) !important}
-*{scrollbar-color:#852CD0 #100b1d !important}
-*::-webkit-scrollbar-track{background:#100b1d !important}
-*::-webkit-scrollbar-thumb{background:linear-gradient(#2A206A,#852CD0) !important;border-color:#211851 !important}
-*::-webkit-scrollbar-thumb:hover{background:#1D9AF2 !important}
-body.theme-light .sidebar{background:linear-gradient(180deg,#ffffff 0%,#f3effa 100%) !important}
-body.theme-light .topbar{background:rgba(255,255,255,.94) !important}
-body.theme-light .app{background:radial-gradient(circle at 88% -8%,rgba(124,50,201,.10),transparent 28%),var(--bg)}
+.progress-bar,.progress-fill{background:var(--primary2) !important}
+*{scrollbar-color:var(--border2) var(--bg2) !important}
+*::-webkit-scrollbar-track{background:var(--bg2) !important}
+*::-webkit-scrollbar-thumb{background:var(--border2) !important;border-color:var(--bg2) !important}
+*::-webkit-scrollbar-thumb:hover{background:var(--primary2) !important}
+body.theme-light .sidebar{background:#ffffff !important}
+body.theme-light .topbar{background:rgba(255,255,255,.96) !important}
+body.theme-light .app{background:var(--bg)}
+/* numeric / technical readouts read as data, not decoration */
+.info-box strong,.item-position,.screen-card-title span,#dsgCanvasInfo{font-family:var(--font-mono)}
+.page-header h1{letter-spacing:-.2px}
+
 
 /* =========================================================
    SCREEN DESIGNER — مصمم الشاشات
@@ -1949,7 +1977,7 @@ body.theme-light .app{background:radial-gradient(circle at 88% -8%,rgba(124,50,2
 <!-- Admin PIN lock -->
 <div class="pin-lock" id="pinLock">
   <div class="pin-lock-card">
-    <div class="pin-lock-icon">🔐</div>
+    <div class="pin-lock-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="9.5" rx="1.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15" r="1.4"/></svg></div>
     <h1 data-i18n="pinTitle">تسجيل الدخول</h1>
     <p data-i18n="pinDesc">أدخل الرقم السري للوصول إلى لوحة التحكم.</p>
     <form id="pinForm" onsubmit="return verifyAdminPin(event)">
@@ -2003,7 +2031,7 @@ body.theme-light .app{background:radial-gradient(circle at 88% -8%,rgba(124,50,2
         data-page="dashboard"
         onclick="navigate('dashboard')"
       >
-        <span class="nav-icon">⌂</span>
+        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9h12v-9"/><path d="M10 19v-5h4v5"/></svg></span>
         <span
           class="nav-label"
           data-i18n="dashboard"
@@ -2016,7 +2044,7 @@ body.theme-light .app{background:radial-gradient(circle at 88% -8%,rgba(124,50,2
         data-page="screens"
         onclick="navigate('screens')"
       >
-        <span class="nav-icon">▣</span>
+        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="12" rx="1.5"/><path d="M9 20.5h6M12 17v3.5"/></svg></span>
         <span
           class="nav-label"
           data-i18n="screens"
@@ -2029,7 +2057,7 @@ body.theme-light .app{background:radial-gradient(circle at 88% -8%,rgba(124,50,2
         data-page="media"
         onclick="navigate('media')"
       >
-        <span class="nav-icon">▧</span>
+        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="14" height="11" rx="1.3"/><path d="m4 13 3.2-3.2a1.4 1.4 0 0 1 2 0L13.5 14"/><circle cx="7.6" cy="8" r="1.1"/><path d="M20.5 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-9"/></svg></span>
         <span
           class="nav-label"
           data-i18n="media"
@@ -2042,7 +2070,7 @@ body.theme-light .app{background:radial-gradient(circle at 88% -8%,rgba(124,50,2
         data-page="content"
         onclick="navigate('content')"
       >
-        <span class="nav-icon">☷</span>
+        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h12M8 12h12M8 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></svg></span>
         <span
           class="nav-label"
           data-i18n="content"
@@ -2055,7 +2083,7 @@ body.theme-light .app{background:radial-gradient(circle at 88% -8%,rgba(124,50,2
         data-page="scheduling"
         onclick="navigate('scheduling')"
       >
-        <span class="nav-icon">◷</span>
+        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12.5" r="8"/><path d="M12 8v4.5l3 2M9.5 3.5h5"/></svg></span>
         <span
           class="nav-label"
           data-i18n="scheduling"
@@ -2068,7 +2096,7 @@ body.theme-light .app{background:radial-gradient(circle at 88% -8%,rgba(124,50,2
         data-page="designer"
         onclick="navigate('designer')"
       >
-        <span class="nav-icon">🎨</span>
+        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m14 4 6 6-9.5 9.5-6.5 1 1-6.5Z"/><path d="m13 6.5 4.5 4.5"/></svg></span>
         <span
           class="nav-label"
           data-i18n="designer"
@@ -2081,7 +2109,7 @@ body.theme-light .app{background:radial-gradient(circle at 88% -8%,rgba(124,50,2
         data-page="settings"
         onclick="navigate('settings')"
       >
-        <span class="nav-icon">⚙</span>
+        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3.5v2.3M12 18.2v2.3M20.5 12h-2.3M5.8 12H3.5M17.7 6.3l-1.6 1.6M7.9 16.1l-1.6 1.6M17.7 17.7l-1.6-1.6M7.9 7.9 6.3 6.3"/></svg></span>
         <span
           class="nav-label"
           data-i18n="settings"
