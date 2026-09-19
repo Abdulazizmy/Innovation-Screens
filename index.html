@@ -49,7 +49,7 @@ body.theme-light{
   --border2:#d3d7df;
   --text:#1d1b22;
   --text2:#4f4b57;
-  --muted:#77727f;
+  --muted:#6b6574;
 }
 body.theme-light .sidebar{background:linear-gradient(180deg,#ffffff 0%,#f5f6f9 100%)}
 body.theme-light .topbar{background:rgba(255,255,255,.92)}
@@ -209,6 +209,27 @@ button{
 a{
   color:inherit;
   text-decoration:none;
+}
+/* keyboard accessibility: visible focus ring on every interactive control */
+button:focus-visible,
+.btn:focus-visible,
+.nav-item:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible{
+  outline:2px solid var(--primary2,#852CD0);
+  outline-offset:2px;
+}
+/* respect the user's OS-level reduced-motion preference */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;
+    scroll-behavior:auto !important;
+  }
 }
 /* =========================
    APP
@@ -7603,7 +7624,12 @@ const Designer = (function(){
       }
     }catch(e){
       console.error(e);
-      toast("تعذر الحفظ — تأكد من تنفيذ ملف supabase_designer_setup.sql في Supabase أولًا", "danger");
+      const detail = (e && (e.message || e.details || e.hint)) || "خطأ غير معروف";
+      toast("تعذر الحفظ: " + detail, "danger");
+      openDesignerModal("⚠️ تفاصيل خطأ الحفظ", `
+        <div style="font-family:var(--font-mono);font-size:11px;line-height:1.7;background:var(--panel2);border:1px solid var(--border2);border-radius:8px;padding:12px;white-space:pre-wrap;word-break:break-word;color:#f4a3a3">${escapeHtml(JSON.stringify({message:e?.message, details:e?.details, hint:e?.hint, code:e?.code}, null, 2))}</div>
+        <p style="font-size:11px;color:var(--muted);margin-top:10px">انسخ هذا النص كامل وابعثه.</p>
+      `);
     }
   }
 
