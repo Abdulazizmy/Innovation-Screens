@@ -1970,6 +1970,17 @@ body.theme-light .app{background:var(--bg)}
   .designer-body{grid-template-columns:1fr;grid-template-rows:auto auto auto}
   .designer-canvas-outer{min-height:340px}
 }
+.dsg-guide{position:absolute;background:#1D9AF2;z-index:9997;pointer-events:none}
+.dsg-guide-x{width:1px;top:0;bottom:0}
+.dsg-guide-y{height:1px;left:0;right:0}
+.dsg-context-menu{position:fixed;z-index:20001;background:var(--panel);border:1px solid var(--border2);border-radius:8px;min-width:160px;padding:6px;box-shadow:0 12px 30px rgba(0,0,0,.4)}
+.dsg-context-menu button{display:flex;align-items:center;gap:8px;width:100%;text-align:right;background:transparent;border:0;color:var(--text2);padding:8px 10px;border-radius:6px;font-size:12px}
+.dsg-context-menu button:hover{background:var(--panel3);color:#fff}
+.btn.dsg-toggle-active{background:var(--primary2) !important;color:#fff !important;border-color:var(--primary2) !important}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.template-section-title{font-size:11px;color:var(--muted);margin:14px 0 8px;font-weight:700}
+.template-card{position:relative}
+.template-card .tpl-delete{position:absolute;top:4px;left:4px;width:22px;height:22px;background:rgba(0,0,0,.55);border:0;border-radius:6px;color:#fff;font-size:11px}
 </style>
 </head>
 <body class="pin-locked">
@@ -2765,6 +2776,9 @@ body.theme-light .app{background:var(--bg)}
             <input type="text" class="select-control" id="dsgDesignName" placeholder="اسم التصميم" style="min-width:160px" oninput="Designer.onNameChange()">
           </div>
           <div class="designer-toolbar-group">
+            <button class="btn btn-sm" id="dsgUndoBtn" onclick="Designer.undo()" title="تراجع (Ctrl+Z)">↶ تراجع</button>
+            <button class="btn btn-sm" id="dsgRedoBtn" onclick="Designer.redo()" title="إعادة (Ctrl+Y)">↷ إعادة</button>
+            <button class="btn btn-sm" id="dsgPaintBtn" onclick="Designer.togglePaintFormat()" title="انسخ شكل عنصر وطبّقه على عنصر ثاني">🖌️ نسخ الستايل</button>
             <button class="btn btn-sm" onclick="Designer.openTemplates()">✨ قوالب جاهزة</button>
             <button class="btn btn-sm" onclick="Designer.openSuggest()">💡 اقترح لي تصميم</button>
             <button class="btn btn-sm" onclick="Designer.openPreview()">▶ معاينة</button>
@@ -6692,6 +6706,8 @@ const Designer = (function(){
     screensList: [], design: null, selectedId: null,
     mountHandle: null, activeTab: "bg", dragging: null,
     _previewHandle: null, _previewCloseBtn: null, _pendingSuggestions: null,
+    history: [], historyIndex: -1, _historyTimer: null,
+    paintFormatActive: false, paintFormatSource: null,
   };
 
   const frameEl = () => document.getElementById("dsgCanvasFrame");
@@ -6700,6 +6716,48 @@ const Designer = (function(){
   const escapeHtml = (s) => String(s==null?"":s).replace(/</g,"&lt;").replace(/>/g,"&gt;");
   const clamp = (v,min,max) => Math.max(min, Math.min(max, v));
   const getLayer = (id) => (state.design?.layers||[]).find(l=>l.id===id);
+
+  /* ---------------- undo / redo ---------------- */
+  function pushHistory(){
+    if(!state.design) return;
+    const snap = JSON.stringify(state.design.layers);
+    if(state.history[state.historyIndex] === snap) return;
+    state.history = state.history.slice(0, state.historyIndex+1);
+    state.history.push(snap);
+    if(state.history.length > 60) state.history.shift();
+    state.historyIndex = state.history.length - 1;
+    updateUndoRedoButtons();
+  }
+  function pushHistoryDebounced(){
+    clearTimeout(state._historyTimer);
+    state._historyTimer = setTimeout(pushHistory, 500);
+  }
+  function updateUndoRedoButtons(){
+    const u = document.getElementById("dsgUndoBtn"), r = document.getElementById("dsgRedoBtn");
+    if(u) u.disabled = state.historyIndex <= 0;
+    if(r) r.disabled = state.historyIndex >= state.history.length-1;
+  }
+  function undo(){
+    if(state.historyIndex<=0) return;
+    state.historyIndex--;
+    state.design.layers = JSON.parse(state.history[state.historyIndex]);
+    state.selectedId = null;
+    mountFrame(); renderLayersList(); renderInspector(); updateUndoRedoButtons();
+  }
+  function redo(){
+    if(state.historyIndex>=state.history.length-1) return;
+    state.historyIndex++;
+    state.design.layers = JSON.parse(state.history[state.historyIndex]);
+    state.selectedId = null;
+    mountFrame(); renderLayersList(); renderInspector(); updateUndoRedoButtons();
+  }
+  document.addEventListener("keydown",(e)=>{
+    if(typeof currentPage==="undefined" || currentPage!=="designer") return;
+    const tag = (e.target.tagName||"").toLowerCase();
+    if(tag==="input" || tag==="textarea" || tag==="select") return;
+    if((e.ctrlKey||e.metaKey) && !e.shiftKey && e.key.toLowerCase()==="z"){ e.preventDefault(); undo(); }
+    else if((e.ctrlKey||e.metaKey) && (e.key.toLowerCase()==="y" || (e.shiftKey && e.key.toLowerCase()==="z"))){ e.preventDefault(); redo(); }
+  });
 
   /* ---------------- boot / screen & design loading ---------------- */
   async function ensureScreens(){
@@ -6755,10 +6813,13 @@ const Designer = (function(){
     }
     state.design = design;
     state.selectedId = null;
+    state.history = [JSON.stringify(design.layers||[])];
+    state.historyIndex = 0;
     document.getElementById("dsgDesignName").value = design.name || "";
     mountFrame();
     renderLayersList();
     renderInspector();
+    updateUndoRedoButtons();
   }
 
   function onNameChange(){
@@ -6793,10 +6854,79 @@ const Designer = (function(){
       e.stopPropagation();
       const layer = getLayer(id);
       if(!layer) return;
+      if(state.paintFormatActive){ handlePaintFormatClick(id); return; }
       selectLayer(id);
       if(layer.locked || isBg(layer.type)) return;
       startDrag(e, id, "move");
     });
+    node.addEventListener("contextmenu", (e)=>{
+      e.preventDefault();
+      e.stopPropagation();
+      const layer = getLayer(id);
+      if(!layer) return;
+      selectLayer(id);
+      showContextMenu(e.clientX, e.clientY, id);
+    });
+  }
+
+  /* ---------------- right-click context menu ---------------- */
+  function hideContextMenu(){
+    const m = document.getElementById("dsgContextMenu");
+    if(m) m.remove();
+    window.removeEventListener("pointerdown", hideContextMenu, true);
+  }
+  function showContextMenu(clientX, clientY, id){
+    hideContextMenu();
+    const menu = document.createElement("div");
+    menu.className = "dsg-context-menu";
+    menu.id = "dsgContextMenu";
+    menu.style.left = Math.min(clientX, window.innerWidth-180)+"px";
+    menu.style.top = Math.min(clientY, window.innerHeight-180)+"px";
+    menu.innerHTML = `
+      <button onclick='Designer.duplicateLayer("${id}");Designer.hideContextMenu()'>⧉ تكرار</button>
+      <button onclick='Designer.bringForward("${id}");Designer.hideContextMenu()'>⬆ إحضار للأمام</button>
+      <button onclick='Designer.sendBackward("${id}");Designer.hideContextMenu()'>⬇ إرسال للخلف</button>
+      <button onclick='Designer.deleteLayer("${id}");Designer.hideContextMenu()'>🗑 حذف</button>`;
+    document.body.appendChild(menu);
+    setTimeout(()=>window.addEventListener("pointerdown", hideContextMenu, true), 0);
+  }
+
+  /* ---------------- paint format (copy style between elements) ---------------- */
+  const STYLE_FIELDS = {
+    "text": ["fontFamily","fontSize","fontWeight","color","align","letterSpacing","shadow","glow","glowColor"],
+    "hub-logo": ["monochrome","glow","glowColor"],
+    "partner-logo": ["monochrome","glow","glowColor"],
+    "image": ["radius"],
+    "bg-animated": ["animKind","animColor","animColor2","density","speed","size"],
+    "bg-color": ["color"],
+    "bg-gradient": ["colorFrom","colorTo","angle"],
+  };
+  function togglePaintFormat(){
+    state.paintFormatActive = !state.paintFormatActive;
+    state.paintFormatSource = null;
+    document.getElementById("dsgPaintBtn").classList.toggle("dsg-toggle-active", state.paintFormatActive);
+    toast(state.paintFormatActive ? "اختر العنصر المصدر (اللي تبي تنسخ شكله)" : "أُلغي وضع نسخ الستايل");
+  }
+  function handlePaintFormatClick(id){
+    const layer = getLayer(id);
+    if(!state.paintFormatSource){
+      state.paintFormatSource = layer;
+      toast("تمام، الحين اختر العنصر اللي تبي تطبّق عليه نفس الستايل");
+      return;
+    }
+    const fields = STYLE_FIELDS[layer.type];
+    if(!fields || layer.type !== state.paintFormatSource.type){
+      toast("لازم يكون العنصرين من نفس النوع", "warning");
+    }else{
+      const patchObj = {};
+      fields.forEach(f=>{ if(state.paintFormatSource[f] !== undefined) patchObj[f] = state.paintFormatSource[f]; });
+      patch(id, patchObj);
+      pushHistory();
+      toast("تم تطبيق الستايل");
+    }
+    state.paintFormatActive = false;
+    state.paintFormatSource = null;
+    document.getElementById("dsgPaintBtn").classList.remove("dsg-toggle-active");
   }
 
   function startDrag(e, layerId, mode){
@@ -6811,13 +6941,48 @@ const Designer = (function(){
     window.addEventListener("pointermove", onDragMove);
     window.addEventListener("pointerup", onDragEnd);
   }
+  const SNAP_T = 1.4;
+  function trySnap(value, list){
+    for(const t of list){ if(Math.abs(value-t) < SNAP_T) return t; }
+    return null;
+  }
+  function computeSnapTargets(excludeId){
+    const targets = {x:[0,50,100], y:[0,50,100]};
+    (state.design.layers||[]).forEach(l=>{
+      if(l.id===excludeId || isBg(l.type) || l.visible===false) return;
+      targets.x.push(l.x, l.x+l.w/2, l.x+l.w);
+      targets.y.push(l.y, l.y+l.h/2, l.y+l.h);
+    });
+    return targets;
+  }
+  function clearGuides(){ document.querySelectorAll(".dsg-guide").forEach(g=>g.remove()); }
+  function showGuide(axis, posPct){
+    const frame = frameEl();
+    const g = document.createElement("div");
+    g.className = "dsg-guide dsg-guide-" + axis;
+    if(axis==="x") g.style.left = posPct+"%"; else g.style.top = posPct+"%";
+    frame.appendChild(g);
+  }
   function onDragMove(e){
     const d = state.dragging; if(!d) return;
     const layer = getLayer(d.layerId); if(!layer) return;
     const dx = e.clientX-d.startClientX, dy = e.clientY-d.startClientY;
+    clearGuides();
     if(d.mode==="move"){
-      layer.x = clamp(d.orig.x + dx/d.rectW*100, -40, 95);
-      layer.y = clamp(d.orig.y + dy/d.rectH*100, -40, 95);
+      let nx = clamp(d.orig.x + dx/d.rectW*100, -40, 95);
+      let ny = clamp(d.orig.y + dy/d.rectH*100, -40, 95);
+      const targets = computeSnapTargets(d.layerId);
+      const candX = [nx, nx+layer.w/2, nx+layer.w];
+      for(let i=0;i<candX.length;i++){
+        const snapped = trySnap(candX[i], targets.x);
+        if(snapped!=null){ nx = snapped - (i===0?0:(i===1?layer.w/2:layer.w)); showGuide("x", snapped); break; }
+      }
+      const candY = [ny, ny+layer.h/2, ny+layer.h];
+      for(let i=0;i<candY.length;i++){
+        const snapped = trySnap(candY[i], targets.y);
+        if(snapped!=null){ ny = snapped - (i===0?0:(i===1?layer.h/2:layer.h)); showGuide("y", snapped); break; }
+      }
+      layer.x = nx; layer.y = ny;
     }else if(d.mode==="resize"){
       layer.w = clamp(d.orig.w + dx/d.rectW*100, 3, 200);
       layer.h = clamp(d.orig.h + dy/d.rectH*100, 3, 200);
@@ -6831,9 +6996,11 @@ const Designer = (function(){
   }
   function onDragEnd(){
     state.dragging = null;
+    clearGuides();
     window.removeEventListener("pointermove", onDragMove);
     window.removeEventListener("pointerup", onDragEnd);
     renderInspector();
+    pushHistory();
   }
 
   /* ---------------- selection & handles ---------------- */
@@ -6888,10 +7055,10 @@ const Designer = (function(){
         <button title="حذف" onclick='event.stopPropagation();Designer.deleteLayer("${l.id}")'>🗑</button>
       </div>`).join("") + "</div>";
   }
-  function toggleVisible(id){ const l=getLayer(id); l.visible = l.visible===false; rebuildNode(id); renderLayersList(); }
+  function toggleVisible(id){ const l=getLayer(id); l.visible = l.visible===false; rebuildNode(id); renderLayersList(); pushHistory(); }
   function toggleLock(id){ const l=getLayer(id); l.locked=!l.locked; positionHandles(); renderLayersList(); }
-  function bringForward(id){ const l=getLayer(id); const max=Math.max(0,...state.design.layers.map(x=>x.zIndex||0)); l.zIndex=max+1; softApplyZ(id); renderLayersList(); }
-  function sendBackward(id){ const l=getLayer(id); l.zIndex=Math.max(0,(l.zIndex||0)-1); softApplyZ(id); renderLayersList(); }
+  function bringForward(id){ const l=getLayer(id); const max=Math.max(0,...state.design.layers.map(x=>x.zIndex||0)); l.zIndex=max+1; softApplyZ(id); renderLayersList(); pushHistory(); }
+  function sendBackward(id){ const l=getLayer(id); l.zIndex=Math.max(0,(l.zIndex||0)-1); softApplyZ(id); renderLayersList(); pushHistory(); }
   function softApplyZ(id){ const node=state.mountHandle.nodes.get(id); const l=getLayer(id); if(node&&l) node.style.zIndex = l.zIndex; }
   function deleteLayer(id){
     state.design.layers = state.design.layers.filter(l=>l.id!==id);
@@ -6900,8 +7067,24 @@ const Designer = (function(){
     state.mountHandle.nodes.delete(id);
     if(state.selectedId===id) state.selectedId=null;
     renderLayersList(); renderInspector(); positionHandles();
+    pushHistory();
   }
   function deleteSelected(){ if(state.selectedId) deleteLayer(state.selectedId); }
+  function duplicateLayer(id){
+    const src = getLayer(id); if(!src) return;
+    const copy = JSON.parse(JSON.stringify(src));
+    copy.id = DesignRenderer.uid();
+    copy.name = (src.name||src.type) + " (نسخة)";
+    if(!isBg(copy.type)){ copy.x = clamp((copy.x||0)+3, 0, 95); copy.y = clamp((copy.y||0)+3, 0, 95); }
+    state.design.layers.push(copy);
+    const node = DesignRenderer.buildLayerNode(copy, frameEl(), (lid,handle)=>state.mountHandle.animations.set(lid,{handle}));
+    attachNodeEvents(node, copy.id);
+    frameEl().appendChild(node);
+    state.mountHandle.nodes.set(copy.id, node);
+    selectLayer(copy.id);
+    renderLayersList();
+    pushHistory();
+  }
 
   function rebuildNode(id){
     const layer = getLayer(id);
@@ -6927,6 +7110,7 @@ const Designer = (function(){
     state.mountHandle.nodes.set(layer.id, node);
     selectLayer(layer.id);
     renderLayersList();
+    pushHistory();
     return layer;
   }
   async function uploadDesignAsset(file){
@@ -7103,9 +7287,8 @@ const Designer = (function(){
     }
     positionHandles();
     renderLayersList();
+    pushHistoryDebounced();
   }
-
-  /* ---------------- templates ---------------- */
   function L(type, ov){ return Object.assign(DesignRenderer.createLayer(type), ov); }
   function generateTemplateLayers(key){
     const sets = {
@@ -7157,14 +7340,72 @@ const Designer = (function(){
     mountFrame();
     renderLayersList();
     renderInspector();
+    pushHistory();
   }
   function openTemplates(){
-    const html = `<div class="template-grid">${TEMPLATE_META.map(t=>`
-      <div class="template-card" onclick='Designer.applyTemplate("${t.key}")'>
-        <div class="template-thumb" style="background:linear-gradient(135deg,#2A206A,#852CD0)">${t.icon}</div>
-        <div class="tname">${t.name}</div>
-      </div>`).join("")}</div>`;
-    openDesignerModal("✨ قوالب رسمية جاهزة", html);
+    const html = `
+      <div style="margin-bottom:14px">
+        <button class="btn btn-primary btn-sm" style="width:100%" onclick="Designer.saveAsTemplate()">💾 احفظ التصميم الحالي كقالب خاص فيك</button>
+      </div>
+      <div class="template-section-title">قوالب رسمية جاهزة</div>
+      <div class="template-grid">${TEMPLATE_META.map(t=>`
+        <div class="template-card" onclick='Designer.applyTemplate("${t.key}")'>
+          <div class="template-thumb" style="background:linear-gradient(135deg,#2A206A,#852CD0)">${t.icon}</div>
+          <div class="tname">${t.name}</div>
+        </div>`).join("")}</div>
+      <div class="template-section-title">قوالبي المحفوظة</div>
+      <div id="dsgCustomTemplates" style="font-size:11px;color:var(--muted)">جارِ التحميل...</div>`;
+    openDesignerModal("✨ القوالب", html);
+    loadCustomTemplates();
+  }
+  async function loadCustomTemplates(){
+    const wrap = document.getElementById("dsgCustomTemplates");
+    if(!wrap) return;
+    try{
+      const {data, error} = await supabaseClient.from("design_templates").select("*").order("created_at",{ascending:false});
+      if(error) throw error;
+      if(!data || !data.length){ wrap.innerHTML = "ما حفظت أي قالب لك للحين."; return; }
+      wrap.innerHTML = `<div class="template-grid">${data.map(t=>`
+        <div class="template-card">
+          <button class="tpl-delete" title="حذف" onclick='event.stopPropagation();Designer.deleteCustomTemplate(${t.id})'>✕</button>
+          <div class="template-thumb" style="background:linear-gradient(135deg,#1D9AF2,#1CC182)" onclick='Designer.applyCustomTemplate(${t.id})'>🗂️</div>
+          <div class="tname" onclick='Designer.applyCustomTemplate(${t.id})'>${escapeHtml(t.name)}</div>
+        </div>`).join("")}</div>`;
+      state._customTemplatesCache = data;
+    }catch(e){
+      console.error(e);
+      wrap.innerHTML = "تعذر تحميل القوالب المخصصة — تأكد من تنفيذ ملف supabase_templates_setup.sql";
+    }
+  }
+  async function saveAsTemplate(){
+    const name = prompt("اسم القالب:", state.design.name || "قالب بدون اسم");
+    if(!name) return;
+    try{
+      const {error} = await supabaseClient.from("design_templates").insert({
+        name, canvas_width: state.design.canvas_width, canvas_height: state.design.canvas_height, layers: state.design.layers,
+      });
+      if(error) throw error;
+      toast("تم حفظ القالب");
+      loadCustomTemplates();
+    }catch(e){
+      console.error(e);
+      toast("تعذر الحفظ — نفّذ ملف supabase_templates_setup.sql في Supabase أولًا", "danger");
+    }
+  }
+  function applyCustomTemplate(id){
+    const t = (state._customTemplatesCache||[]).find(x=>x.id===id);
+    if(!t) return;
+    if(state.design.layers.length && !confirm("هذا سيستبدل التصميم الحالي بالكامل، متابعة؟")) return;
+    closeDesignerModal();
+    loadLayers(JSON.parse(JSON.stringify(t.layers)).map(l=>Object.assign(l,{id:DesignRenderer.uid()})));
+  }
+  async function deleteCustomTemplate(id){
+    if(!confirm("حذف هذا القالب نهائيًا؟")) return;
+    try{
+      const {error} = await supabaseClient.from("design_templates").delete().eq("id", id);
+      if(error) throw error;
+      loadCustomTemplates();
+    }catch(e){ console.error(e); toast("تعذر الحذف", "danger"); }
   }
   function applyTemplate(key){
     if(state.design.layers.length && !confirm("هذا سيستبدل التصميم الحالي بالكامل، متابعة؟")) return;
@@ -7384,7 +7625,10 @@ const Designer = (function(){
     render, onScreenChange, onNameChange, onLeave, switchTab,
     addLayer, uploadAndAdd, replaceImage, patch,
     selectLayer, toggleVisible, toggleLock, bringForward, sendBackward, deleteLayer, deleteSelected,
+    duplicateLayer, hideContextMenu, togglePaintFormat,
+    undo, redo,
     openTemplates, applyTemplate, openSuggest, buildSuggestions, pickSuggestion,
+    saveAsTemplate, applyCustomTemplate, deleteCustomTemplate,
     closeModal: closeDesignerModal, runAI, openPreview,
     saveDesign,
   };
