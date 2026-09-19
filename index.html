@@ -7410,7 +7410,12 @@ const Designer = (function(){
       loadCustomTemplates();
     }catch(e){
       console.error(e);
-      toast("تعذر الحفظ — نفّذ ملف supabase_templates_setup.sql في Supabase أولًا", "danger");
+      const detail = (e && (e.message || e.details || e.hint)) || "خطأ غير معروف";
+      toast("تعذر حفظ القالب: " + detail, "danger");
+      openDesignerModal("⚠️ تفاصيل خطأ حفظ القالب", `
+        <div style="font-family:var(--font-mono);font-size:11px;line-height:1.7;background:var(--panel2);border:1px solid var(--border2);border-radius:8px;padding:12px;white-space:pre-wrap;word-break:break-word;color:#f4a3a3">${escapeHtml(JSON.stringify({message:e?.message, details:e?.details, hint:e?.hint, code:e?.code}, null, 2))}</div>
+        <p style="font-size:11px;color:var(--muted);margin-top:10px">انسخ هذا النص كامل وابعثه.</p>
+      `);
     }
   }
   function applyCustomTemplate(id){
