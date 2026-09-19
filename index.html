@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Innovation Screens</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="design-renderer.js"></script>
 <style>
 *{
   box-sizing:border-box;
@@ -18,7 +19,7 @@
   --border:#2c2539;
   --border2:#382f48;
   --primary:#2A206A;
-  --primary2:#7C32C9;
+  --primary2:#852CD0;
   --primary-dark:#211851;
   --text:#f4f1fa;
   --text2:#c7c1d4;
@@ -26,7 +27,7 @@
   --success:#1CC182;
   --warning:#f3b84b;
   --danger:#ef6262;
-  --info:#00ABAF;
+  --info:#1D9AF2;
   --sidebar:270px;
   --topbar:72px;
   --radius:14px;
@@ -89,7 +90,7 @@ body.pin-locked .toast-container{
   display:grid;
   place-items:center;
   border-radius:16px;
-  background:linear-gradient(135deg,#2A206A,#7C32C9);
+  background:linear-gradient(135deg,#2A206A,#852CD0);
   font-size:25px;
 }
 .pin-lock-card h1{
@@ -116,7 +117,7 @@ body.pin-locked .toast-container{
   outline:none;
 }
 .pin-input:focus{
-  border-color:#7C32C9;
+  border-color:#852CD0;
   box-shadow:0 0 0 3px rgba(124,50,201,.14);
 }
 .pin-submit{
@@ -125,7 +126,7 @@ body.pin-locked .toast-container{
   margin-top:12px;
   border:0;
   border-radius:12px;
-  background:linear-gradient(135deg,#2A206A,#7C32C9);
+  background:linear-gradient(135deg,#2A206A,#852CD0);
   color:#fff;
   font-weight:700;
 }
@@ -1784,10 +1785,10 @@ html[dir="ltr"] .toast-container{
   --border:#34265a;
   --border2:#4a3474;
   --primary:#2A206A;
-  --primary2:#7C32C9;
+  --primary2:#852CD0;
   --primary-dark:#211851;
   --success:#1CC182;
-  --info:#00ABAF;
+  --info:#1D9AF2;
   --warning:#f3b84b;
   --danger:#ef6262;
 }
@@ -1800,10 +1801,10 @@ body.theme-light{
   --border:#ddd5eb;
   --border2:#c9b9df;
   --primary:#2A206A;
-  --primary2:#7C32C9;
+  --primary2:#852CD0;
   --primary-dark:#211851;
   --success:#1CC182;
-  --info:#00ABAF;
+  --info:#1D9AF2;
 }
 .app{
   background:
@@ -1829,8 +1830,8 @@ body.theme-light{
 .btn.primary,
 .btn-primary,
 button.primary{
-  background:linear-gradient(135deg,#2A206A,#7C32C9) !important;
-  border-color:#7C32C9 !important;
+  background:linear-gradient(135deg,#2A206A,#852CD0) !important;
+  border-color:#852CD0 !important;
   box-shadow:0 6px 18px rgba(124,50,201,.22);
 }
 .btn.primary:hover,
@@ -1853,7 +1854,7 @@ button.primary:hover{
 .screen-card:hover,
 .media-card:hover,
 .schedule-card:hover{
-  border-color:#7C32C9 !important;
+  border-color:#852CD0 !important;
   box-shadow:0 12px 30px rgba(42,32,106,.18) !important;
 }
 .screen-preview{
@@ -1861,7 +1862,7 @@ button.primary:hover{
   border-color:#34265a !important;
 }
 input:focus,select:focus,textarea:focus{
-  border-color:#00ABAF !important;
+  border-color:#1D9AF2 !important;
   box-shadow:0 0 0 3px rgba(0,171,175,.12) !important;
 }
 .switch input:checked + .slider,
@@ -1872,18 +1873,76 @@ input[type="checkbox"]:checked{
 .tab.active,
 .segment.active{
   background:rgba(124,50,201,.18) !important;
-  border-color:#7C32C9 !important;
+  border-color:#852CD0 !important;
   color:#d8b8ff !important;
 }
-.progress-bar,.progress-fill{background:linear-gradient(90deg,#2A206A,#7C32C9,#00ABAF) !important}
-*{scrollbar-color:#7C32C9 #100b1d !important}
+.progress-bar,.progress-fill{background:linear-gradient(90deg,#2A206A,#852CD0,#1D9AF2) !important}
+*{scrollbar-color:#852CD0 #100b1d !important}
 *::-webkit-scrollbar-track{background:#100b1d !important}
-*::-webkit-scrollbar-thumb{background:linear-gradient(#2A206A,#7C32C9) !important;border-color:#211851 !important}
-*::-webkit-scrollbar-thumb:hover{background:#00ABAF !important}
+*::-webkit-scrollbar-thumb{background:linear-gradient(#2A206A,#852CD0) !important;border-color:#211851 !important}
+*::-webkit-scrollbar-thumb:hover{background:#1D9AF2 !important}
 body.theme-light .sidebar{background:linear-gradient(180deg,#ffffff 0%,#f3effa 100%) !important}
 body.theme-light .topbar{background:rgba(255,255,255,.94) !important}
 body.theme-light .app{background:radial-gradient(circle at 88% -8%,rgba(124,50,201,.10),transparent 28%),var(--bg)}
 
+/* =========================================================
+   SCREEN DESIGNER — مصمم الشاشات
+========================================================= */
+.designer-wrap{display:flex;flex-direction:column;gap:14px;height:calc(100vh - var(--topbar) - 54px)}
+.designer-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px 14px}
+.designer-toolbar .select-control{width:auto;min-width:170px}
+.designer-toolbar-group{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.designer-body{flex:1;min-height:0;display:grid;grid-template-columns:280px minmax(0,1fr) 300px;gap:14px}
+.designer-panel{background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+.designer-panel-head{padding:12px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:space-between}
+.designer-panel-body{padding:12px;overflow-y:auto;flex:1;min-height:0}
+.designer-tabs{display:flex;flex-wrap:wrap;gap:5px;padding:10px 10px 0}
+.designer-tab{border:1px solid var(--border);background:var(--panel2);color:var(--muted);font-size:10px;padding:6px 9px;border-radius:7px}
+.designer-tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.element-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.element-btn{border:1px solid var(--border);background:var(--panel2);color:var(--text2);border-radius:10px;padding:10px 6px;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;min-height:64px}
+.element-btn:hover{border-color:var(--primary2);color:#fff;background:var(--panel3)}
+.element-btn .ic{font-size:18px}
+.phrase-btn{display:block;width:100%;text-align:right;border:1px solid var(--border);background:var(--panel2);color:var(--text2);border-radius:8px;padding:8px 10px;font-size:11px;margin-bottom:6px}
+.phrase-btn:hover{border-color:var(--primary2);color:#fff}
+.designer-canvas-outer{flex:1;display:flex;align-items:center;justify-content:center;padding:16px;background:repeating-conic-gradient(#100d19 0% 25%,#151025 0% 50%) 50%/22px 22px;border-radius:14px;overflow:auto}
+.designer-canvas-frame{position:relative;box-shadow:0 20px 60px rgba(0,0,0,.5);border:1px solid var(--border2);background:#000}
+.dr-layer{transform-origin:center center}
+.designer-canvas-frame .dr-layer{pointer-events:auto;cursor:move}
+.designer-canvas-frame .dr-layer.locked{cursor:not-allowed}
+.designer-canvas-frame .dr-layer.selected{outline:2px solid var(--primary2);outline-offset:1px}
+.layer-handle{position:absolute;width:12px;height:12px;background:var(--primary2);border:2px solid #fff;border-radius:50%;z-index:9999}
+.layer-handle.rotate{background:#1D9AF2;top:-26px;left:calc(50% - 6px);border-radius:50%}
+.layers-list{display:flex;flex-direction:column;gap:6px}
+.layer-row{display:flex;align-items:center;gap:8px;padding:7px 8px;border:1px solid var(--border);border-radius:8px;background:var(--panel2);font-size:11px}
+.layer-row.selected{border-color:var(--primary2);background:rgba(133,44,208,.12)}
+.layer-row .lname{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fff}
+.layer-row button{background:transparent;border:0;color:var(--muted);width:22px;height:22px;border-radius:6px;font-size:12px}
+.layer-row button:hover{color:#fff;background:var(--panel3)}
+.inspector-group{margin-bottom:14px}
+.inspector-group label{display:block;font-size:10px;color:var(--muted);margin-bottom:5px}
+.inspector-row{display:flex;gap:8px;margin-bottom:8px}
+.inspector-row > *{flex:1}
+.inspector-group input[type="text"],.inspector-group input[type="number"],.inspector-group select,.inspector-group textarea{width:100%;background:var(--panel2);border:1px solid var(--border);color:#fff;border-radius:7px;padding:6px 8px;font-size:11px}
+.inspector-group input[type="range"]{width:100%}
+.inspector-group input[type="color"]{width:100%;height:32px;border:1px solid var(--border);border-radius:7px;background:var(--panel2);padding:2px}
+.inspector-empty{color:var(--muted);font-size:11px;text-align:center;padding:30px 10px}
+.template-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.template-card{border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--panel2);cursor:pointer}
+.template-card:hover{border-color:var(--primary2)}
+.template-thumb{height:70px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff}
+.template-card .tname{font-size:10px;text-align:center;padding:6px;color:var(--text2)}
+.ai-box textarea{min-height:70px;resize:vertical}
+.ai-suggest-cards{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.ai-suggest-card{border:1px solid var(--border);border-radius:9px;padding:9px;background:var(--panel2);font-size:11px}
+.ai-suggest-card strong{display:block;color:#fff;margin-bottom:3px;font-size:11.5px}
+.preview-overlay{position:fixed;inset:0;background:#000;z-index:9998;display:flex;align-items:center;justify-content:center}
+.preview-overlay .designer-canvas-frame{box-shadow:none}
+.preview-close{position:fixed;top:16px;left:16px;z-index:9999;background:rgba(20,15,30,.75);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:9px;padding:8px 14px;font-size:12px}
+@media (max-width:1100px){
+  .designer-body{grid-template-columns:1fr;grid-template-rows:auto auto auto}
+  .designer-canvas-outer{min-height:340px}
+}
 </style>
 </head>
 <body class="pin-locked">
@@ -2002,6 +2061,19 @@ body.theme-light .app{background:radial-gradient(circle at 88% -8%,rgba(124,50,2
           data-i18n="scheduling"
         >
           الجدولة
+        </span>
+      </button>
+      <button
+        class="nav-item"
+        data-page="designer"
+        onclick="navigate('designer')"
+      >
+        <span class="nav-icon">🎨</span>
+        <span
+          class="nav-label"
+          data-i18n="designer"
+        >
+          مصمم الشاشات
         </span>
       </button>
       <button
@@ -2656,6 +2728,58 @@ body.theme-light .app{background:radial-gradient(circle at 88% -8%,rgba(124,50,2
             <span data-i18n="loading">
               جاري التحميل...
             </span>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- =====================================================
+         SCREEN DESIGNER — مصمم الشاشات
+    ====================================================== -->
+    <section class="page hidden" id="page-designer">
+      <div class="designer-wrap">
+        <div class="designer-toolbar">
+          <div class="designer-toolbar-group">
+            <select class="select-control" id="dsgScreenSelect" onchange="Designer.onScreenChange()"></select>
+            <input type="text" class="select-control" id="dsgDesignName" placeholder="اسم التصميم" style="min-width:160px" oninput="Designer.onNameChange()">
+          </div>
+          <div class="designer-toolbar-group">
+            <button class="btn btn-sm" onclick="Designer.openTemplates()">✨ قوالب جاهزة</button>
+            <button class="btn btn-sm" onclick="Designer.openSuggest()">💡 اقترح لي تصميم</button>
+            <button class="btn btn-sm" onclick="Designer.openPreview()">▶ معاينة</button>
+            <button class="btn btn-sm" onclick="Designer.saveDesign(false)">💾 حفظ</button>
+            <button class="btn btn-sm btn-primary" onclick="Designer.saveDesign(true)">🚀 نشر على الشاشة</button>
+          </div>
+        </div>
+        <div class="designer-body">
+          <!-- LEFT: element library -->
+          <div class="designer-panel">
+            <div class="designer-panel-head"><span>مكتبة العناصر</span></div>
+            <div class="designer-tabs" id="dsgTabs">
+              <button class="designer-tab active" data-tab="bg" onclick="Designer.switchTab('bg')">🖼️ خلفيات</button>
+              <button class="designer-tab" data-tab="anim" onclick="Designer.switchTab('anim')">✨ حركة</button>
+              <button class="designer-tab" data-tab="logo" onclick="Designer.switchTab('logo')">🏛️ الشعارات</button>
+              <button class="designer-tab" data-tab="text" onclick="Designer.switchTab('text')">🔤 نص</button>
+              <button class="designer-tab" data-tab="img" onclick="Designer.switchTab('img')">🖼️ صور</button>
+              <button class="designer-tab" data-tab="ai" onclick="Designer.switchTab('ai')">🤖 مساعد</button>
+            </div>
+            <div class="designer-panel-body" id="dsgTabBody"></div>
+          </div>
+          <!-- CENTER: canvas -->
+          <div class="designer-panel">
+            <div class="designer-panel-head">
+              <span id="dsgCanvasInfo">الكانفاس</span>
+              <button class="btn btn-sm btn-danger" onclick="Designer.deleteSelected()">🗑 حذف المحدد</button>
+            </div>
+            <div class="designer-canvas-outer" id="dsgCanvasOuter">
+              <div class="designer-canvas-frame" id="dsgCanvasFrame"></div>
+            </div>
+          </div>
+          <!-- RIGHT: layers + inspector -->
+          <div class="designer-panel">
+            <div class="designer-panel-head"><span>الطبقات</span></div>
+            <div class="designer-panel-body" id="dsgLayersList" style="max-height:34%;flex:none;border-bottom:1px solid var(--border)"></div>
+            <div class="designer-panel-head"><span>الخصائص</span></div>
+            <div class="designer-panel-body" id="dsgInspector"><div class="inspector-empty">اختر عنصرًا من الكانفاس أو الطبقات</div></div>
           </div>
         </div>
       </div>
@@ -3317,6 +3441,8 @@ const I18N = {
       "المحتوى",
     scheduling:
       "الجدولة",
+    designer:
+      "مصمم الشاشات",
     settings:
       "الإعدادات",
     topDescription:
@@ -3786,6 +3912,8 @@ const I18N = {
       "Content",
     scheduling:
       "Scheduling",
+    designer:
+      "Screen Designer",
     settings:
       "Settings",
     topDescription:
@@ -4359,6 +4487,11 @@ function renderCurrentPage(){
   }
   if(currentPage === "settings"){
     updateConnectionUI();
+  }
+  if(currentPage === "designer"){
+    Designer.render();
+  }else if(typeof Designer !== "undefined"){
+    Designer.onLeave();
   }
 }
 /* =========================================================
@@ -6510,5 +6643,730 @@ document.addEventListener(
     </div>
   </div>
 </div>
+
+<!-- =========================================================
+     SCREEN DESIGNER MODULE — مصمم الشاشات
+========================================================= -->
+<script>
+const READY_PHRASES = ["حياكم الله","أهلاً وسهلاً بكم","نرحب بكم في مركز الابتكار","شراكة نحو مستقبل رقمي","نعتز بشراكاتنا","معًا نحو الابتكار"];
+const TEMPLATE_META = [
+  {key:"welcome",icon:"👋",name:"ترحيب"},
+  {key:"partnership",icon:"🤝",name:"شراكة"},
+  {key:"visit",icon:"🏛️",name:"زيارة رسمية"},
+  {key:"event",icon:"🎪",name:"فعالية"},
+  {key:"hackathon",icon:"💻",name:"هاكاثون"},
+  {key:"national",icon:"🇸🇦",name:"مناسبة وطنية"},
+];
+const COLOR_WORDS = {
+  "أسود":"#05040a","اسود":"#05040a","غامق":"#0d0a1a","داكن":"#0d0a1a",
+  "أبيض":"#f4f1fa","ابيض":"#f4f1fa","فاتح":"#f4f1fa",
+  "بنفسجي":"#852CD0","أرجواني":"#852CD0",
+  "أزرق":"#1D9AF2","تركوازي":"#1D9AF2","سماوي":"#1D9AF2",
+  "أخضر":"#1CC182","ذهبي":"#f3b84b","أصفر":"#f3b84b","أحمر":"#ef6262"
+};
+
+const Designer = (function(){
+  const state = {
+    screensList: [], design: null, selectedId: null,
+    mountHandle: null, activeTab: "bg", dragging: null,
+    _previewHandle: null, _previewCloseBtn: null, _pendingSuggestions: null,
+  };
+
+  const frameEl = () => document.getElementById("dsgCanvasFrame");
+  const isBg = (type) => type.indexOf("bg-") === 0;
+  const round1 = (n) => Math.round((n||0)*10)/10;
+  const escapeHtml = (s) => String(s==null?"":s).replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const clamp = (v,min,max) => Math.max(min, Math.min(max, v));
+  const getLayer = (id) => (state.design?.layers||[]).find(l=>l.id===id);
+
+  /* ---------------- boot / screen & design loading ---------------- */
+  async function ensureScreens(){
+    if(typeof screens !== "undefined" && screens && screens.length){ state.screensList = screens; return; }
+    const {data} = await supabaseClient.from("screens").select("*").order("id");
+    state.screensList = data || [];
+  }
+
+  async function render(){
+    await ensureScreens();
+    const sel = document.getElementById("dsgScreenSelect");
+    if(!state.screensList.length){
+      sel.innerHTML = '<option>لا توجد شاشات — أضف شاشة أولاً من صفحة «الشاشات»</option>';
+      return;
+    }
+    sel.innerHTML = state.screensList.map(s=>`<option value="${s.id}">${escapeHtml(s.name)} (${s.width}×${s.height})</option>`).join("");
+    if(!state.design || !state.screensList.some(s=>Number(s.id)===Number(state.design.screen_id))){
+      sel.value = state.screensList[0].id;
+      await loadDesignForScreen(state.screensList[0].id);
+    }else{
+      sel.value = state.design.screen_id;
+      mountFrame();
+    }
+    renderTabBody();
+    renderLayersList();
+    renderInspector();
+  }
+
+  async function onScreenChange(){
+    const id = Number(document.getElementById("dsgScreenSelect").value);
+    await loadDesignForScreen(id);
+  }
+
+  async function loadDesignForScreen(screenId){
+    const screenRow = state.screensList.find(s=>Number(s.id)===Number(screenId));
+    let design = null;
+    try{
+      const {data, error} = await supabaseClient
+        .from("screen_designs").select("*")
+        .eq("screen_id", screenId)
+        .order("updated_at", {ascending:false})
+        .limit(1).maybeSingle();
+      if(!error && data) design = data;
+    }catch(e){ console.warn("screen_designs غير جاهز بعد — نفّذ ملف supabase_designer_setup.sql", e); }
+    if(!design){
+      design = {
+        id: null, screen_id: screenId,
+        name: "تصميم " + (screenRow ? screenRow.name : screenId),
+        canvas_width: screenRow?.width || 1080,
+        canvas_height: screenRow?.height || 1920,
+        layers: [], status: "draft",
+      };
+    }
+    state.design = design;
+    state.selectedId = null;
+    document.getElementById("dsgDesignName").value = design.name || "";
+    mountFrame();
+    renderLayersList();
+    renderInspector();
+  }
+
+  function onNameChange(){
+    if(state.design) state.design.name = document.getElementById("dsgDesignName").value;
+  }
+
+  function onLeave(){
+    if(state.mountHandle){ state.mountHandle.destroy(); state.mountHandle = null; }
+    document.querySelectorAll(".layer-handle").forEach(h=>h.remove());
+  }
+
+  /* ---------------- canvas mount + interactivity ---------------- */
+  function mountFrame(){
+    if(!state.design) return;
+    const outer = document.getElementById("dsgCanvasOuter");
+    const frame = frameEl();
+    const cw = state.design.canvas_width, ch = state.design.canvas_height;
+    const availW = Math.max(120, outer.clientWidth - 32), availH = Math.max(120, outer.clientHeight - 32);
+    const scale = Math.min(availW/cw, availH/ch, 1) || 1;
+    frame.style.width = Math.round(cw*scale)+"px";
+    frame.style.height = Math.round(ch*scale)+"px";
+    document.getElementById("dsgCanvasInfo").textContent = `${cw}×${ch}px`;
+    if(state.mountHandle) state.mountHandle.destroy();
+    state.mountHandle = DesignRenderer.mount(frame, state.design, {interactive:true});
+    state.mountHandle.nodes.forEach((node,id)=>attachNodeEvents(node,id));
+    frame.onpointerdown = (e)=>{ if(e.target===frame) selectLayer(null); };
+    highlightSelected();
+  }
+
+  function attachNodeEvents(node, id){
+    node.addEventListener("pointerdown", (e)=>{
+      e.stopPropagation();
+      const layer = getLayer(id);
+      if(!layer) return;
+      selectLayer(id);
+      if(layer.locked || isBg(layer.type)) return;
+      startDrag(e, id, "move");
+    });
+  }
+
+  function startDrag(e, layerId, mode){
+    const layer = getLayer(layerId);
+    const rect = frameEl().getBoundingClientRect();
+    state.dragging = {
+      mode, layerId, startClientX:e.clientX, startClientY:e.clientY,
+      rectW:rect.width, rectH:rect.height,
+      orig:{x:layer.x,y:layer.y,w:layer.w,h:layer.h},
+      centerPx:{ x: rect.left + (layer.x+layer.w/2)/100*rect.width, y: rect.top + (layer.y+layer.h/2)/100*rect.height },
+    };
+    window.addEventListener("pointermove", onDragMove);
+    window.addEventListener("pointerup", onDragEnd);
+  }
+  function onDragMove(e){
+    const d = state.dragging; if(!d) return;
+    const layer = getLayer(d.layerId); if(!layer) return;
+    const dx = e.clientX-d.startClientX, dy = e.clientY-d.startClientY;
+    if(d.mode==="move"){
+      layer.x = clamp(d.orig.x + dx/d.rectW*100, -40, 95);
+      layer.y = clamp(d.orig.y + dy/d.rectH*100, -40, 95);
+    }else if(d.mode==="resize"){
+      layer.w = clamp(d.orig.w + dx/d.rectW*100, 3, 200);
+      layer.h = clamp(d.orig.h + dy/d.rectH*100, 3, 200);
+    }else if(d.mode==="rotate"){
+      const ang = Math.atan2(e.clientY-d.centerPx.y, e.clientX-d.centerPx.x)*180/Math.PI;
+      layer.rotation = Math.round(ang+90);
+    }
+    const node = state.mountHandle.nodes.get(d.layerId);
+    if(node) DesignRenderer.applyCommonStyle(node, layer);
+    positionHandles();
+  }
+  function onDragEnd(){
+    state.dragging = null;
+    window.removeEventListener("pointermove", onDragMove);
+    window.removeEventListener("pointerup", onDragEnd);
+    renderInspector();
+  }
+
+  /* ---------------- selection & handles ---------------- */
+  function selectLayer(id){
+    state.selectedId = id;
+    highlightSelected();
+    renderLayersList();
+    renderInspector();
+  }
+  function highlightSelected(){
+    if(!state.mountHandle) return;
+    state.mountHandle.nodes.forEach((node,id)=>node.classList.toggle("selected", id===state.selectedId));
+    positionHandles();
+  }
+  function positionHandles(){
+    document.querySelectorAll(".layer-handle").forEach(h=>h.remove());
+    if(!state.selectedId) return;
+    const layer = getLayer(state.selectedId);
+    if(!layer || layer.locked || isBg(layer.type)) return;
+    const frame = frameEl();
+    const resizeH = document.createElement("div");
+    resizeH.className = "layer-handle";
+    resizeH.style.left = (layer.x+layer.w)+"%"; resizeH.style.top = (layer.y+layer.h)+"%";
+    resizeH.style.transform = "translate(-50%,-50%)"; resizeH.style.cursor = "nwse-resize";
+    resizeH.onpointerdown = (e)=>{ e.stopPropagation(); startDrag(e, state.selectedId, "resize"); };
+    frame.appendChild(resizeH);
+    const rotateH = document.createElement("div");
+    rotateH.className = "layer-handle rotate";
+    rotateH.style.left = (layer.x+layer.w/2)+"%"; rotateH.style.top = (layer.y-6)+"%";
+    rotateH.style.transform = "translate(-50%,-50%)"; rotateH.style.cursor = "grab";
+    rotateH.onpointerdown = (e)=>{ e.stopPropagation(); startDrag(e, state.selectedId, "rotate"); };
+    frame.appendChild(rotateH);
+  }
+
+  /* ---------------- layers list ---------------- */
+  function iconFor(type){
+    return {"bg-color":"⬛","bg-gradient":"🌈","bg-image":"🖼️","bg-animated":"✨","hub-logo":"🏛️","partner-logo":"🤝","text":"🔤","image":"🖼️"}[type] || "◻️";
+  }
+  function renderLayersList(){
+    const wrap = document.getElementById("dsgLayersList");
+    if(!state.design){ wrap.innerHTML = ""; return; }
+    const layers = (state.design.layers||[]).slice().sort((a,b)=>(b.zIndex||0)-(a.zIndex||0));
+    if(!layers.length){ wrap.innerHTML = '<div class="inspector-empty">لا توجد عناصر بعد</div>'; return; }
+    wrap.innerHTML = '<div class="layers-list">' + layers.map(l=>`
+      <div class="layer-row ${l.id===state.selectedId?'selected':''}" onclick='Designer.selectLayer("${l.id}")'>
+        <span>${iconFor(l.type)}</span>
+        <span class="lname">${escapeHtml(l.name||l.type)}</span>
+        <button title="إخفاء/إظهار" onclick='event.stopPropagation();Designer.toggleVisible("${l.id}")'>${l.visible===false?"🚫":"👁"}</button>
+        <button title="قفل" onclick='event.stopPropagation();Designer.toggleLock("${l.id}")'>${l.locked?"🔒":"🔓"}</button>
+        <button title="للأمام" onclick='event.stopPropagation();Designer.bringForward("${l.id}")'>⬆</button>
+        <button title="للخلف" onclick='event.stopPropagation();Designer.sendBackward("${l.id}")'>⬇</button>
+        <button title="حذف" onclick='event.stopPropagation();Designer.deleteLayer("${l.id}")'>🗑</button>
+      </div>`).join("") + "</div>";
+  }
+  function toggleVisible(id){ const l=getLayer(id); l.visible = l.visible===false; rebuildNode(id); renderLayersList(); }
+  function toggleLock(id){ const l=getLayer(id); l.locked=!l.locked; positionHandles(); renderLayersList(); }
+  function bringForward(id){ const l=getLayer(id); const max=Math.max(0,...state.design.layers.map(x=>x.zIndex||0)); l.zIndex=max+1; softApplyZ(id); renderLayersList(); }
+  function sendBackward(id){ const l=getLayer(id); l.zIndex=Math.max(0,(l.zIndex||0)-1); softApplyZ(id); renderLayersList(); }
+  function softApplyZ(id){ const node=state.mountHandle.nodes.get(id); const l=getLayer(id); if(node&&l) node.style.zIndex = l.zIndex; }
+  function deleteLayer(id){
+    state.design.layers = state.design.layers.filter(l=>l.id!==id);
+    const anim = state.mountHandle.animations.get(id); if(anim) anim.handle.stop();
+    const node = state.mountHandle.nodes.get(id); if(node) node.remove();
+    state.mountHandle.nodes.delete(id);
+    if(state.selectedId===id) state.selectedId=null;
+    renderLayersList(); renderInspector(); positionHandles();
+  }
+  function deleteSelected(){ if(state.selectedId) deleteLayer(state.selectedId); }
+
+  function rebuildNode(id){
+    const layer = getLayer(id);
+    const old = state.mountHandle.nodes.get(id);
+    if(!layer || !old) return;
+    const oldAnim = state.mountHandle.animations.get(id);
+    if(oldAnim){ oldAnim.handle.stop(); state.mountHandle.animations.delete(id); }
+    const node = DesignRenderer.buildLayerNode(layer, frameEl(), (lid,handle)=>state.mountHandle.animations.set(lid,{handle}));
+    attachNodeEvents(node, id);
+    old.replaceWith(node);
+    state.mountHandle.nodes.set(id, node);
+    highlightSelected();
+  }
+
+  /* ---------------- add / upload ---------------- */
+  function addLayer(type, overrides){
+    const layer = DesignRenderer.createLayer(type);
+    Object.assign(layer, overrides||{});
+    state.design.layers.push(layer);
+    const node = DesignRenderer.buildLayerNode(layer, frameEl(), (lid,handle)=>state.mountHandle.animations.set(lid,{handle}));
+    attachNodeEvents(node, layer.id);
+    frameEl().appendChild(node);
+    state.mountHandle.nodes.set(layer.id, node);
+    selectLayer(layer.id);
+    renderLayersList();
+    return layer;
+  }
+  async function uploadDesignAsset(file){
+    const ext = (file.name.split(".").pop()||"png").toLowerCase().replace(/[^a-z0-9]/g,"") || "png";
+    const path = `designs/${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`;
+    const up = await supabaseClient.storage.from(STORAGE_BUCKET).upload(path, file, {cacheControl:"3600", upsert:false, contentType:file.type});
+    if(up.error) throw up.error;
+    return supabaseClient.storage.from(STORAGE_BUCKET).getPublicUrl(path).data.publicUrl;
+  }
+  async function uploadAndAdd(inputEl, type){
+    const file = inputEl.files[0]; if(!file) return;
+    try{
+      toast("جارِ رفع الملف...");
+      const url = await uploadDesignAsset(file);
+      if(type==="bg-image") addLayer("bg-image", {src:url, name:"خلفية صورة"});
+      else addLayer(type, {src:url, name:file.name.replace(/\.[^.]+$/,"")});
+      toast("تمت الإضافة");
+    }catch(e){ console.error(e); toast("تعذر رفع الملف", "danger"); }
+    inputEl.value = "";
+  }
+  async function replaceImage(id, inputEl){
+    const file = inputEl.files[0]; if(!file) return;
+    try{ const url = await uploadDesignAsset(file); patch(id, {src:url}); toast("تم الاستبدال"); }
+    catch(e){ console.error(e); toast("تعذر الرفع", "danger"); }
+  }
+
+  /* ---------------- tabs (element library) ---------------- */
+  function switchTab(tab){
+    state.activeTab = tab;
+    document.querySelectorAll(".designer-tab").forEach(b=>b.classList.toggle("active", b.dataset.tab===tab));
+    renderTabBody();
+  }
+  function renderTabBody(){
+    const body = document.getElementById("dsgTabBody");
+    const map = {bg:bgTabHtml, anim:animTabHtml, logo:logoTabHtml, text:textTabHtml, img:imgTabHtml, ai:aiTabHtml};
+    body.innerHTML = (map[state.activeTab]||bgTabHtml)();
+  }
+  function bgTabHtml(){
+    return `<div class="element-grid">
+      <button class="element-btn" onclick='Designer.addLayer("bg-color",{color:"#05040a",name:"خلفية سوداء"})'><span class="ic">⬛</span>أسود</button>
+      <button class="element-btn" onclick='Designer.addLayer("bg-color",{color:"#f4f1fa",name:"خلفية بيضاء"})'><span class="ic">⬜</span>أبيض</button>
+      <button class="element-btn" onclick='Designer.addLayer("bg-gradient",{colorFrom:"#2A206A",colorTo:"#852CD0",angle:135,name:"تدرج بنفسجي"})'><span class="ic">🌈</span>تدرج بنفسجي</button>
+      <button class="element-btn" onclick='Designer.addLayer("bg-gradient",{colorFrom:"#2A206A",colorTo:"#1CC182",angle:120,name:"تدرج أخضر"})'><span class="ic">🌈</span>تدرج أخضر</button>
+      <button class="element-btn" onclick='Designer.addLayer("bg-gradient",{colorFrom:"#05040a",colorTo:"#1D9AF2",angle:160,name:"تدرج أزرق"})'><span class="ic">🌈</span>تدرج أزرق</button>
+      <label class="element-btn" style="cursor:pointer"><span class="ic">📤</span>رفع خلفية<input type="file" accept="image/*" style="display:none" onchange='Designer.uploadAndAdd(this,"bg-image")'></label>
+    </div>
+    <p style="font-size:10px;color:var(--muted);margin-top:10px">للخلفيات المتحركة (نجوم، جزيئات، خطوط) روح لتبويب «✨ حركة».</p>`;
+  }
+  function animTabHtml(){
+    return `<div class="element-grid">
+      <button class="element-btn" onclick='Designer.addLayer("bg-animated",{animKind:"stars",name:"⭐ نجوم متحركة"})'><span class="ic">⭐</span>نجوم</button>
+      <button class="element-btn" onclick='Designer.addLayer("bg-animated",{animKind:"dots",name:"نقاط مضيئة"})'><span class="ic">🔵</span>نقاط مضيئة</button>
+      <button class="element-btn" onclick='Designer.addLayer("bg-animated",{animKind:"lines",name:"خطوط متحركة"})'><span class="ic">📶</span>خطوط</button>
+      <button class="element-btn" onclick='Designer.addLayer("bg-animated",{animKind:"glow",name:"توهج Glow"})'><span class="ic">💠</span>Glow</button>
+    </div>
+    <p style="font-size:10px;color:var(--muted);margin-top:10px">بعد الإضافة، تحكّم باللون والسرعة والحجم والكثافة من لوحة «الخصائص».</p>`;
+  }
+  function logoTabHtml(){
+    return `<div class="element-grid">
+      <label class="element-btn" style="cursor:pointer"><span class="ic">🏛️</span>شعار المركز<input type="file" accept="image/*" style="display:none" onchange='Designer.uploadAndAdd(this,"hub-logo")'></label>
+      <label class="element-btn" style="cursor:pointer"><span class="ic">🤝</span>شعار شريك<input type="file" accept="image/*" style="display:none" onchange='Designer.uploadAndAdd(this,"partner-logo")'></label>
+    </div>
+    <p style="font-size:10px;color:var(--muted);margin-top:10px">تقدر تضيف أكثر من شعار شريك في نفس التصميم، وكل واحد يتحرك ويتحجم لحاله.</p>`;
+  }
+  function textTabHtml(){
+    const phrases = READY_PHRASES.map(p=>`<button class="phrase-btn" onclick='Designer.addLayer("text",{text:${JSON.stringify(p)}})'>${escapeHtml(p)}</button>`).join("");
+    return `<button class="btn btn-sm" style="width:100%;margin-bottom:10px" onclick='Designer.addLayer("text",{text:"نص جديد"})'>+ نص مخصص</button>${phrases}`;
+  }
+  function imgTabHtml(){
+    return `<label class="element-btn" style="cursor:pointer;width:100%"><span class="ic">🖼️</span>رفع صورة<input type="file" accept="image/*" style="display:none" onchange='Designer.uploadAndAdd(this,"image")'></label>`;
+  }
+  function aiTabHtml(){
+    return `<div class="ai-box">
+      <label style="font-size:10px;color:var(--muted);display:block;margin-bottom:6px">وش تبي تصمم أو تعدّل؟</label>
+      <textarea id="dsgAiPrompt" placeholder="مثال: أبي تصميم استقبال، خلفية سوداء، نجوم بنفسجية، شعار المركز بالمنتصف"></textarea>
+      <button class="btn btn-primary btn-sm" style="width:100%;margin-top:8px" onclick="Designer.runAI()">✨ نفّذ</button>
+    </div>
+    <p style="font-size:10px;color:var(--muted);margin-top:10px">مساعد قواعد جاهز (يعمل محليًا بدون إنترنت). يفهم الألوان والخلفيات المتحركة والشعارات، وأوامر تعديل مثل «خل النجوم أبطأ» أو «خل الشعار أصغر وحطه فوق».</p>`;
+  }
+
+  /* ---------------- inspector ---------------- */
+  function renderInspector(){
+    const wrap = document.getElementById("dsgInspector");
+    const layer = state.selectedId ? getLayer(state.selectedId) : null;
+    if(!layer){ wrap.innerHTML = '<div class="inspector-empty">اختر عنصرًا من الكانفاس أو الطبقات</div>'; return; }
+    let html = `
+      <div class="inspector-group"><label>اسم الطبقة</label><input type="text" value="${escapeHtml(layer.name||"")}" oninput='Designer.patch("${layer.id}",{name:this.value},true)'></div>
+      <div class="inspector-row">
+        <div><label>الشفافية</label><input type="range" min="0" max="1" step="0.05" value="${layer.opacity??1}" oninput='Designer.patch("${layer.id}",{opacity:Number(this.value)})'></div>
+        <div><label>الدوران°</label><input type="number" value="${layer.rotation||0}" oninput='Designer.patch("${layer.id}",{rotation:Number(this.value)})'></div>
+      </div>`;
+    if(!isBg(layer.type)){
+      html += `
+      <div class="inspector-row">
+        <div><label>X%</label><input type="number" value="${round1(layer.x)}" oninput='Designer.patch("${layer.id}",{x:Number(this.value)})'></div>
+        <div><label>Y%</label><input type="number" value="${round1(layer.y)}" oninput='Designer.patch("${layer.id}",{y:Number(this.value)})'></div>
+      </div>
+      <div class="inspector-row">
+        <div><label>العرض%</label><input type="number" value="${round1(layer.w)}" oninput='Designer.patch("${layer.id}",{w:Number(this.value)})'></div>
+        <div><label>الارتفاع%</label><input type="number" value="${round1(layer.h)}" oninput='Designer.patch("${layer.id}",{h:Number(this.value)})'></div>
+      </div>`;
+    }
+    if(layer.type==="bg-color"){
+      html += `<div class="inspector-group"><label>اللون</label><input type="color" value="${layer.color}" oninput='Designer.patch("${layer.id}",{color:this.value})'></div>`;
+    }else if(layer.type==="bg-gradient"){
+      html += `
+      <div class="inspector-row">
+        <div><label>من</label><input type="color" value="${layer.colorFrom}" oninput='Designer.patch("${layer.id}",{colorFrom:this.value})'></div>
+        <div><label>إلى</label><input type="color" value="${layer.colorTo}" oninput='Designer.patch("${layer.id}",{colorTo:this.value})'></div>
+      </div>
+      <div class="inspector-group"><label>الزاوية°</label><input type="range" min="0" max="360" value="${layer.angle}" oninput='Designer.patch("${layer.id}",{angle:Number(this.value)})'></div>`;
+    }else if(layer.type==="bg-animated"){
+      html += `
+      <div class="inspector-group"><label>نوع الحركة</label>
+        <select onchange='Designer.patch("${layer.id}",{animKind:this.value})'>
+          ${["stars","dots","lines","glow"].map(k=>`<option value="${k}" ${layer.animKind===k?"selected":""}>${({stars:"نجوم",dots:"نقاط مضيئة",lines:"خطوط",glow:"Glow"})[k]}</option>`).join("")}
+        </select>
+      </div>
+      <div class="inspector-row">
+        <div><label>اللون الأول</label><input type="color" value="${layer.animColor}" oninput='Designer.patch("${layer.id}",{animColor:this.value})'></div>
+        <div><label>اللون الثاني</label><input type="color" value="${layer.animColor2}" oninput='Designer.patch("${layer.id}",{animColor2:this.value})'></div>
+      </div>
+      <div class="inspector-group"><label>الكثافة</label><input type="range" min="5" max="100" value="${layer.density}" oninput='Designer.patch("${layer.id}",{density:Number(this.value)})'></div>
+      <div class="inspector-group"><label>السرعة</label><input type="range" min="0" max="100" value="${layer.speed}" oninput='Designer.patch("${layer.id}",{speed:Number(this.value)})'></div>
+      <div class="inspector-group"><label>الحجم</label><input type="range" min="5" max="100" value="${layer.size}" oninput='Designer.patch("${layer.id}",{size:Number(this.value)})'></div>`;
+    }else if(layer.type==="hub-logo" || layer.type==="partner-logo" || layer.type==="image"){
+      html += `<div class="inspector-group"><label>استبدال/رفع الملف</label><input type="file" accept="image/*" onchange='Designer.replaceImage("${layer.id}",this)'></div>`;
+      if(layer.type!=="image"){
+        html += `
+        <div class="inspector-row">
+          <div><label><input type="checkbox" ${layer.monochrome?"checked":""} onchange='Designer.patch("${layer.id}",{monochrome:this.checked})'> أحادي اللون</label></div>
+          <div><label><input type="checkbox" ${layer.glow?"checked":""} onchange='Designer.patch("${layer.id}",{glow:this.checked})'> توهج</label></div>
+        </div>
+        <div class="inspector-group"><label>لون التوهج</label><input type="color" value="${layer.glowColor||"#852CD0"}" oninput='Designer.patch("${layer.id}",{glowColor:this.value})'></div>`;
+      }
+    }else if(layer.type==="text"){
+      html += `
+      <div class="inspector-group"><label>النص</label><textarea oninput='Designer.patch("${layer.id}",{text:this.value})'>${escapeHtml(layer.text)}</textarea></div>
+      <div class="inspector-row">
+        <div><label>حجم الخط</label><input type="range" min="1" max="20" step="0.5" value="${layer.fontSize}" oninput='Designer.patch("${layer.id}",{fontSize:Number(this.value)})'></div>
+        <div><label>سُمك الخط</label><select onchange='Designer.patch("${layer.id}",{fontWeight:Number(this.value)})'>
+          ${[400,600,700,800,900].map(w=>`<option value="${w}" ${layer.fontWeight==w?"selected":""}>${w}</option>`).join("")}
+        </select></div>
+      </div>
+      <div class="inspector-row">
+        <div><label>اللون</label><input type="color" value="${layer.color}" oninput='Designer.patch("${layer.id}",{color:this.value})'></div>
+        <div><label>المحاذاة</label><select onchange='Designer.patch("${layer.id}",{align:this.value})'>
+          <option value="right" ${layer.align==="right"?"selected":""}>يمين</option>
+          <option value="center" ${layer.align==="center"?"selected":""}>وسط</option>
+          <option value="left" ${layer.align==="left"?"selected":""}>يسار</option>
+        </select></div>
+      </div>
+      <div class="inspector-group"><label>تباعد الحروف</label><input type="range" min="-2" max="20" value="${layer.letterSpacing||0}" oninput='Designer.patch("${layer.id}",{letterSpacing:Number(this.value)})'></div>
+      <div class="inspector-row">
+        <div><label><input type="checkbox" ${layer.shadow?"checked":""} onchange='Designer.patch("${layer.id}",{shadow:this.checked})'> ظل</label></div>
+        <div><label><input type="checkbox" ${layer.glow?"checked":""} onchange='Designer.patch("${layer.id}",{glow:this.checked})'> توهج</label></div>
+      </div>
+      <div class="inspector-group"><label>لون التوهج</label><input type="color" value="${layer.glowColor||"#852CD0"}" oninput='Designer.patch("${layer.id}",{glowColor:this.value})'></div>`;
+    }
+    wrap.innerHTML = html;
+  }
+
+  function patch(id, obj, skipRebuild){
+    const layer = getLayer(id); if(!layer) return;
+    Object.assign(layer, obj);
+    const node = state.mountHandle.nodes.get(id);
+    if(!node) return;
+    DesignRenderer.applyCommonStyle(node, layer);
+    if(layer.type==="bg-animated"){
+      const anim = state.mountHandle.animations.get(id);
+      if(anim) anim.handle.update({kind:layer.animKind, color:layer.animColor, color2:layer.animColor2, density:layer.density, speed:layer.speed, size:layer.size});
+    }else if(!skipRebuild){
+      rebuildNode(id);
+    }
+    positionHandles();
+    renderLayersList();
+  }
+
+  /* ---------------- templates ---------------- */
+  function L(type, ov){ return Object.assign(DesignRenderer.createLayer(type), ov); }
+  function generateTemplateLayers(key){
+    const sets = {
+      welcome:[
+        L("bg-color",{color:"#05040a",zIndex:0,name:"خلفية سوداء"}),
+        L("bg-animated",{animKind:"stars",animColor:"#852CD0",animColor2:"#1D9AF2",density:55,speed:25,size:35,zIndex:1,name:"نجوم"}),
+        L("hub-logo",{x:32,y:26,w:36,h:24,zIndex:5,name:"شعار المركز"}),
+        L("text",{x:10,y:58,w:80,h:12,fontSize:8,text:"حياكم الله",zIndex:6,name:"نص ترحيب"}),
+      ],
+      partnership:[
+        L("bg-gradient",{colorFrom:"#2A206A",colorTo:"#852CD0",angle:150,zIndex:0,name:"خلفية متدرجة"}),
+        L("hub-logo",{x:8,y:36,w:28,h:22,zIndex:5,name:"شعار المركز"}),
+        L("partner-logo",{x:64,y:36,w:28,h:22,zIndex:5,name:"شعار الشريك"}),
+        L("text",{x:10,y:68,w:80,h:10,fontSize:5.5,text:"شراكة نحو مستقبل رقمي",zIndex:6,name:"نص الشراكة"}),
+      ],
+      visit:[
+        L("bg-color",{color:"#0d0a1a",zIndex:0,name:"خلفية داكنة"}),
+        L("bg-animated",{animKind:"glow",animColor:"#1D9AF2",animColor2:"#852CD0",density:25,speed:12,size:55,zIndex:1,name:"توهج هادئ"}),
+        L("partner-logo",{x:36,y:14,w:28,h:16,zIndex:5,name:"شعار الجهة الزائرة"}),
+        L("hub-logo",{x:36,y:34,w:28,h:16,zIndex:5,name:"شعار المركز"}),
+        L("text",{x:10,y:56,w:80,h:10,fontSize:6,text:"نسعد بزيارتكم",zIndex:6,name:"نص الترحيب"}),
+      ],
+      event:[
+        L("bg-gradient",{colorFrom:"#852CD0",colorTo:"#2A206A",angle:135,zIndex:0,name:"خلفية الفعالية"}),
+        L("text",{x:10,y:18,w:80,h:12,fontSize:7.5,text:"عنوان الفعالية",zIndex:6,name:"العنوان"}),
+        L("text",{x:10,y:33,w:80,h:6,fontSize:3.5,text:"التاريخ والوقت",fontWeight:600,zIndex:6,name:"التاريخ"}),
+        L("hub-logo",{x:8,y:78,w:20,h:15,zIndex:5,name:"شعار المركز"}),
+        L("partner-logo",{x:72,y:78,w:20,h:15,zIndex:5,name:"شعار الجهة"}),
+      ],
+      hackathon:[
+        L("bg-color",{color:"#040308",zIndex:0,name:"خلفية سوداء"}),
+        L("bg-animated",{animKind:"lines",animColor:"#1D9AF2",animColor2:"#852CD0",density:70,speed:45,size:55,zIndex:1,name:"شبكة تقنية"}),
+        L("text",{x:10,y:40,w:80,h:14,fontSize:8,text:"اسم الهاكاثون",glow:true,glowColor:"#1D9AF2",zIndex:6,name:"عنوان الهاكاثون"}),
+        L("hub-logo",{x:26,y:62,w:22,h:15,zIndex:5,name:"شعار المركز"}),
+        L("partner-logo",{x:52,y:62,w:22,h:15,zIndex:5,name:"شعار الشريك"}),
+      ],
+      national:[
+        L("bg-gradient",{colorFrom:"#2A206A",colorTo:"#1CC182",angle:120,zIndex:0,name:"خلفية وطنية"}),
+        L("text",{x:10,y:50,w:80,h:10,fontSize:6.5,text:"بمناسبة اليوم الوطني",zIndex:6,name:"نص المناسبة"}),
+        L("hub-logo",{x:38,y:18,w:24,h:16,zIndex:5,name:"شعار المركز"}),
+        L("partner-logo",{x:38,y:72,w:24,h:16,zIndex:5,name:"شعار الجهة"}),
+      ],
+    };
+    return sets[key] || sets.welcome;
+  }
+  function loadLayers(layers){
+    state.design.layers = layers;
+    state.selectedId = null;
+    mountFrame();
+    renderLayersList();
+    renderInspector();
+  }
+  function openTemplates(){
+    const html = `<div class="template-grid">${TEMPLATE_META.map(t=>`
+      <div class="template-card" onclick='Designer.applyTemplate("${t.key}")'>
+        <div class="template-thumb" style="background:linear-gradient(135deg,#2A206A,#852CD0)">${t.icon}</div>
+        <div class="tname">${t.name}</div>
+      </div>`).join("")}</div>`;
+    openDesignerModal("✨ قوالب رسمية جاهزة", html);
+  }
+  function applyTemplate(key){
+    if(state.design.layers.length && !confirm("هذا سيستبدل التصميم الحالي بالكامل، متابعة؟")) return;
+    closeDesignerModal();
+    loadLayers(generateTemplateLayers(key).map(l=>Object.assign(l,{id:DesignRenderer.uid()})));
+  }
+
+  /* ---------------- suggestions ---------------- */
+  function suggestionVariants(category){
+    const base = generateTemplateLayers(category);
+    const clone = () => JSON.parse(JSON.stringify(base)).map(l=>Object.assign(l,{id:DesignRenderer.uid()}));
+    const official = clone();
+    const technical = clone();
+    technical.forEach(l=>{ if(l.type==="bg-animated"){ l.density=Math.min(100,l.density+25); l.speed=Math.min(100,l.speed+20); if(l.animKind==="glow") l.animKind="lines"; } });
+    const minimal = clone().filter(l=>l.type!=="bg-animated");
+    minimal.forEach(l=>{ if(l.type==="text") l.fontSize=Math.max(3, l.fontSize-1); });
+    return [{label:"رسمي",layers:official},{label:"تقني",layers:technical},{label:"Minimal",layers:minimal}];
+  }
+  function openSuggest(){
+    const opts = [...TEMPLATE_META, {key:"ad",icon:"📣",name:"إعلان"}];
+    const html = `
+      <div class="inspector-group"><label>اختر نوع الاستخدام</label>
+        <select id="dsgSuggestCat">${opts.map(o=>`<option value="${o.key}">${o.icon} ${o.name}</option>`).join("")}</select>
+      </div>
+      <button class="btn btn-primary btn-sm" style="width:100%" onclick="Designer.buildSuggestions()">اقترح 3 أفكار</button>
+      <div id="dsgSuggestResults" class="ai-suggest-cards"></div>`;
+    openDesignerModal("💡 اقترح لي تصميم", html);
+  }
+  function buildSuggestions(){
+    const cat = document.getElementById("dsgSuggestCat").value;
+    const key = cat==="ad" ? "event" : cat;
+    const variants = suggestionVariants(key);
+    document.getElementById("dsgSuggestResults").innerHTML = variants.map((v,i)=>`
+      <div class="ai-suggest-card">
+        <strong>فكرة ${i+1} — ${v.label}</strong>
+        <p style="color:var(--muted);margin:0 0 8px">${v.layers.length} عناصر مقترحة</p>
+        <button class="btn btn-sm btn-primary" style="width:100%" onclick="Designer.pickSuggestion(${i})">استخدم هذه الفكرة</button>
+      </div>`).join("");
+    state._pendingSuggestions = variants;
+  }
+  function pickSuggestion(i){
+    const v = state._pendingSuggestions[i];
+    if(state.design.layers.length && !confirm("سيتم استبدال التصميم الحالي، متابعة؟")) return;
+    closeDesignerModal();
+    loadLayers(JSON.parse(JSON.stringify(v.layers)));
+  }
+
+  /* ---------------- lightweight modal ---------------- */
+  function openDesignerModal(title, html){
+    let m = document.getElementById("dsgModal");
+    if(!m){
+      m = document.createElement("div");
+      m.id = "dsgModal";
+      m.style.cssText = "position:fixed;inset:0;background:rgba(5,3,10,.72);z-index:20000;display:flex;align-items:center;justify-content:center;padding:16px";
+      m.innerHTML = `<div style="background:var(--panel);border:1px solid var(--border);border-radius:14px;max-width:520px;width:100%;max-height:85vh;overflow:auto">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border)">
+          <strong id="dsgModalTitle" style="color:#fff;font-size:14px"></strong>
+          <button onclick="Designer.closeModal()" style="background:transparent;border:0;color:var(--muted);font-size:20px">×</button>
+        </div>
+        <div id="dsgModalBody" style="padding:16px"></div>
+      </div>`;
+      document.body.appendChild(m);
+      m.onclick = (e)=>{ if(e.target===m) closeDesignerModal(); };
+    }
+    document.getElementById("dsgModalTitle").textContent = title;
+    document.getElementById("dsgModalBody").innerHTML = html;
+    m.style.display = "flex";
+  }
+  function closeDesignerModal(){ const m = document.getElementById("dsgModal"); if(m) m.style.display = "none"; }
+
+  /* ---------------- AI assistant (rule-based, offline) ---------------- */
+  function findColor(text){ for(const k in COLOR_WORDS){ if(text.includes(k)) return COLOR_WORDS[k]; } return null; }
+  function tryApplyEdit(text){
+    let applied = false;
+    const hub = [...state.design.layers].reverse().find(l=>l.type==="hub-logo");
+    const anim = [...state.design.layers].reverse().find(l=>l.type==="bg-animated");
+    if(/شعار/.test(text) && hub){
+      if(/أصغر|صغّر|صغر/.test(text)){ hub.w*=0.8; hub.h*=0.8; applied=true; }
+      if(/أكبر|كبّر|كبر/.test(text)){ hub.w*=1.2; hub.h*=1.2; applied=true; }
+      if(/فوق|أعلى/.test(text)){ hub.y=Math.max(2,hub.y-12); applied=true; }
+      if(/تحت|أسفل/.test(text)){ hub.y=Math.min(80,hub.y+12); applied=true; }
+      if(/يمين/.test(text)){ hub.x=Math.min(70,hub.x+15); applied=true; }
+      if(/يسار/.test(text)){ hub.x=Math.max(2,hub.x-15); applied=true; }
+    }
+    if(anim){
+      if(/أبطأ/.test(text)){ anim.speed=Math.max(5,anim.speed-15); applied=true; }
+      if(/أسرع/.test(text)){ anim.speed=Math.min(100,anim.speed+15); applied=true; }
+      if(/أهدأ/.test(text)){ anim.density=Math.max(10,anim.density-20); anim.speed=Math.max(5,anim.speed-15); applied=true; }
+      if(/أوضح|أكثر حيوية/.test(text)){ anim.density=Math.min(100,anim.density+15); anim.speed=Math.min(100,anim.speed+10); applied=true; }
+    }
+    if(applied){ mountFrame(); renderInspector(); renderLayersList(); }
+    return applied;
+  }
+  function generateFromPrompt(text){
+    const layers = [];
+    const bgColor = /أسود|غامق|داكن/.test(text) ? "#05040a" : /أبيض|فاتح/.test(text) ? "#f4f1fa" : "#0d0a1a";
+    layers.push(L("bg-color",{color:bgColor,zIndex:0,name:"خلفية"}));
+    let animKind = null;
+    if(/نجوم/.test(text)) animKind="stars";
+    else if(/جزيئات|نقاط/.test(text)) animKind="dots";
+    else if(/خطوط|شبكة/.test(text)) animKind="lines";
+    else if(/توهج|glow/i.test(text)) animKind="glow";
+    if(animKind){
+      const c1 = findColor(text) || "#852CD0";
+      layers.push(L("bg-animated",{animKind,animColor:c1,animColor2:"#1D9AF2",density:50,speed:28,size:38,zIndex:1,name:"حركة"}));
+    }
+    if(/شعار المركز|شعارنا/.test(text) || !/شعار/.test(text)){
+      layers.push(L("hub-logo",{x:32,y:28,w:36,h:22,zIndex:5,name:"شعار المركز"}));
+    }
+    const partnerMatch = text.match(/شعار\s+(?:ال)?(وزارة\s+\S+|هيئة\s+\S+|شركة\s+\S+|جهة\s+\S+|مركز\s+\S+)/);
+    if(partnerMatch){
+      layers.push(L("partner-logo",{x:35,y:56,w:30,h:18,zIndex:5,name:"شعار "+partnerMatch[1]}));
+    }
+    const foundPhrase = READY_PHRASES.find(p=>text.includes(p));
+    const quoteMatch = text.match(/[«"']([^»"']{2,40})[»"']/);
+    const finalText = foundPhrase || (quoteMatch ? quoteMatch[1] : null);
+    if(finalText){
+      layers.push(L("text",{text:finalText,x:10,y:74,w:80,h:10,fontSize:6,zIndex:6,name:"نص"}));
+    }
+    return layers;
+  }
+  function runAI(){
+    const text = (document.getElementById("dsgAiPrompt").value||"").trim();
+    if(!text) return;
+    const hasLayers = state.design.layers.length > 0;
+    if(hasLayers && tryApplyEdit(text)){ toast("تم تنفيذ التعديل"); return; }
+    if(hasLayers && !/صمم|اعمل تصميم|أبي تصميم|ابغى تصميم|سوّي تصميم|سوي تصميم|ابي تصميم/.test(text)){
+      toast("ما قدرت أفهم الأمر، جرّب مثل: خل الشعار أصغر / خل النجوم أبطأ / أبي تصميم ...", "warning");
+      return;
+    }
+    if(hasLayers && !confirm("بسوي تصميم جديد بناءً على وصفك، وهذا يستبدل التصميم الحالي. متابعة؟")) return;
+    loadLayers(generateFromPrompt(text));
+    toast("تم إنشاء تصميم مبدئي — كمّل التعديل بنفسك");
+  }
+
+  /* ---------------- preview ---------------- */
+  function escCloseOnce(e){ if(e.key==="Escape") closePreview(); }
+  function openPreview(){
+    if(!state.design) return;
+    const overlay = document.createElement("div");
+    overlay.className = "preview-overlay";
+    overlay.id = "dsgPreviewOverlay";
+    const frame = document.createElement("div");
+    frame.className = "designer-canvas-frame";
+    overlay.appendChild(frame);
+    const closeBtn = document.createElement("button");
+    closeBtn.className = "preview-close";
+    closeBtn.textContent = "✕ إغلاق (Esc)";
+    closeBtn.onclick = closePreview;
+    document.body.appendChild(overlay);
+    document.body.appendChild(closeBtn);
+    const cw = state.design.canvas_width, ch = state.design.canvas_height;
+    const scale = Math.min((window.innerWidth-40)/cw, (window.innerHeight-40)/ch);
+    frame.style.width = Math.round(cw*scale)+"px";
+    frame.style.height = Math.round(ch*scale)+"px";
+    state._previewHandle = DesignRenderer.mount(frame, state.design, {interactive:false});
+    state._previewCloseBtn = closeBtn;
+    document.addEventListener("keydown", escCloseOnce);
+  }
+  function closePreview(){
+    const overlay = document.getElementById("dsgPreviewOverlay");
+    if(state._previewHandle){ state._previewHandle.destroy(); state._previewHandle = null; }
+    if(overlay) overlay.remove();
+    if(state._previewCloseBtn){ state._previewCloseBtn.remove(); state._previewCloseBtn = null; }
+    document.removeEventListener("keydown", escCloseOnce);
+  }
+
+  /* ---------------- save / publish ---------------- */
+  async function saveDesign(publish){
+    if(!state.design) return;
+    const payload = {
+      screen_id: state.design.screen_id,
+      name: state.design.name || "تصميم بدون عنوان",
+      canvas_width: state.design.canvas_width,
+      canvas_height: state.design.canvas_height,
+      layers: state.design.layers,
+      status: publish ? "published" : (state.design.status || "draft"),
+      updated_at: new Date().toISOString(),
+    };
+    if(publish) payload.published_at = new Date().toISOString();
+    try{
+      let result;
+      if(state.design.id){
+        result = await supabaseClient.from("screen_designs").update(payload).eq("id", state.design.id).select().single();
+      }else{
+        result = await supabaseClient.from("screen_designs").insert(payload).select().single();
+      }
+      if(result.error) throw result.error;
+      state.design = result.data;
+      if(publish){
+        await supabaseClient.from("screen_designs").update({status:"draft"}).eq("screen_id", state.design.screen_id).neq("id", state.design.id);
+        toast("🚀 تم النشر — الشاشة راح تستلم التصميم تلقائيًا");
+      }else{
+        toast("💾 تم الحفظ كمسودة");
+      }
+    }catch(e){
+      console.error(e);
+      toast("تعذر الحفظ — تأكد من تنفيذ ملف supabase_designer_setup.sql في Supabase أولًا", "danger");
+    }
+  }
+
+  /* responsive canvas frame on window resize */
+  window.addEventListener("resize", ()=>{
+    if(typeof currentPage!=="undefined" && currentPage==="designer" && state.design){
+      const outer = document.getElementById("dsgCanvasOuter");
+      const frame = frameEl();
+      if(outer && frame){
+        const cw=state.design.canvas_width, ch=state.design.canvas_height;
+        const scale = Math.min((outer.clientWidth-32)/cw, (outer.clientHeight-32)/ch, 1) || 1;
+        frame.style.width = Math.round(cw*scale)+"px";
+        frame.style.height = Math.round(ch*scale)+"px";
+      }
+    }
+  });
+
+  return {
+    render, onScreenChange, onNameChange, onLeave, switchTab,
+    addLayer, uploadAndAdd, replaceImage, patch,
+    selectLayer, toggleVisible, toggleLock, bringForward, sendBackward, deleteLayer, deleteSelected,
+    openTemplates, applyTemplate, openSuggest, buildSuggestions, pickSuggestion,
+    closeModal: closeDesignerModal, runAI, openPreview,
+    saveDesign,
+  };
+})();
+</script>
 </body>
 </html>
